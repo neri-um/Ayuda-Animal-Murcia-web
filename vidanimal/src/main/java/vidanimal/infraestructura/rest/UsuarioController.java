@@ -43,4 +43,9 @@ public class UsuarioController {
         usuariosAdmin.eliminarUsuario(id);
         return ResponseEntity.noContent().build();
     }
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<Usuario> obtener(@PathVariable Long id) {
+        return ResponseEntity.ok(usuariosAdmin.obtenerPorId(id));
+    }
 }

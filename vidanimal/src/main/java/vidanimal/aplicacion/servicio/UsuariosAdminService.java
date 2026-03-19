@@ -59,4 +59,10 @@ public class UsuariosAdminService implements UsuariosAdminUseCase {
         if (nombre != null && !nombre.isBlank()) return usuarioRepo.buscarPorNombre(nombre);
         return usuarioRepo.buscarTodosOrdenados();
     }
+    
+    @Override
+    public Usuario obtenerPorId(Long id) {
+        return usuarioRepo.buscarPorId(id)
+            .orElseThrow(() -> new RecursoNoEncontradoException("Usuario con id " + id + " no encontrado"));
+    }
 }

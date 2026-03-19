@@ -6,14 +6,18 @@ import vidanimal.dominio.modelo.Rol;
 import vidanimal.dominio.modelo.Usuario;
 
 public interface UsuariosAdminUseCase {
-	// CU-23
-	Usuario crearUsuario(Usuario usuario); 
 
-	// CU-24
-	Usuario editarUsuario(Long id, Usuario datos); 
+    // CU-23
+    Usuario crearUsuario(Usuario usuario);
 
-	// CU-25
-	void eliminarUsuario(Long id); 
+    // (para endpoint /usuarios/{id})
+    Usuario obtenerPorId(Long id);
 
-	List<Usuario> listarUsuarios(Rol rol, String nombre);
+    // CU-24
+    Usuario editarUsuario(Long id, Usuario datos);
+
+    // CU-25
+    void eliminarUsuario(Long id);
+
+    List<Usuario> listarUsuarios(Rol rol, String nombre);
 }
