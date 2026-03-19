@@ -1,0 +1,16 @@
+package vidanimal.dominio.modelo;
+
+public enum Tratamiento {
+    DESPARASITACION_INTERNA,
+    DESPARASITACION_EXTERNA,
+    TRIVALENTE_FELINA,
+    POLIVALENTE,
+    RABIA,
+    TEST_FELV_FIV,
+    TEST_LEISHMANIA,
+    CASTRACION,
+    REVISION,
+    MICROCHIP,
+    VACUNACION_RABIA,
+    COPROLÓGICO
+}
