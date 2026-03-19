@@ -2,28 +2,28 @@ package vidanimal.infraestructura.rest.dto;
 
 import vidanimal.dominio.modelo.CitaVeterinaria;
 import vidanimal.dominio.modelo.Tratamiento;
-import java.time.LocalDate;
 
 public class CitaNuevaDTO {
-	private Tratamiento tratamiento;
+
+	private String tratamiento;
 	private String descripcion;
-	private LocalDate fecha;
+	private String fecha; // "YYYY-MM-DD"
 	private String veterinario;
 
 	public CitaVeterinaria toDominio() {
 		CitaVeterinaria cita = new CitaVeterinaria();
-		cita.setTratamiento(this.tratamiento);
-		cita.setDescripcion(this.descripcion);
-		cita.setFecha(this.fecha);
-		cita.setVeterinario(this.veterinario);
+		cita.setTratamiento(DtoParsers.parseEnum(Tratamiento.class, tratamiento, "tratamiento"));
+		cita.setDescripcion(descripcion);
+		cita.setFecha(DtoParsers.parseLocalDate(fecha, "fecha"));
+		cita.setVeterinario(veterinario);
 		return cita;
 	}
 
-	public Tratamiento getTratamiento() {
+	public String getTratamiento() {
 		return tratamiento;
 	}
 
-	public void setTratamiento(Tratamiento tratamiento) {
+	public void setTratamiento(String tratamiento) {
 		this.tratamiento = tratamiento;
 	}
 
@@ -35,11 +35,11 @@ public class CitaNuevaDTO {
 		this.descripcion = descripcion;
 	}
 
-	public LocalDate getFecha() {
+	public String getFecha() {
 		return fecha;
 	}
 
-	public void setFecha(LocalDate fecha) {
+	public void setFecha(String fecha) {
 		this.fecha = fecha;
 	}
 

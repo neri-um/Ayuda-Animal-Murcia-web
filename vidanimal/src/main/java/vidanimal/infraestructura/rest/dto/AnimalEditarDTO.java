@@ -1,6 +1,9 @@
 package vidanimal.infraestructura.rest.dto;
 
 import vidanimal.dominio.modelo.Animal;
+import vidanimal.dominio.modelo.Especie;
+import vidanimal.dominio.modelo.Sexo;
+import vidanimal.dominio.modelo.Tamanyo;
 
 public class AnimalEditarDTO {
 
@@ -12,6 +15,22 @@ public class AnimalEditarDTO {
 	private String sexo;
 	private String tamanyo;
 	private String fotoUrl;
+
+	public Animal toDominio() {
+		Animal a = new Animal();
+		a.setNombre(nombre);
+		a.setDescripcion(descripcion);
+		a.setFotoUrl(fotoUrl);
+
+		a.setEspecie(DtoParsers.parseEnum(Especie.class, especie, "especie"));
+		a.setSexo(DtoParsers.parseEnum(Sexo.class, sexo, "sexo"));
+		a.setTamanyo(DtoParsers.parseEnum(Tamanyo.class, tamanyo, "tamanyo"));
+
+		a.setFechaNacimiento(DtoParsers.parseLocalDate(fechaNacimiento, "fechaNacimiento"));
+		a.setFechaIngreso(DtoParsers.parseLocalDate(fechaIngreso, "fechaIngreso"));
+
+		return a;
+	}
 
 	public String getNombre() {
 		return nombre;
@@ -76,10 +95,4 @@ public class AnimalEditarDTO {
 	public void setFotoUrl(String fotoUrl) {
 		this.fotoUrl = fotoUrl;
 	}
-
-	public Animal toDominio() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

@@ -1,36 +1,39 @@
 package vidanimal.infraestructura.rest.dto;
 
-import vidanimal.dominio.modelo.*;
-import java.time.LocalDate;
+import vidanimal.dominio.modelo.Animal;
+import vidanimal.dominio.modelo.Especie;
+import vidanimal.dominio.modelo.Sexo;
+import vidanimal.dominio.modelo.Tamanyo;
 
 public class AnimalNuevoDTO {
-	private Especie especie;
+
+	private String especie;
 	private String nombre;
 	private String descripcion;
-	private Sexo sexo;
-	private Tamanyo tamanyo;
-	private LocalDate fechaNacimiento;
-	private LocalDate fechaIngreso;
+	private String sexo;
+	private String tamanyo;
+	private String fechaNacimiento; // "YYYY-MM-DD"
+	private String fechaIngreso; // "YYYY-MM-DD"
 	private String fotoUrl;
 
 	public Animal toDominio() {
 		Animal animal = new Animal();
-		animal.setEspecie(this.especie);
-		animal.setNombre(this.nombre);
-		animal.setDescripcion(this.descripcion);
-		animal.setSexo(this.sexo);
-		animal.setTamanyo(this.tamanyo);
-		animal.setFechaNacimiento(this.fechaNacimiento);
-		animal.setFechaIngreso(this.fechaIngreso);
-		animal.setFotoUrl(this.fotoUrl);
+		animal.setEspecie(DtoParsers.parseEnum(Especie.class, especie, "especie"));
+		animal.setNombre(nombre);
+		animal.setDescripcion(descripcion);
+		animal.setSexo(DtoParsers.parseEnum(Sexo.class, sexo, "sexo"));
+		animal.setTamanyo(DtoParsers.parseEnum(Tamanyo.class, tamanyo, "tamanyo"));
+		animal.setFechaNacimiento(DtoParsers.parseLocalDate(fechaNacimiento, "fechaNacimiento"));
+		animal.setFechaIngreso(DtoParsers.parseLocalDate(fechaIngreso, "fechaIngreso"));
+		animal.setFotoUrl(fotoUrl);
 		return animal;
 	}
 
-	public Especie getEspecie() {
+	public String getEspecie() {
 		return especie;
 	}
 
-	public void setEspecie(Especie especie) {
+	public void setEspecie(String especie) {
 		this.especie = especie;
 	}
 
@@ -50,35 +53,35 @@ public class AnimalNuevoDTO {
 		this.descripcion = descripcion;
 	}
 
-	public Sexo getSexo() {
+	public String getSexo() {
 		return sexo;
 	}
 
-	public void setSexo(Sexo sexo) {
+	public void setSexo(String sexo) {
 		this.sexo = sexo;
 	}
 
-	public Tamanyo getTamanyo() {
+	public String getTamanyo() {
 		return tamanyo;
 	}
 
-	public void setTamanyo(Tamanyo tamanyo) {
+	public void setTamanyo(String tamanyo) {
 		this.tamanyo = tamanyo;
 	}
 
-	public LocalDate getFechaNacimiento() {
+	public String getFechaNacimiento() {
 		return fechaNacimiento;
 	}
 
-	public void setFechaNacimiento(LocalDate fechaNacimiento) {
+	public void setFechaNacimiento(String fechaNacimiento) {
 		this.fechaNacimiento = fechaNacimiento;
 	}
 
-	public LocalDate getFechaIngreso() {
+	public String getFechaIngreso() {
 		return fechaIngreso;
 	}
 
-	public void setFechaIngreso(LocalDate fechaIngreso) {
+	public void setFechaIngreso(String fechaIngreso) {
 		this.fechaIngreso = fechaIngreso;
 	}
 
