@@ -1,5 +1,7 @@
 package vidanimal.infraestructura.rest.dto;
 
+import vidanimal.dominio.modelo.Animal;
+
 public class AnimalEditarDTO {
 
 	private String nombre;
@@ -73,6 +75,11 @@ public class AnimalEditarDTO {
 
 	public void setFotoUrl(String fotoUrl) {
 		this.fotoUrl = fotoUrl;
+	}
+
+	public Animal toDominio() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

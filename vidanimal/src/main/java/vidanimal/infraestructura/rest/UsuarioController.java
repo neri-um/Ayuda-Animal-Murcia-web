@@ -1,52 +1,46 @@
 package vidanimal.infraestructura.rest;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import vidanimal.aplicacion.input.UsuariosAdminUseCase;
+import vidanimal.dominio.modelo.Rol;
 import vidanimal.dominio.modelo.Usuario;
-import vidanimal.dominio.puerto.entrada.UsuarioServicioPuerto;
-
-import java.util.List;
+import vidanimal.infraestructura.rest.dto.UsuarioEditarDTO;
+import vidanimal.infraestructura.rest.dto.UsuarioNuevoDTO;
 
 @RestController
 @RequestMapping("/vidanimal/usuarios")
 public class UsuarioController {
 
-    private final UsuarioServicioPuerto servicio;
+    private final UsuariosAdminUseCase usuariosAdmin;
 
-    public UsuarioController(UsuarioServicioPuerto servicio) {
-        this.servicio = servicio;
+    public UsuarioController(UsuariosAdminUseCase usuariosAdmin) {
+        this.usuariosAdmin = usuariosAdmin;
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<List<Usuario>> listar() {
-        return ResponseEntity.ok(servicio.obtenerTodos());
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Usuario> obtener(@PathVariable Long id) {
-        return ResponseEntity.ok(servicio.obtenerPorId(id));
+    public ResponseEntity<List<Usuario>> listar(
+            @RequestParam(required = false) Rol rol,
+            @RequestParam(required = false) String nombre) {
+        return ResponseEntity.ok(usuariosAdmin.listarUsuarios(rol, nombre));
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Usuario> crear(@RequestBody Usuario usuario) {
-        return ResponseEntity.ok(servicio.crearUsuario(usuario));
+    public ResponseEntity<Usuario> crear(@RequestBody UsuarioNuevoDTO dto) {
+        return ResponseEntity.ok(usuariosAdmin.crearUsuario(dto.toDominio()));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO')")
-    public ResponseEntity<Usuario> editar(@PathVariable Long id,
-                                           @RequestBody Usuario datosNuevos) {
-        return ResponseEntity.ok(servicio.editarUsuario(id, datosNuevos));
+    public ResponseEntity<Usuario> editar(@PathVariable Long id, @RequestBody UsuarioEditarDTO dto) {
+        return ResponseEntity.ok(usuariosAdmin.editarUsuario(id, dto.toDominio()));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
-        servicio.eliminarUsuario(id);
+        usuariosAdmin.eliminarUsuario(id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import vidanimal.dominio.modelo.AsignacionProducto;
 import vidanimal.dominio.modelo.Producto;
 import vidanimal.dominio.modelo.SolicitudProducto;
-import vidanimal.dominio.puerto.entrada.AlmacenServicioPuerto;
+import vidanimal.aplicacion.servicio.AlmacenService;
 import vidanimal.infraestructura.rest.dto.ConfirmacionDevolucionDTO;
 import vidanimal.infraestructura.rest.dto.DecisionSolicitudDTO;
 import vidanimal.infraestructura.rest.dto.SolicitudNuevaDTO;
@@ -18,9 +18,9 @@ import java.util.List;
 @RequestMapping("/vidanimal/almacen")
 public class AlmacenController {
 
-    private final AlmacenServicioPuerto servicio;
+    private final AlmacenService servicio;
 
-    public AlmacenController(AlmacenServicioPuerto servicio) {
+    public AlmacenController(AlmacenService servicio) {
         this.servicio = servicio;
     }
 
@@ -28,7 +28,7 @@ public class AlmacenController {
 
     @GetMapping("/productos")
     public ResponseEntity<List<Producto>> listarProductos() {
-        return ResponseEntity.ok(servicio.obtenerProductos());
+        return ResponseEntity.ok(servicio.listarProductos());
     }
 
     @GetMapping("/productos/{id}")

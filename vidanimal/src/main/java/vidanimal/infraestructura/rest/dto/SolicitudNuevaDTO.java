@@ -6,6 +6,40 @@ public class SolicitudNuevaDTO {
 	private int cantidad;
 	private String motivo;
 
+	public CrearSolicitudCommand toCommand() {
+		return new CrearSolicitudCommand(voluntarioId, productoId, cantidad, motivo);
+	}
+
+	public static class CrearSolicitudCommand {
+		private final Long voluntarioId;
+		private final Long productoId;
+		private final int cantidad;
+		private final String motivo;
+
+		public CrearSolicitudCommand(Long voluntarioId, Long productoId, int cantidad, String motivo) {
+			this.voluntarioId = voluntarioId;
+			this.productoId = productoId;
+			this.cantidad = cantidad;
+			this.motivo = motivo;
+		}
+
+		public Long getVoluntarioId() {
+			return voluntarioId;
+		}
+
+		public Long getProductoId() {
+			return productoId;
+		}
+
+		public int getCantidad() {
+			return cantidad;
+		}
+
+		public String getMotivo() {
+			return motivo;
+		}
+	}
+
 	public Long getVoluntarioId() {
 		return voluntarioId;
 	}
