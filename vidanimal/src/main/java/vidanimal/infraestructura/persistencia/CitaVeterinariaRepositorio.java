@@ -15,6 +15,4 @@ public interface CitaVeterinariaRepositorio extends JpaRepository<CitaVeterinari
     List<CitaVeterinaria> findByAnimalIdAndTratamientoOrderByFechaDesc(Long animalId, Tratamiento tratamiento);
 
     List<CitaVeterinaria> findByFechaBetweenOrderByFechaAsc(LocalDate desde, LocalDate hasta);
-
-    List<CitaVeterinaria> findByCompletadaFalseOrderByFechaAsc();
 }
