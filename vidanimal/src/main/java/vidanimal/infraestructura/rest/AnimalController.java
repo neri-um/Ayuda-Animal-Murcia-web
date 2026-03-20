@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -57,35 +58,43 @@ public class AnimalController {
 
 	    return ResponseEntity.ok(AnimalPublicoDTO.fromDominio(animal));
 	}
-
+	
+	// Crear, editar, eliminar animales
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
 	@PostMapping
 	public ResponseEntity<Animal> crear(@RequestBody AnimalNuevoDTO dto) {
 		return ResponseEntity.ok(animales.crear(dto.toDominio()));
 	}
-
+	
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
 	@PutMapping("/{id}")
 	public ResponseEntity<Animal> editar(@PathVariable Long id, @RequestBody AnimalEditarDTO dto) {
 		return ResponseEntity.ok(animales.editar(id, dto.toDominio()));
 	}
 
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> eliminar(@PathVariable Long id) {
 		animales.eliminar(id);
 		return ResponseEntity.noContent().build();
 	}
 
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
 	@PatchMapping("/{id}/estado")
 	public ResponseEntity<Animal> cambiarEstado(@PathVariable Long id, @RequestBody CambioEstadoDTO dto) {
 		return ResponseEntity.ok(animales.cambiarEstado(id, dto.getEstado()));
 	}
 
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
 	@PostMapping("/{id}/citas")
 	public ResponseEntity<CitaVeterinaria> agregarCita(@PathVariable Long id, @RequestBody CitaNuevaDTO dto) {
 		return ResponseEntity.ok(animales.agregarCita(id, dto.toDominio()));
 	}
 
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
 	@GetMapping("/{id}/citas")
 	public ResponseEntity<List<CitaVeterinaria>> listarCitas(@PathVariable Long id) {
 		return ResponseEntity.ok(animales.listarCitas(id));
 	}
+
 }

@@ -25,11 +25,13 @@ public class AlmacenController {
 
 	// --- PRODUCTOS ---
 
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO', 'VOLUNTARIO')")
 	@GetMapping("/productos")
 	public ResponseEntity<List<Producto>> listarProductos() {
 		return ResponseEntity.ok(servicio.listarProductos());
 	}
 
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO', 'VOLUNTARIO')")
 	@GetMapping("/productos/{id}")
 	public ResponseEntity<Producto> obtenerProducto(@PathVariable Long id) {
 		return ResponseEntity.ok(servicio.obtenerProductoPorId(id));
@@ -62,6 +64,7 @@ public class AlmacenController {
 		return ResponseEntity.ok(servicio.obtenerSolicitudes());
 	}
 
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO', 'VOLUNTARIO')")
 	@PostMapping("/solicitudes")
 	public ResponseEntity<SolicitudProducto> crearSolicitud(@RequestBody SolicitudNuevaDTO dto) {
 		return ResponseEntity.ok(servicio.crearSolicitud(dto.getVoluntarioId(), dto.getProductoId(), dto.getCantidad(),
@@ -75,6 +78,7 @@ public class AlmacenController {
 		return ResponseEntity.ok(servicio.decidirSolicitud(id, dto.getDecision(), dto.getEncargadoId()));
 	}
 
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO', 'VOLUNTARIO')")
 	@PutMapping("/solicitudes/{id}/devolucion")
 	public ResponseEntity<AsignacionProducto> registrarDevolucion(@PathVariable Long id) {
 		return ResponseEntity.ok(servicio.registrarDevolucion(id));
