@@ -51,11 +51,11 @@ public class ProductoPersistenciaAdapter implements ProductoRepositorioPort {
 
     @Override
     public List<Producto> buscarConStockMenorQue(int cantidad) {
-        return jpa.findByStockLessThanOrderByStockAsc(cantidad);
+        return jpa.findByStockLessThanOrderByStockTotalAsc(cantidad);
     }
 
     @Override
     public List<Producto> buscarConStockMayorQue(int cantidad) {
-        return jpa.findByStockGreaterThanOrderByNombre(cantidad);
+        return jpa.findByStockTotalGreaterThanOrderByNombre(cantidad);
     }
 }
