@@ -4,7 +4,16 @@ import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Usuario {
@@ -33,6 +42,7 @@ public class Usuario {
 	private LocalDate fechaAlta;
 
 	@OneToMany(mappedBy = "responsable")
+	@JsonIgnore
 	private List<Animal> animalesACargo = new LinkedList<>();
 
 	@OneToMany(mappedBy = "voluntario")

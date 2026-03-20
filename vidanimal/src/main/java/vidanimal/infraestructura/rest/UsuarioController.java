@@ -3,6 +3,7 @@ package vidanimal.infraestructura.rest;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,10 +50,12 @@ public class UsuarioController {
         return ResponseEntity.ok(usuariosAdmin.obtenerPorId(id));
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO') or authentication.name == #id.toString()")
     @GetMapping("/{id}/animales")
     public ResponseEntity<List<Animal>> listarAnimalesDeUsuario(@PathVariable Long id) {
         return ResponseEntity.ok(animales.listarPorResponsable(id));
     }
+
     
     @PostMapping
     public ResponseEntity<Usuario> crear(@RequestBody UsuarioNuevoDTO dto) {
