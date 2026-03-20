@@ -38,6 +38,11 @@ public class Animal {
 	@OneToMany(mappedBy = "animal", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<CitaVeterinaria> protocolo = new ArrayList<>();
 
+	@ManyToOne
+	@JoinColumn(name = "responsable_id")
+	private Usuario responsable;
+
+
 	// Constructor vacío (necesario para JPA)
 	public Animal() {
 	}
@@ -129,5 +134,13 @@ public class Animal {
 
 	public void setProtocolo(List<CitaVeterinaria> protocolo) {
 		this.protocolo = protocolo;
+	}
+	
+	public Usuario getResponsable() {
+		return responsable;
+	}
+
+	public void setResponsable(Usuario responsable) {
+		this.responsable = responsable;
 	}
 }

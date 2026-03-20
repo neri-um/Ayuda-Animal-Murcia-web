@@ -29,4 +29,6 @@ public interface AnimalRepositorioPort {
 	List<Animal> buscarPorTamanyo(Tamanyo tamanyo);
 
 	List<Animal> buscarPorSexo(Sexo sexo);
+	
+	List<Animal> buscarPorResponsableId(Long responsableId);
 }

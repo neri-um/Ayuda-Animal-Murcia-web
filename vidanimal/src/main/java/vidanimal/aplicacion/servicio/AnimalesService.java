@@ -112,4 +112,9 @@ public class AnimalesService implements AnimalesUseCase {
         obtenerPorId(animalId);
         return citaRepo.buscarPorAnimalId(animalId);
     }
+    
+    @Override
+    public List<Animal> listarPorResponsable(Long responsableId) {
+        return animalRepo.buscarPorResponsableId(responsableId);
+    }
 }

@@ -34,4 +34,6 @@ public interface AnimalesUseCase {
 
     // CU-12
     List<CitaVeterinaria> listarCitas(Long animalId);
+    
+    List<Animal> listarPorResponsable(Long responsableId);
 }

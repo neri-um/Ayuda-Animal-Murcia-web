@@ -30,4 +30,6 @@ public interface AnimalRepositorio extends JpaRepository<Animal, Long> {
     List<Animal> findByFechaNacimientoBetweenOrderByFechaNacimiento(LocalDate desde, LocalDate hasta);
 
     List<Animal> findByFechaIngresoBetweenOrderByFechaIngresoAsc(LocalDate desde, LocalDate hasta);
+    
+    List<Animal> findByResponsableIdOrderByNombre(Long responsableId);
 }
