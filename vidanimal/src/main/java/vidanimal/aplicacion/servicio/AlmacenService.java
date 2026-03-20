@@ -12,6 +12,7 @@ import vidanimal.aplicacion.output.SolicitudProductoRepositorioPort;
 import vidanimal.aplicacion.output.UsuarioRepositorioPort;
 import vidanimal.dominio.excepcion.RecursoNoEncontradoException;
 import vidanimal.dominio.modelo.AsignacionProducto;
+import vidanimal.dominio.modelo.CategoriaProducto;
 import vidanimal.dominio.modelo.EstadoSolicitudProducto;
 import vidanimal.dominio.modelo.Producto;
 import vidanimal.dominio.modelo.SolicitudProducto;
@@ -192,5 +193,10 @@ public class AlmacenService implements AlmacenUseCase {
     @Override
     public AsignacionProducto registrarDevolucion(Long solicitudId) {
         return notificarDevolucion(solicitudId);
+    }
+
+    @Override
+    public List<Producto> listarProductosPorCategoria(CategoriaProducto categoria) {
+        return productoRepo.buscarPorCategoria(categoria);
     }
 }

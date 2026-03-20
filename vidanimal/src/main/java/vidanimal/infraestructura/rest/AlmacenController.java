@@ -1,18 +1,27 @@
 package vidanimal.infraestructura.rest;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+import vidanimal.aplicacion.input.AlmacenUseCase;
 import vidanimal.dominio.modelo.AsignacionProducto;
+import vidanimal.dominio.modelo.CategoriaProducto;
 import vidanimal.dominio.modelo.Producto;
 import vidanimal.dominio.modelo.SolicitudProducto;
-import vidanimal.aplicacion.input.AlmacenUseCase;
 import vidanimal.infraestructura.rest.dto.ConfirmacionDevolucionDTO;
 import vidanimal.infraestructura.rest.dto.DecisionSolicitudDTO;
 import vidanimal.infraestructura.rest.dto.SolicitudNuevaDTO;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/vidanimal/almacen")
@@ -27,9 +36,17 @@ public class AlmacenController {
 
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO', 'VOLUNTARIO')")
 	@GetMapping("/productos")
-	public ResponseEntity<List<Producto>> listarProductos() {
-		return ResponseEntity.ok(servicio.listarProductos());
+
+	public ResponseEntity<List<Producto>> listarProductos(
+	        @RequestParam(required = false) String categoria) {
+
+	    if (categoria != null) {
+	        CategoriaProducto cat = CategoriaProducto.valueOf(categoria.toUpperCase());
+	        return ResponseEntity.ok(servicio.listarProductosPorCategoria(cat));
+	    }
+	    return ResponseEntity.ok(servicio.listarProductos());
 	}
+
 
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO', 'VOLUNTARIO')")
 	@GetMapping("/productos/{id}")

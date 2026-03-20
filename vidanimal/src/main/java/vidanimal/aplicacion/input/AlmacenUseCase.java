@@ -3,6 +3,7 @@ package vidanimal.aplicacion.input;
 import java.util.List;
 
 import vidanimal.dominio.modelo.AsignacionProducto;
+import vidanimal.dominio.modelo.CategoriaProducto;
 import vidanimal.dominio.modelo.Producto;
 import vidanimal.dominio.modelo.SolicitudProducto;
 
@@ -10,6 +11,9 @@ public interface AlmacenUseCase {
 
 	// CU-13
 	List<Producto> listarProductos();
+
+	// CU-13 filtrado
+	List<Producto> listarProductosPorCategoria(CategoriaProducto categoria);
 
 	// CU-17
 	Producto crearProducto(Producto producto);
