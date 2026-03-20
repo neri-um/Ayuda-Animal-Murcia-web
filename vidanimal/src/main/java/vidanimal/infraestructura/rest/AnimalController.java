@@ -1,7 +1,6 @@
 package vidanimal.infraestructura.rest;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,6 +27,7 @@ import vidanimal.infraestructura.rest.dto.AnimalNuevoDTO;
 import vidanimal.infraestructura.rest.dto.AnimalPublicoDTO;
 import vidanimal.infraestructura.rest.dto.CambioEstadoDTO;
 import vidanimal.infraestructura.rest.dto.CitaNuevaDTO;
+import vidanimal.infraestructura.rest.dto.DtoParsers;
 
 @RestController
 @RequestMapping("/vidanimal/animales")
@@ -40,12 +40,23 @@ public class AnimalController {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<AnimalPublicoDTO>> listar(@RequestParam(required = false) Especie especie,
-			@RequestParam(required = false) String nombre, @RequestParam(required = false) Tamanyo tamanyo,
-			@RequestParam(required = false) Sexo sexo) {
+	public ResponseEntity<List<AnimalPublicoDTO>> listar(
+	        @RequestParam(required = false) String especie,
+	        @RequestParam(required = false) String nombre,
+	        @RequestParam(required = false) String tamanyo,
+	        @RequestParam(required = false) String sexo) {
 
-		return ResponseEntity.ok(animales.listar(especie, Estado.EN_ADOPCION, nombre, tamanyo, sexo).stream()
-				.map(AnimalPublicoDTO::fromDominio).collect(Collectors.toList()));
+	    return ResponseEntity.ok(
+	        animales.listar(
+	                DtoParsers.parseEnum(Especie.class, especie, "especie"),
+	                Estado.EN_ADOPCION,
+	                nombre,
+	                DtoParsers.parseEnum(Tamanyo.class, tamanyo, "tamanyo"),
+	                DtoParsers.parseEnum(Sexo.class, sexo, "sexo")
+	        ).stream()
+	         .map(AnimalPublicoDTO::fromDominio)
+	         .toList()
+	    );
 	}
 
 	@GetMapping("/{id}")

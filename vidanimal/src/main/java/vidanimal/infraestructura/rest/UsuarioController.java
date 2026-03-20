@@ -18,6 +18,7 @@ import vidanimal.aplicacion.input.UsuariosAdminUseCase;
 import vidanimal.dominio.modelo.Animal;
 import vidanimal.dominio.modelo.Rol;
 import vidanimal.dominio.modelo.Usuario;
+import vidanimal.infraestructura.rest.dto.DtoParsers;
 import vidanimal.infraestructura.rest.dto.UsuarioEditarDTO;
 import vidanimal.infraestructura.rest.dto.UsuarioNuevoDTO;
 
@@ -35,9 +36,12 @@ public class UsuarioController {
 
     @GetMapping
     public ResponseEntity<List<Usuario>> listar(
-            @RequestParam(required = false) Rol rol,
+            @RequestParam(required = false) String rol,
             @RequestParam(required = false) String nombre) {
-        return ResponseEntity.ok(usuariosAdmin.listarUsuarios(rol, nombre));
+
+        return ResponseEntity.ok(
+                usuariosAdmin.listarUsuarios(DtoParsers.parseEnum(Rol.class, rol, "rol"), nombre)
+        );
     }
     
     @GetMapping("/{id}")
