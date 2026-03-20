@@ -47,11 +47,14 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String path = request.getRequestURI();
+        String method = request.getMethod();
 
-        // ── Rutas públicas ──
-        // Como @PermitAll en JAX-RS:
-        //   if (resourceInfo.getResourceMethod().isAnnotationPresent(PermitAll.class)) return;
-        if (path.startsWith("/vidanimal/auth/")) {
+        // Rutas públicas
+        boolean esPublicoAnimales =
+                "GET".equalsIgnoreCase(method) &&
+                ("/vidanimal/animales".equals(path) || path.matches("^/vidanimal/animales/\\d+$"));
+
+        if (path.startsWith("/vidanimal/auth/") || esPublicoAnimales) {
             filterChain.doFilter(request, response);
             return;
         }

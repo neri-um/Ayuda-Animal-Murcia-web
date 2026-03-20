@@ -42,7 +42,6 @@ public class SecurityConfig {
             		.requestMatchers("/vidanimal/auth/**").permitAll()
             		.requestMatchers(HttpMethod.GET, "/vidanimal/animales").permitAll()
             		.requestMatchers(HttpMethod.GET, "/vidanimal/animales/*").permitAll()
-            		.anyRequest().authenticated()
 
                 // privado (todo lo demás, incluido /vidanimal/usuarios/{id}/animales)
                 .anyRequest().authenticated()
