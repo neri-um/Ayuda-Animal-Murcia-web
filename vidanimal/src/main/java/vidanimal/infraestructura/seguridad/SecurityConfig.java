@@ -29,7 +29,8 @@ public class SecurityConfig {
                 CorsConfiguration config = new CorsConfiguration();
                 config.setAllowedOrigins(List.of(
                         "http://localhost:3000",
-                        "http://localhost:4200"));
+                        "http://localhost:4200",
+                        "http://localhost:5173"));
                 config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
                 config.setAllowedHeaders(List.of("*"));
                 return config;
@@ -38,12 +39,9 @@ public class SecurityConfig {
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // público
-            		.requestMatchers("/vidanimal/auth/**").permitAll()
-            		.requestMatchers(HttpMethod.GET, "/vidanimal/animales").permitAll()
-            		.requestMatchers(HttpMethod.GET, "/vidanimal/animales/*").permitAll()
-
-                // privado (todo lo demás, incluido /vidanimal/usuarios/{id}/animales)
+                .requestMatchers("/vidanimal/auth/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/vidanimal/animales").permitAll()
+                .requestMatchers(HttpMethod.GET, "/vidanimal/animales/*").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
