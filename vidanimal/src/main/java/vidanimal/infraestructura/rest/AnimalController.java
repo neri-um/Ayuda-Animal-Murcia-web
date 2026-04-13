@@ -69,14 +69,13 @@ public class AnimalController {
 
 	    return ResponseEntity.ok(AnimalPublicoDTO.fromDominio(animal));
 	}
-	
-	// Crear, editar, eliminar animales
+
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
 	@PostMapping
 	public ResponseEntity<Animal> crear(@RequestBody AnimalNuevoDTO dto) {
 		return ResponseEntity.ok(animales.crear(dto.toDominio()));
 	}
-	
+
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
 	@PutMapping("/{id}")
 	public ResponseEntity<Animal> editar(@PathVariable Long id, @RequestBody AnimalEditarDTO dto) {
@@ -96,16 +95,24 @@ public class AnimalController {
 		return ResponseEntity.ok(animales.cambiarEstado(id, dto.getEstado()));
 	}
 
+	// CU-11: Añadir cita realizada (completada = true automáticamente)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
 	@PostMapping("/{id}/citas")
 	public ResponseEntity<CitaVeterinaria> agregarCita(@PathVariable Long id, @RequestBody CitaNuevaDTO dto) {
 		return ResponseEntity.ok(animales.agregarCita(id, dto.toDominio()));
 	}
 
+	// CU-12: Listar todas las citas (protocolo pendiente + realizadas)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
 	@GetMapping("/{id}/citas")
 	public ResponseEntity<List<CitaVeterinaria>> listarCitas(@PathVariable Long id) {
 		return ResponseEntity.ok(animales.listarCitas(id));
 	}
 
+	// CU-13: Marcar una cita del protocolo como completada (tachar checklist)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
+	@PatchMapping("/{id}/citas/{citaId}/completar")
+	public ResponseEntity<CitaVeterinaria> completarCita(@PathVariable Long id, @PathVariable Long citaId) {
+		return ResponseEntity.ok(animales.completarCita(id, citaId));
+	}
 }

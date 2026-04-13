@@ -112,7 +112,17 @@ public class AnimalesService implements AnimalesUseCase {
         obtenerPorId(animalId);
         return citaRepo.buscarPorAnimalId(animalId);
     }
-    
+
+    // CU-13
+    @Override
+    public CitaVeterinaria completarCita(Long animalId, Long citaId) {
+        obtenerPorId(animalId); // valida que el animal existe
+        CitaVeterinaria cita = citaRepo.buscarPorId(citaId)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Cita con id " + citaId + " no encontrada"));
+        cita.setCompletada(true);
+        return citaRepo.guardar(cita);
+    }
+
     @Override
     public List<Animal> listarPorResponsable(Long responsableId) {
         return animalRepo.buscarPorResponsableId(responsableId);

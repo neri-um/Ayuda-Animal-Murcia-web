@@ -40,25 +40,35 @@ public class CitaVeterinaria {
 
     private String veterinario;
 
+    /**
+     * true  → cita realizada (añadida manualmente o marcada como hecha desde el checklist)
+     * false → pendiente del protocolo obligatorio (checklist)
+     */
+    @Column(nullable = false)
+    private boolean completada = false;
 
     public CitaVeterinaria() {
     }
 
+    // Constructor para citas del protocolo inicial (pendientes)
     public CitaVeterinaria(Animal animal, LocalDate fecha, Tratamiento tratamiento, String descripcion) {
         this.animal = animal;
         this.fecha = fecha;
         this.tratamiento = tratamiento;
         this.descripcion = descripcion;
         this.veterinario = VETERINARIO_ASOCIADO;
+        this.completada = false;
     }
 
-    public CitaVeterinaria(Animal animal, LocalDate fecha, Tratamiento tratamiento, 
+    // Constructor para citas realizadas (con veterinario específico)
+    public CitaVeterinaria(Animal animal, LocalDate fecha, Tratamiento tratamiento,
                             String descripcion, String veterinario) {
         this.animal = animal;
         this.fecha = fecha;
         this.tratamiento = tratamiento;
         this.descripcion = descripcion;
         this.veterinario = veterinario;
+        this.completada = true;
     }
 
     public Long getId() { return id; }
@@ -79,13 +89,17 @@ public class CitaVeterinaria {
     public String getVeterinario() { return veterinario; }
     public void setVeterinario(String veterinario) { this.veterinario = veterinario; }
 
+    public boolean isCompletada() { return completada; }
+    public void setCompletada(boolean completada) { this.completada = completada; }
+
     @Override
     public String toString() {
-        return "CitaVeterinaria [id=" + id + 
-               ", animalId=" + (animal != null ? animal.getId() : null) + 
-               ", tratamiento=" + tratamiento + 
-               ", descripcion=" + descripcion + 
-               ", fecha=" + fecha + 
-               ", veterinario=" + veterinario + "]";
+        return "CitaVeterinaria [id=" + id +
+               ", animalId=" + (animal != null ? animal.getId() : null) +
+               ", tratamiento=" + tratamiento +
+               ", descripcion=" + descripcion +
+               ", fecha=" + fecha +
+               ", veterinario=" + veterinario +
+               ", completada=" + completada + "]";
     }
 }

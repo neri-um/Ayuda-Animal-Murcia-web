@@ -34,6 +34,9 @@ public interface AnimalesUseCase {
 
     // CU-12
     List<CitaVeterinaria> listarCitas(Long animalId);
-    
+
+    // CU-13: Marcar una cita del protocolo como completada
+    CitaVeterinaria completarCita(Long animalId, Long citaId);
+
     List<Animal> listarPorResponsable(Long responsableId);
 }
