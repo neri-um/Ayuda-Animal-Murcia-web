@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vidanimal.aplicacion.input.AnimalesUseCase;
 import vidanimal.dominio.modelo.Animal;
-import vidanimal.dominio.modelo.CitaVeterinaria;
 import vidanimal.dominio.modelo.Especie;
 import vidanimal.dominio.modelo.Estado;
 import vidanimal.dominio.modelo.Sexo;
@@ -27,6 +26,7 @@ import vidanimal.infraestructura.rest.dto.AnimalNuevoDTO;
 import vidanimal.infraestructura.rest.dto.AnimalPublicoDTO;
 import vidanimal.infraestructura.rest.dto.CambioEstadoDTO;
 import vidanimal.infraestructura.rest.dto.CitaNuevaDTO;
+import vidanimal.infraestructura.rest.dto.CitaResponseDTO;
 import vidanimal.infraestructura.rest.dto.DtoParsers;
 
 @RestController
@@ -62,11 +62,9 @@ public class AnimalController {
 	@GetMapping("/{id}")
 	public ResponseEntity<AnimalPublicoDTO> obtener(@PathVariable Long id) {
 	    Animal animal = animales.obtenerPorId(id);
-
 	    if (animal.getEstado() != Estado.EN_ADOPCION) {
 	        return ResponseEntity.notFound().build();
 	    }
-
 	    return ResponseEntity.ok(AnimalPublicoDTO.fromDominio(animal));
 	}
 
@@ -95,24 +93,26 @@ public class AnimalController {
 		return ResponseEntity.ok(animales.cambiarEstado(id, dto.getEstado()));
 	}
 
-	// CU-11: Añadir cita realizada (completada = true automáticamente)
+	// CU-11
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
 	@PostMapping("/{id}/citas")
-	public ResponseEntity<CitaVeterinaria> agregarCita(@PathVariable Long id, @RequestBody CitaNuevaDTO dto) {
-		return ResponseEntity.ok(animales.agregarCita(id, dto.toDominio()));
+	public ResponseEntity<CitaResponseDTO> agregarCita(@PathVariable Long id, @RequestBody CitaNuevaDTO dto) {
+		return ResponseEntity.ok(CitaResponseDTO.from(animales.agregarCita(id, dto.toDominio())));
 	}
 
-	// CU-12: Listar todas las citas (protocolo pendiente + realizadas)
+	// CU-12
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
 	@GetMapping("/{id}/citas")
-	public ResponseEntity<List<CitaVeterinaria>> listarCitas(@PathVariable Long id) {
-		return ResponseEntity.ok(animales.listarCitas(id));
+	public ResponseEntity<List<CitaResponseDTO>> listarCitas(@PathVariable Long id) {
+		return ResponseEntity.ok(
+			animales.listarCitas(id).stream().map(CitaResponseDTO::from).toList()
+		);
 	}
 
-	// CU-13: Marcar una cita del protocolo como completada (tachar checklist)
+	// CU-13
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
 	@PatchMapping("/{id}/citas/{citaId}/completar")
-	public ResponseEntity<CitaVeterinaria> completarCita(@PathVariable Long id, @PathVariable Long citaId) {
-		return ResponseEntity.ok(animales.completarCita(id, citaId));
+	public ResponseEntity<CitaResponseDTO> completarCita(@PathVariable Long id, @PathVariable Long citaId) {
+		return ResponseEntity.ok(CitaResponseDTO.from(animales.completarCita(id, citaId)));
 	}
 }
