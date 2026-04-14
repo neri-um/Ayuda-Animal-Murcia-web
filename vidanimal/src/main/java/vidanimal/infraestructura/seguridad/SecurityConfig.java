@@ -40,6 +40,7 @@ public class SecurityConfig {
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/vidanimal/auth/**").permitAll()
+                .requestMatchers("/vidanimal/enums").permitAll()
                 .requestMatchers(HttpMethod.GET, "/vidanimal/animales").permitAll()
                 .requestMatchers(HttpMethod.GET, "/vidanimal/animales/*").permitAll()
                 .anyRequest().authenticated()
