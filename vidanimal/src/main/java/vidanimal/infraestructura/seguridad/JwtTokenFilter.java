@@ -39,7 +39,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 "GET".equalsIgnoreCase(method) &&
                 ("/vidanimal/animales".equals(path) || path.matches("^/vidanimal/animales/\\d+$"));
 
-        if (path.startsWith("/vidanimal/auth/") || esPublicoAnimales) {
+        boolean esPublico = path.startsWith("/vidanimal/auth/")
+                || "/vidanimal/enums".equals(path)
+                || esPublicoAnimales;
+
+        if (esPublico) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -66,7 +70,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
             UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(
-                            claims.getSubject(), // id (String)
+                            claims.getSubject(),
                             null,
                             authorities
                     );
