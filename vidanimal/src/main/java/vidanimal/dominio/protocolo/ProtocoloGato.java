@@ -13,17 +13,24 @@ public class ProtocoloGato implements IProtocoloVeterinario {
     public List<CitaVeterinaria> getProtocolo() {
         List<CitaVeterinaria> citas = new ArrayList<>();
 
-        // Desparasitación interna y externa
-        CitaVeterinaria desparasitacion = new CitaVeterinaria();
-        desparasitacion.setTratamiento(Tratamiento.DESPARASITACION_EXTERNA);
-        desparasitacion.setDescripcion("Desparasitación interna y externa");
-        desparasitacion.setFecha(LocalDate.now().plusWeeks(1));
-        citas.add(desparasitacion);
+        // Desparasitación interna
+        CitaVeterinaria desparasitacionInterna = new CitaVeterinaria();
+        desparasitacionInterna.setTratamiento(Tratamiento.DESPARASITACION_INTERNA);
+        desparasitacionInterna.setDescripcion("Desparasitación interna");
+        desparasitacionInterna.setFecha(LocalDate.now().plusWeeks(1));
+        citas.add(desparasitacionInterna);
+
+        // Desparasitación externa
+        CitaVeterinaria desparasitacionExterna = new CitaVeterinaria();
+        desparasitacionExterna.setTratamiento(Tratamiento.DESPARASITACION_EXTERNA);
+        desparasitacionExterna.setDescripcion("Desparasitación externa");
+        desparasitacionExterna.setFecha(LocalDate.now().plusWeeks(1));
+        citas.add(desparasitacionExterna);
 
         // Trivalente felina — dosis 1
         CitaVeterinaria trivalente1 = new CitaVeterinaria();
         trivalente1.setTratamiento(Tratamiento.TRIVALENTE_FELINA);
-        trivalente1.setDescripcion("Vacuna trivalente felina — dosis 1");
+        trivalente1.setDescripcion("Vacuna trivalente felina \u2014 dosis 1");
         trivalente1.setFecha(LocalDate.now().plusWeeks(1));
         citas.add(trivalente1);
 
@@ -37,21 +44,21 @@ public class ProtocoloGato implements IProtocoloVeterinario {
         // Microchip
         CitaVeterinaria microchip = new CitaVeterinaria();
         microchip.setTratamiento(Tratamiento.MICROCHIP);
-        microchip.setDescripcion("Implantación de microchip");
+        microchip.setDescripcion("Implantaci\u00f3n de microchip");
         microchip.setFecha(LocalDate.now().plusWeeks(2));
         citas.add(microchip);
 
         // Trivalente felina — dosis 2
         CitaVeterinaria trivalente2 = new CitaVeterinaria();
         trivalente2.setTratamiento(Tratamiento.TRIVALENTE_FELINA);
-        trivalente2.setDescripcion("Vacuna trivalente felina — dosis 2");
+        trivalente2.setDescripcion("Vacuna trivalente felina \u2014 dosis 2");
         trivalente2.setFecha(LocalDate.now().plusWeeks(5));
         citas.add(trivalente2);
 
         // Castración
         CitaVeterinaria castracion = new CitaVeterinaria();
         castracion.setTratamiento(Tratamiento.CASTRACION);
-        castracion.setDescripcion("Esterilización felina");
+        castracion.setDescripcion("Esterilizaci\u00f3n felina");
         castracion.setFecha(LocalDate.now().plusMonths(2));
         citas.add(castracion);
 
