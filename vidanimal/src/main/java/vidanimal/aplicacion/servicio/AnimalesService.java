@@ -59,9 +59,16 @@ public class AnimalesService implements AnimalesUseCase {
         );
 
         if (animal.getDescripcion() != null) animalConProtocolo.setDescripcion(animal.getDescripcion());
+        if (animal.getRaza() != null) animalConProtocolo.setRaza(animal.getRaza());
         if (animal.getSexo() != null) animalConProtocolo.setSexo(animal.getSexo());
         if (animal.getTamanyo() != null) animalConProtocolo.setTamanyo(animal.getTamanyo());
         if (animal.getFotoUrl() != null) animalConProtocolo.setFotoUrl(animal.getFotoUrl());
+        if (animal.getGaleria() != null) animalConProtocolo.setGaleria(animal.getGaleria());
+        animalConProtocolo.setVacunado(animal.isVacunado());
+        animalConProtocolo.setEsterilizado(animal.isEsterilizado());
+        animalConProtocolo.setMicrochip(animal.isMicrochip());
+        animalConProtocolo.setCompatibleGatos(animal.isCompatibleGatos());
+        animalConProtocolo.setCompatiblePerros(animal.isCompatiblePerros());
 
         return animalRepo.guardar(animalConProtocolo);
     }
@@ -72,6 +79,7 @@ public class AnimalesService implements AnimalesUseCase {
         Animal animal = obtenerPorId(id);
 
         if (datosNuevos.getNombre() != null) animal.setNombre(datosNuevos.getNombre());
+        if (datosNuevos.getRaza() != null) animal.setRaza(datosNuevos.getRaza());
         if (datosNuevos.getDescripcion() != null) animal.setDescripcion(datosNuevos.getDescripcion());
         if (datosNuevos.getEspecie() != null) animal.setEspecie(datosNuevos.getEspecie());
         if (datosNuevos.getSexo() != null) animal.setSexo(datosNuevos.getSexo());
@@ -79,6 +87,13 @@ public class AnimalesService implements AnimalesUseCase {
         if (datosNuevos.getFechaNacimiento() != null) animal.setFechaNacimiento(datosNuevos.getFechaNacimiento());
         if (datosNuevos.getFechaIngreso() != null) animal.setFechaIngreso(datosNuevos.getFechaIngreso());
         if (datosNuevos.getFotoUrl() != null) animal.setFotoUrl(datosNuevos.getFotoUrl());
+        if (datosNuevos.getGaleria() != null) animal.setGaleria(datosNuevos.getGaleria());
+        // booleans siempre se actualizan (false es un valor válido)
+        animal.setVacunado(datosNuevos.isVacunado());
+        animal.setEsterilizado(datosNuevos.isEsterilizado());
+        animal.setMicrochip(datosNuevos.isMicrochip());
+        animal.setCompatibleGatos(datosNuevos.isCompatibleGatos());
+        animal.setCompatiblePerros(datosNuevos.isCompatiblePerros());
 
         return animalRepo.guardar(animal);
     }
@@ -116,7 +131,7 @@ public class AnimalesService implements AnimalesUseCase {
     // CU-13
     @Override
     public CitaVeterinaria completarCita(Long animalId, Long citaId) {
-        obtenerPorId(animalId); // valida que el animal existe
+        obtenerPorId(animalId);
         CitaVeterinaria cita = citaRepo.buscarPorId(citaId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Cita con id " + citaId + " no encontrada"));
         cita.setCompletada(true);
