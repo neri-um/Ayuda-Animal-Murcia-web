@@ -43,6 +43,10 @@ public class SecurityConfig {
                 .requestMatchers("/vidanimal/enums").permitAll()
                 .requestMatchers(HttpMethod.GET, "/vidanimal/animales").permitAll()
                 .requestMatchers(HttpMethod.GET, "/vidanimal/animales/*").permitAll()
+                .requestMatchers(HttpMethod.GET, "/vidanimal/adopciones/formulario/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/vidanimal/adopciones").permitAll()
+                .requestMatchers(HttpMethod.GET, "/vidanimal/adopciones").authenticated()
+                .requestMatchers(HttpMethod.PATCH, "/vidanimal/adopciones/*/estado").hasAnyRole("VOLUNTARIO","ENCARGADO", "ADMIN")
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);

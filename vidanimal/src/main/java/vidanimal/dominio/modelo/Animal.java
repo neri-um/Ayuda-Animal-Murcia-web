@@ -71,62 +71,158 @@ public class Animal {
 	@JoinColumn(name = "responsable_id")
 	private Usuario responsable;
 
-	public Animal() {}
+	public Animal() {
+	}
 
-	public Long getId() { return id; }
-	public void setId(Long id) { this.id = id; }
+	public Long getId() {
+		return id;
+	}
 
-	public Especie getEspecie() { return especie; }
-	public void setEspecie(Especie especie) { this.especie = especie; }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-	public String getNombre() { return nombre; }
-	public void setNombre(String nombre) { this.nombre = nombre; }
+	public Especie getEspecie() {
+		return especie;
+	}
 
-	public String getRaza() { return raza; }
-	public void setRaza(String raza) { this.raza = raza; }
+	public void setEspecie(Especie especie) {
+		this.especie = especie;
+	}
 
-	public String getDescripcion() { return descripcion; }
-	public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+	public String getNombre() {
+		return nombre;
+	}
 
-	public Sexo getSexo() { return sexo; }
-	public void setSexo(Sexo sexo) { this.sexo = sexo; }
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
 
-	public Tamanyo getTamanyo() { return tamanyo; }
-	public void setTamanyo(Tamanyo tamanyo) { this.tamanyo = tamanyo; }
+	public String getRaza() {
+		return raza;
+	}
 
-	public LocalDate getFechaNacimiento() { return fechaNacimiento; }
-	public void setFechaNacimiento(LocalDate fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
+	public void setRaza(String raza) {
+		this.raza = raza;
+	}
 
-	public LocalDate getFechaIngreso() { return fechaIngreso; }
-	public void setFechaIngreso(LocalDate fechaIngreso) { this.fechaIngreso = fechaIngreso; }
+	public String getDescripcion() {
+		return descripcion;
+	}
 
-	public Estado getEstado() { return estado; }
-	public void setEstado(Estado estado) { this.estado = estado; }
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
 
-	public String getFotoUrl() { return fotoUrl; }
-	public void setFotoUrl(String fotoUrl) { this.fotoUrl = fotoUrl; }
+	public Sexo getSexo() {
+		return sexo;
+	}
 
-	public List<String> getGaleria() { return galeria; }
-	public void setGaleria(List<String> galeria) { this.galeria = galeria != null ? galeria : new ArrayList<>(); }
+	public void setSexo(Sexo sexo) {
+		this.sexo = sexo;
+	}
 
-	public boolean isVacunado() { return vacunado; }
-	public void setVacunado(boolean vacunado) { this.vacunado = vacunado; }
+	public Tamanyo getTamanyo() {
+		return tamanyo;
+	}
 
-	public boolean isEsterilizado() { return esterilizado; }
-	public void setEsterilizado(boolean esterilizado) { this.esterilizado = esterilizado; }
+	public void setTamanyo(Tamanyo tamanyo) {
+		this.tamanyo = tamanyo;
+	}
 
-	public boolean isMicrochip() { return microchip; }
-	public void setMicrochip(boolean microchip) { this.microchip = microchip; }
+	public LocalDate getFechaNacimiento() {
+		return fechaNacimiento;
+	}
 
-	public boolean isCompatibleGatos() { return compatibleGatos; }
-	public void setCompatibleGatos(boolean compatibleGatos) { this.compatibleGatos = compatibleGatos; }
+	public void setFechaNacimiento(LocalDate fechaNacimiento) {
+		this.fechaNacimiento = fechaNacimiento;
+	}
 
-	public boolean isCompatiblePerros() { return compatiblePerros; }
-	public void setCompatiblePerros(boolean compatiblePerros) { this.compatiblePerros = compatiblePerros; }
+	public LocalDate getFechaIngreso() {
+		return fechaIngreso;
+	}
 
-	public List<CitaVeterinaria> getProtocolo() { return protocolo; }
-	public void setProtocolo(List<CitaVeterinaria> protocolo) { this.protocolo = protocolo; }
+	public void setFechaIngreso(LocalDate fechaIngreso) {
+		this.fechaIngreso = fechaIngreso;
+	}
 
-	public Usuario getResponsable() { return responsable; }
-	public void setResponsable(Usuario responsable) { this.responsable = responsable; }
+	public Estado getEstado() {
+		return estado;
+	}
+
+	public void setEstado(Estado estado) {
+		this.estado = estado;
+	}
+
+	public String getFotoUrl() {
+		return fotoUrl;
+	}
+
+	public void setFotoUrl(String fotoUrl) {
+		this.fotoUrl = fotoUrl;
+	}
+
+	public List<String> getGaleria() {
+		return galeria;
+	}
+
+	public void setGaleria(List<String> galeria) {
+		this.galeria = galeria != null ? galeria : new ArrayList<>();
+	}
+
+	public boolean isVacunado() {
+		return vacunado;
+	}
+
+	public void setVacunado(boolean vacunado) {
+		this.vacunado = vacunado;
+	}
+
+	public boolean isEsterilizado() {
+		return esterilizado;
+	}
+
+	public void setEsterilizado(boolean esterilizado) {
+		this.esterilizado = esterilizado;
+	}
+
+	public boolean isMicrochip() {
+		return microchip;
+	}
+
+	public void setMicrochip(boolean microchip) {
+		this.microchip = microchip;
+	}
+
+	public boolean isCompatibleGatos() {
+		return compatibleGatos;
+	}
+
+	public void setCompatibleGatos(boolean compatibleGatos) {
+		this.compatibleGatos = compatibleGatos;
+	}
+
+	public boolean isCompatiblePerros() {
+		return compatiblePerros;
+	}
+
+	public void setCompatiblePerros(boolean compatiblePerros) {
+		this.compatiblePerros = compatiblePerros;
+	}
+
+	public List<CitaVeterinaria> getProtocolo() {
+		return protocolo;
+	}
+
+	public void setProtocolo(List<CitaVeterinaria> protocolo) {
+		this.protocolo = protocolo;
+	}
+
+	public Usuario getResponsable() {
+		return responsable;
+	}
+
+	public void setResponsable(Usuario responsable) {
+		this.responsable = responsable;
+	}
 }
