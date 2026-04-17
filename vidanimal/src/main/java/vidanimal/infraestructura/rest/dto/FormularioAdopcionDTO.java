@@ -4,6 +4,7 @@ public class FormularioAdopcionDTO {
 	private Long id;
 	private String nombre;
 	private String especie;
+	private Boolean cachorro;
 	private Object preguntas;
 
 	public FormularioAdopcionDTO() {
@@ -31,6 +32,14 @@ public class FormularioAdopcionDTO {
 
 	public void setEspecie(String especie) {
 		this.especie = especie;
+	}
+
+	public Boolean getCachorro() {
+		return cachorro;
+	}
+
+	public void setCachorro(Boolean cachorro) {
+		this.cachorro = cachorro;
 	}
 
 	public Object getPreguntas() {
