@@ -5,7 +5,9 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,65 +25,71 @@ import vidanimal.infraestructura.rest.dto.FormularioAdopcionDTO;
 @RequestMapping("/vidanimal/formularios")
 public class FormularioController {
 
-    private final FormularioAdopcionRepositorio repositorio;
-    private final ObjectMapper objectMapper;
+	private final FormularioAdopcionRepositorio repositorio;
+	private final ObjectMapper objectMapper;
 
-    public FormularioController(FormularioAdopcionRepositorio repositorio, ObjectMapper objectMapper) {
-        this.repositorio = repositorio;
-        this.objectMapper = objectMapper;
-    }
+	public FormularioController(FormularioAdopcionRepositorio repositorio, ObjectMapper objectMapper) {
+		this.repositorio = repositorio;
+		this.objectMapper = objectMapper;
+	}
 
-    @GetMapping
-    public ResponseEntity<List<FormularioAdopcionDTO>> listar() {
-        List<FormularioAdopcionDTO> resultado = repositorio.findAll().stream()
-            .map(this::toDTO)
-            .collect(Collectors.toList());
-        return ResponseEntity.ok(resultado);
-    }
+	@GetMapping
+	public ResponseEntity<List<FormularioAdopcionDTO>> listar() {
+		List<FormularioAdopcionDTO> resultado = repositorio.findAll().stream().map(this::toDTO)
+				.collect(Collectors.toList());
+		return ResponseEntity.ok(resultado);
+	}
 
-    @PostMapping
-    public ResponseEntity<FormularioAdopcionDTO> crear(@RequestBody FormularioAdopcionDTO dto) {
-        FormularioAdopcion entidad = new FormularioAdopcion();
-        entidad.setNombre(dto.getNombre());
+	@PostMapping
+	public ResponseEntity<FormularioAdopcionDTO> crear(@RequestBody FormularioAdopcionDTO dto) {
+		FormularioAdopcion entidad = new FormularioAdopcion();
+		entidad.setNombre(dto.getNombre());
 
-        if (dto.getEspecie() != null && !dto.getEspecie().isBlank()) {
-            try {
-                entidad.setEspecie(Especie.valueOf(dto.getEspecie().toUpperCase()));
-            } catch (IllegalArgumentException e) {
-                return ResponseEntity.badRequest().build();
-            }
-        }
+		if (dto.getEspecie() != null && !dto.getEspecie().isBlank()) {
+			try {
+				entidad.setEspecie(Especie.valueOf(dto.getEspecie().toUpperCase()));
+			} catch (IllegalArgumentException e) {
+				return ResponseEntity.badRequest().build();
+			}
+		}
 
-        entidad.setCachorro(dto.getCachorro());
+		entidad.setCachorro(dto.getCachorro());
 
-        // Convertir preguntas (Object -> String JSON)
-        try {
-            String preguntasJson = dto.getPreguntas() instanceof String
-                ? (String) dto.getPreguntas()
-                : objectMapper.writeValueAsString(dto.getPreguntas());
-            entidad.setPreguntas(preguntasJson);
-        } catch (JsonProcessingException e) {
-            return ResponseEntity.badRequest().build();
-        }
+		try {
+			String preguntasJson = dto.getPreguntas() instanceof String ? (String) dto.getPreguntas()
+					: objectMapper.writeValueAsString(dto.getPreguntas());
+			entidad.setPreguntas(preguntasJson);
+		} catch (JsonProcessingException e) {
+			return ResponseEntity.badRequest().build();
+		}
 
-        FormularioAdopcion guardado = repositorio.save(entidad);
-        return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(guardado));
-    }
+		FormularioAdopcion guardado = repositorio.save(entidad);
+		return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(guardado));
+	}
 
-    private FormularioAdopcionDTO toDTO(FormularioAdopcion f) {
-        FormularioAdopcionDTO dto = new FormularioAdopcionDTO();
-        dto.setId(f.getId());
-        dto.setNombre(f.getNombre());
-        dto.setEspecie(f.getEspecie() != null ? f.getEspecie().name() : null);
-        dto.setCachorro(f.getCachorro());
-        // Intentar devolver preguntas como objeto JSON, si falla como string
-        if (f.getPreguntas() != null) {
-            try {
-                dto.setPreguntas(objectMapper.readValue(f.getPreguntas(), Object.class));
-            } catch (JsonProcessingException e) {
-                dto.setPreguntas(f.getPreguntas());
-            }
-        }
-        return dto;
-    }
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+		if (!repositorio.existsById(id)) {
+			return ResponseEntity.notFound().build();
+		}
+		repositorio.deleteById(id);
+		return ResponseEntity.noContent().build();
+	}
+
+	private FormularioAdopcionDTO toDTO(FormularioAdopcion f) {
+		FormularioAdopcionDTO dto = new FormularioAdopcionDTO();
+		dto.setId(f.getId());
+		dto.setNombre(f.getNombre());
+		dto.setEspecie(f.getEspecie() != null ? f.getEspecie().name() : null);
+		dto.setCachorro(f.getCachorro());
+		// Intentar devolver preguntas como objeto JSON, si falla como string
+		if (f.getPreguntas() != null) {
+			try {
+				dto.setPreguntas(objectMapper.readValue(f.getPreguntas(), Object.class));
+			} catch (JsonProcessingException e) {
+				dto.setPreguntas(f.getPreguntas());
+			}
+		}
+		return dto;
+	}
 }

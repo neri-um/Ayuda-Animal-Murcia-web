@@ -17,7 +17,7 @@ public class FormularioAdopcion {
 	private Especie especie;
 
 	@Column(nullable = true)
-	private Boolean cria;
+	private Boolean cachorro;
 
 	@Column(columnDefinition = "TEXT")
 	private String preguntas;
@@ -49,12 +49,12 @@ public class FormularioAdopcion {
 		this.especie = especie;
 	}
 
-	public Boolean getCria() {
-		return cria;
+	public Boolean getCachorro() {
+		return cachorro;
 	}
 
-	public void setCria(Boolean cria) {
-		this.cria = cria;
+	public void setCachorro(Boolean cachorro) {
+		this.cachorro = cachorro;
 	}
 
 	public String getPreguntas() {

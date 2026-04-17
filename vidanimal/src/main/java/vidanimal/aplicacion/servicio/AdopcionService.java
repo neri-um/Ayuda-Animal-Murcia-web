@@ -48,8 +48,8 @@ public class AdopcionService {
         boolean esCria = animal.getFechaNacimiento() != null &&
             ChronoUnit.MONTHS.between(animal.getFechaNacimiento(), LocalDate.now()) < 12;
 
-        FormularioAdopcion form = formularioRepo.findByEspecieAndCria(especie, esCria)
-            .or(() -> formularioRepo.findByEspecieAndCriaIsNull(especie))
+        FormularioAdopcion form = formularioRepo.findByEspecieAndCachorro(especie, esCria)
+            .or(() -> formularioRepo.findByEspecieAndCachorroIsNull(especie))
             .or(() -> formularioRepo.findByEspecieIsNull())
             .orElseThrow(() -> new RuntimeException("No hay formulario configurado"));
 

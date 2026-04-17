@@ -47,9 +47,10 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/vidanimal/adopciones").permitAll()
                 .requestMatchers(HttpMethod.GET, "/vidanimal/adopciones").authenticated()
                 .requestMatchers(HttpMethod.PATCH, "/vidanimal/adopciones/*/estado").hasAnyAuthority("VOLUNTARIO", "ENCARGADO", "ADMIN")
-                // Formularios de adopción: gestión interna
-                .requestMatchers(HttpMethod.GET, "/vidanimal/formularios").hasAnyAuthority("ENCARGADO", "ADMIN")
-                .requestMatchers(HttpMethod.POST, "/vidanimal/formularios").hasAnyAuthority("ENCARGADO", "ADMIN")
+
+                .requestMatchers(HttpMethod.GET, "/vidanimal/formularios").hasAnyAuthority("VOLUNTARIO", "ENCARGADO", "ADMIN")
+                .requestMatchers(HttpMethod.POST, "/vidanimal/formularios").hasAnyAuthority("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/vidanimal/formularios/*").hasAnyAuthority("ADMIN")
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);

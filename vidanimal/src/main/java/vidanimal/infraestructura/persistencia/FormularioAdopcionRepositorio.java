@@ -6,9 +6,9 @@ import vidanimal.dominio.modelo.FormularioAdopcion;
 import java.util.Optional;
 
 public interface FormularioAdopcionRepositorio extends JpaRepository<FormularioAdopcion, Long> {
-	Optional<FormularioAdopcion> findByEspecieAndCria(Especie especie, Boolean cria);
+	Optional<FormularioAdopcion> findByEspecieAndCachorro(Especie especie, Boolean cachorro);
 
-	Optional<FormularioAdopcion> findByEspecieAndCriaIsNull(Especie especie);
+	Optional<FormularioAdopcion> findByEspecieAndCachorroIsNull(Especie especie);
 
 	Optional<FormularioAdopcion> findByEspecieIsNull();
 }

@@ -34,21 +34,33 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             return;
         }
 
-        // ── Rutas públicas ──
+
         boolean esPublicoAnimales =
                 "GET".equalsIgnoreCase(method) &&
                 ("/vidanimal/animales".equals(path) || path.matches("^/vidanimal/animales/\\d+$"));
 
+        boolean esPublicoFormulario =
+                "GET".equalsIgnoreCase(method) &&
+                path.matches("^/vidanimal/adopciones/formulario/.*$");
+
+        boolean esPublicoSolicitud =
+                "POST".equalsIgnoreCase(method) &&
+                "/vidanimal/adopciones".equals(path);
+
         boolean esPublico = path.startsWith("/vidanimal/auth/")
                 || "/vidanimal/enums".equals(path)
-                || esPublicoAnimales;
+                || esPublicoAnimales
+                || esPublicoFormulario   
+                || esPublicoSolicitud;   
 
         if (esPublico) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // ── Token obligatorio a partir de aquí ──
+
+
+
         String authorization = request.getHeader("Authorization");
 
         if (authorization == null || !authorization.startsWith("Bearer ")) {

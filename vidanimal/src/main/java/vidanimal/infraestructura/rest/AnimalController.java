@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import vidanimal.aplicacion.input.AnimalesUseCase;
+import vidanimal.aplicacion.output.UsuarioRepositorioPort;
 import vidanimal.dominio.modelo.Animal;
 import vidanimal.dominio.modelo.Especie;
 import vidanimal.dominio.modelo.Estado;
@@ -34,9 +35,11 @@ import vidanimal.infraestructura.rest.dto.DtoParsers;
 public class AnimalController {
 
 	private final AnimalesUseCase animales;
+	private final UsuarioRepositorioPort usuarioRepo; 
 
-	public AnimalController(AnimalesUseCase animales) {
-		this.animales = animales;
+	public AnimalController(AnimalesUseCase animales, UsuarioRepositorioPort usuarioRepo) {
+	    this.animales = animales;
+	    this.usuarioRepo = usuarioRepo;
 	}
 
 	@GetMapping
@@ -70,8 +73,17 @@ public class AnimalController {
 
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
 	@PostMapping
-	public ResponseEntity<Animal> crear(@RequestBody AnimalNuevoDTO dto) {
-		return ResponseEntity.ok(animales.crear(dto.toDominio()));
+	public ResponseEntity<Animal> crear(
+	        @RequestBody AnimalNuevoDTO dto,
+	        org.springframework.security.core.Authentication authentication) {
+
+	    Animal animal = dto.toDominio();
+
+	    // El principal es el email (claims.getSubject() del JWT)
+	    String email = (String) authentication.getPrincipal();
+	    usuarioRepo.buscarPorEmail(email).ifPresent(animal::setResponsable);
+
+	    return ResponseEntity.ok(animales.crear(animal));
 	}
 
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
