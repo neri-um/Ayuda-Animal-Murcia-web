@@ -41,7 +41,7 @@ public class SolicitudProductoPersistenciaAdapter implements SolicitudProductoRe
 
     @Override
     public List<SolicitudProducto> buscarPorVoluntarioId(Long voluntarioId) {
-        return jpa.findByVoluntarioIdOrderByFechaSolicitudDesc(voluntarioId);
+        return jpa.findByVoluntario_IdOrderByFechaSolicitudDesc(voluntarioId);
     }
 
     @Override
