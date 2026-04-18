@@ -13,6 +13,8 @@ import vidanimal.dominio.modelo.EstadoSolicitudAdopcion;
 import vidanimal.dominio.modelo.EstadoSolicitudProducto;
 import vidanimal.dominio.protocolo.*;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -39,15 +41,32 @@ public class EnumsController {
 
     /**
      * Devuelve el protocolo veterinario base para una especie.
-     * - GATO: mismo protocolo adulto o cachorro (ProtocoloGato)
-     * - PERRO adulto: ProtocoloPerroAdulto
-     * - PERRO cachorro (< 1 año): ProtocoloPerroCachorro
-     * - Resto de especies: lista vacía (sin protocolo predefinido)
+     *
+     * Acepta dos formas de indicar la edad:
+     *   1. ?fechaNacimiento=YYYY-MM-DD  → el backend calcula si es cachorro (< 12 meses)
+     *   2. ?tipo=cachorro|adulto        → forma legacy, se mantiene por compatibilidad
+     *
+     * Reglas:
+     *   - GATO:  mismo protocolo adulto y cachorro (ProtocoloGato)
+     *   - PERRO: ProtocoloPerroCachorro si < 12 meses, ProtocoloPerroAdulto si >= 12 meses
+     *   - Resto: lista vacía
      */
     @GetMapping("/enums/protocolo/{especie}")
     public ResponseEntity<?> getProtocolo(
             @PathVariable String especie,
+            @RequestParam(required = false) String fechaNacimiento,
             @RequestParam(defaultValue = "adulto") String tipo) {
+
+        // Si llega fechaNacimiento, el backend decide si es cachorro
+        if (fechaNacimiento != null && !fechaNacimiento.isBlank()) {
+            try {
+                LocalDate nacimiento = LocalDate.parse(fechaNacimiento);
+                long meses = ChronoUnit.MONTHS.between(nacimiento, LocalDate.now());
+                tipo = meses < 12 ? "cachorro" : "adulto";
+            } catch (Exception ignored) {
+                // fecha malformada → mantener el valor de ?tipo
+            }
+        }
 
         IProtocoloVeterinario protocolo = switch (especie.toUpperCase()) {
             case "GATO"  -> new ProtocoloGato();   // mismo protocolo para adulto y cachorro
