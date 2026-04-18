@@ -2,6 +2,8 @@ package vidanimal.dominio.modelo;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -21,6 +23,7 @@ public class SolicitudProducto {
 
 	@ManyToOne
 	@JoinColumn(name = "voluntario_id", nullable = false)
+	@JsonIgnore 
 	private Usuario voluntario; // CU-14: quién solicita
 
 	@ManyToOne
@@ -42,6 +45,7 @@ public class SolicitudProducto {
 
 	@ManyToOne
 	@JoinColumn(name = "gestionado_por")
+	@JsonIgnore 
 	private Usuario encargado; // CU-20: encargado que decide
 
 	// ---- Flujo de devolución (CU-16, CU-22) ----
