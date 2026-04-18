@@ -74,7 +74,7 @@ public class AlmacenController {
     // --- SOLICITUDES ---
 
     @GetMapping("/solicitudes")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO', 'VOLUNTARIO')")
     public ResponseEntity<List<SolicitudProducto>> listarSolicitudes() {
         return ResponseEntity.ok(servicio.obtenerSolicitudes());
     }
