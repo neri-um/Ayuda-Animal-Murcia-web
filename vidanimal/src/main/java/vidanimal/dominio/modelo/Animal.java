@@ -225,4 +225,6 @@ public class Animal {
 	public void setResponsable(Usuario responsable) {
 		this.responsable = responsable;
 	}
+
+
 }

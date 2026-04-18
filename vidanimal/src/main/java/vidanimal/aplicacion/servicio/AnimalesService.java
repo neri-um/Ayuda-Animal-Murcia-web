@@ -69,7 +69,7 @@ public class AnimalesService implements AnimalesUseCase {
         animalConProtocolo.setMicrochip(animal.isMicrochip());
         animalConProtocolo.setCompatibleGatos(animal.isCompatibleGatos());
         animalConProtocolo.setCompatiblePerros(animal.isCompatiblePerros());
-        animalConProtocolo.setResponsable(animal.getResponsable()); // ← AÑADIR ESTO
+        animalConProtocolo.setResponsable(animal.getResponsable());
 
         return animalRepo.guardar(animalConProtocolo);
     }

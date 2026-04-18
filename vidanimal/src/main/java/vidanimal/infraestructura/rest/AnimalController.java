@@ -1,6 +1,7 @@
 package vidanimal.infraestructura.rest;
 
 import java.util.List;
+import org.springframework.security.core.Authentication;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,55 +36,42 @@ import vidanimal.infraestructura.rest.dto.DtoParsers;
 public class AnimalController {
 
 	private final AnimalesUseCase animales;
-	private final UsuarioRepositorioPort usuarioRepo; 
+	private final UsuarioRepositorioPort usuarioRepo;
 
 	public AnimalController(AnimalesUseCase animales, UsuarioRepositorioPort usuarioRepo) {
-	    this.animales = animales;
-	    this.usuarioRepo = usuarioRepo;
+		this.animales = animales;
+		this.usuarioRepo = usuarioRepo;
 	}
 
 	@GetMapping
-	public ResponseEntity<List<AnimalPublicoDTO>> listar(
-	        @RequestParam(required = false) String especie,
-	        @RequestParam(required = false) String nombre,
-	        @RequestParam(required = false) String tamanyo,
-	        @RequestParam(required = false) String sexo) {
+	public ResponseEntity<List<AnimalPublicoDTO>> listar(@RequestParam(required = false) String especie,
+			@RequestParam(required = false) String nombre, @RequestParam(required = false) String tamanyo,
+			@RequestParam(required = false) String sexo) {
 
-	    return ResponseEntity.ok(
-	        animales.listar(
-	                DtoParsers.parseEnum(Especie.class, especie, "especie"),
-	                Estado.EN_ADOPCION,
-	                nombre,
-	                DtoParsers.parseEnum(Tamanyo.class, tamanyo, "tamanyo"),
-	                DtoParsers.parseEnum(Sexo.class, sexo, "sexo")
-	        ).stream()
-	         .map(AnimalPublicoDTO::fromDominio)
-	         .toList()
-	    );
+		return ResponseEntity.ok(animales
+				.listar(DtoParsers.parseEnum(Especie.class, especie, "especie"), Estado.EN_ADOPCION, nombre,
+						DtoParsers.parseEnum(Tamanyo.class, tamanyo, "tamanyo"),
+						DtoParsers.parseEnum(Sexo.class, sexo, "sexo"))
+				.stream().map(AnimalPublicoDTO::fromDominio).toList());
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<AnimalPublicoDTO> obtener(@PathVariable Long id) {
-	    Animal animal = animales.obtenerPorId(id);
-	    if (animal.getEstado() != Estado.EN_ADOPCION) {
-	        return ResponseEntity.notFound().build();
-	    }
-	    return ResponseEntity.ok(AnimalPublicoDTO.fromDominio(animal));
+		Animal animal = animales.obtenerPorId(id);
+		if (animal.getEstado() != Estado.EN_ADOPCION) {
+			return ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok(AnimalPublicoDTO.fromDominio(animal));
 	}
 
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
 	@PostMapping
-	public ResponseEntity<Animal> crear(
-	        @RequestBody AnimalNuevoDTO dto,
-	        org.springframework.security.core.Authentication authentication) {
+	public ResponseEntity<Animal> crear(@RequestBody AnimalNuevoDTO dto, Authentication authentication) {
+		Animal animal = dto.toDominio();
+		Long usuarioId = Long.parseLong((String) authentication.getPrincipal());
+		usuarioRepo.buscarPorId(usuarioId).ifPresent(animal::setResponsable);
 
-	    Animal animal = dto.toDominio();
-
-	    // El principal es el email (claims.getSubject() del JWT)
-	    String email = (String) authentication.getPrincipal();
-	    usuarioRepo.buscarPorEmail(email).ifPresent(animal::setResponsable);
-
-	    return ResponseEntity.ok(animales.crear(animal));
+		return ResponseEntity.ok(animales.crear(animal));
 	}
 
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
@@ -116,9 +104,7 @@ public class AnimalController {
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
 	@GetMapping("/{id}/citas")
 	public ResponseEntity<List<CitaResponseDTO>> listarCitas(@PathVariable Long id) {
-		return ResponseEntity.ok(
-			animales.listarCitas(id).stream().map(CitaResponseDTO::from).toList()
-		);
+		return ResponseEntity.ok(animales.listarCitas(id).stream().map(CitaResponseDTO::from).toList());
 	}
 
 	// CU-13
