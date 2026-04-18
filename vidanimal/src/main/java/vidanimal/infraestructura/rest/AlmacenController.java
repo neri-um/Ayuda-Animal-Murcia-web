@@ -93,6 +93,14 @@ public class AlmacenController {
         return ResponseEntity.ok(servicio.decidirSolicitud(id, dto.getDecision(), dto.getEncargadoId()));
     }
 
+    // Alias para compatibilidad con el frontend (PUT /solicitudes/{id}/decision)
+    @PutMapping("/solicitudes/{id}/decision")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO')")
+    public ResponseEntity<SolicitudProducto> decidirSolicitudAlias(@PathVariable Long id,
+            @RequestBody DecisionSolicitudDTO dto) {
+        return ResponseEntity.ok(servicio.decidirSolicitud(id, dto.getDecision(), dto.getEncargadoId()));
+    }
+
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO', 'VOLUNTARIO')")
     @PutMapping("/solicitudes/{id}/devolucion")
     public ResponseEntity<AsignacionProducto> registrarDevolucion(@PathVariable Long id) {
