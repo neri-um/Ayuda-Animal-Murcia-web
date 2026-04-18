@@ -13,17 +13,19 @@ public class ProductoNuevoDTO {
     private String descripcion;
 
     @NotNull
-    private String categoria; // viene como String para mapear a enum
+    private String categoria;
 
     @NotNull
     private Integer stock;
 
     public Producto toDominio() {
+        int cantidad = stock != null ? stock : 0;
         Producto p = new Producto();
         p.setNombre(nombre);
         p.setDescripcion(descripcion);
         p.setCategoria(parseCategoria(categoria));
-        p.setStockTotal(stock != null ? stock : 0);
+        p.setStockTotal(cantidad);
+        p.setStockDisponible(cantidad); // igual al total al crear/editar
         return p;
     }
 
