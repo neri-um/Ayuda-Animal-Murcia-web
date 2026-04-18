@@ -9,7 +9,7 @@ import vidanimal.dominio.modelo.AsignacionProducto;
 
 public interface AsignacionProductoRepositorio extends JpaRepository<AsignacionProducto, Long> {
 
-    Optional<AsignacionProducto> findBySolicitudId(Long solicitudId);
+    Optional<AsignacionProducto> findBySolicitud_Id(Long solicitudId);
 
     List<AsignacionProducto> findAllByOrderByFechaEntregaDesc();
 
