@@ -43,7 +43,6 @@ public class AlmacenService implements AlmacenUseCase {
 
     @Override
     public Producto crearProducto(Producto producto) {
-        // stockDisponible = stockTotal al crear
         producto.setStockDisponible(producto.getStockTotal());
         return productoRepo.guardar(producto);
     }
@@ -57,7 +56,6 @@ public class AlmacenService implements AlmacenUseCase {
         if (datosNuevos.getDescripcion() != null) producto.setDescripcion(datosNuevos.getDescripcion());
         if (datosNuevos.getCategoria() != null) producto.setCategoria(datosNuevos.getCategoria());
 
-        // Ajustar stockDisponible proporcionalmente al cambio de stockTotal
         int diferencia = datosNuevos.getStockTotal() - producto.getStockTotal();
         producto.setStockTotal(datosNuevos.getStockTotal());
         int nuevoDisponible = Math.max(0, producto.getStockDisponible() + diferencia);
@@ -117,7 +115,6 @@ public class AlmacenService implements AlmacenUseCase {
         if ("ACEPTADA".equalsIgnoreCase(decision)) {
             solicitud.setEstado(EstadoSolicitudProducto.ACEPTADA);
 
-            // Descontar del stockDisponible, no del stockTotal
             Producto producto = solicitud.getProducto();
             producto.setStockDisponible(producto.getStockDisponible() - solicitud.getCantidad());
             productoRepo.guardar(producto);
@@ -144,8 +141,17 @@ public class AlmacenService implements AlmacenUseCase {
     public AsignacionProducto notificarDevolucion(Long solicitudId) {
         AsignacionProducto asignacion = asignacionRepo.buscarPorSolicitudId(solicitudId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Asignación no encontrada"));
+
+        // Marcar en la asignación
         asignacion.setFechaDevolucion(LocalDateTime.now());
-        return asignacionRepo.guardar(asignacion);
+        asignacionRepo.guardar(asignacion);
+
+        // Marcar en la solicitud para que el frontend lo vea
+        SolicitudProducto solicitud = asignacion.getSolicitud();
+        solicitud.setDevolucionNotificada(true);
+        solicitudRepo.guardar(solicitud);
+
+        return asignacion;
     }
 
     @Override
@@ -158,13 +164,23 @@ public class AlmacenService implements AlmacenUseCase {
 
         asignacion.setDevuelto(true);
         asignacion.setEncargadoConfirmacion(encargado);
+        asignacionRepo.guardar(asignacion);
 
-        // Devolver al stockDisponible, no al stockTotal
-        Producto producto = asignacion.getSolicitud().getProducto();
-        producto.setStockDisponible(producto.getStockDisponible() + asignacion.getSolicitud().getCantidad());
-        productoRepo.guardar(producto);
+        // Marcar en la solicitud para que el frontend lo vea
+        SolicitudProducto solicitud = asignacion.getSolicitud();
+        solicitud.setDevolucionConfirmada(true);
+        productoRepo.guardar(solicitud.getProducto() != null
+            ? actualizarStockDevolucion(solicitud)
+            : solicitud.getProducto());
+        solicitudRepo.guardar(solicitud);
 
-        return asignacionRepo.guardar(asignacion);
+        return asignacion;
+    }
+
+    private Producto actualizarStockDevolucion(SolicitudProducto solicitud) {
+        Producto producto = solicitud.getProducto();
+        producto.setStockDisponible(producto.getStockDisponible() + solicitud.getCantidad());
+        return productoRepo.guardar(producto);
     }
 
     @Override
