@@ -57,6 +57,16 @@ public class SolicitudProducto {
 	public SolicitudProducto() {
 	}
 
+	// Expone solo el id del voluntario sin serializar el objeto completo
+	public Long getVoluntarioId() {
+		return voluntario != null ? voluntario.getId() : null;
+	}
+
+	// Expone solo el id del encargado sin serializar el objeto completo
+	public Long getEncargadoId() {
+		return encargado != null ? encargado.getId() : null;
+	}
+
 	public Long getId() {
 		return id;
 	}
