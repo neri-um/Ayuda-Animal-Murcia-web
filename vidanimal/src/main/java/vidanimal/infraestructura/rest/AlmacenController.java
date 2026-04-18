@@ -21,98 +21,96 @@ import vidanimal.dominio.modelo.Producto;
 import vidanimal.dominio.modelo.SolicitudProducto;
 import vidanimal.infraestructura.rest.dto.ConfirmacionDevolucionDTO;
 import vidanimal.infraestructura.rest.dto.DecisionSolicitudDTO;
+import vidanimal.infraestructura.rest.dto.ProductoNuevoDTO;
 import vidanimal.infraestructura.rest.dto.SolicitudNuevaDTO;
 
 @RestController
 @RequestMapping("/vidanimal/almacen")
 public class AlmacenController {
-	private final AlmacenUseCase servicio;
+    private final AlmacenUseCase servicio;
 
-	public AlmacenController(AlmacenUseCase servicio) {
-		this.servicio = servicio;
-	}
+    public AlmacenController(AlmacenUseCase servicio) {
+        this.servicio = servicio;
+    }
 
-	// --- PRODUCTOS ---
+    // --- PRODUCTOS ---
 
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO', 'VOLUNTARIO')")
-	@GetMapping("/productos")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO', 'VOLUNTARIO')")
+    @GetMapping("/productos")
+    public ResponseEntity<List<Producto>> listarProductos(
+            @RequestParam(required = false) String categoria) {
+        if (categoria != null) {
+            CategoriaProducto cat = CategoriaProducto.valueOf(categoria.toUpperCase());
+            return ResponseEntity.ok(servicio.listarProductosPorCategoria(cat));
+        }
+        return ResponseEntity.ok(servicio.listarProductos());
+    }
 
-	public ResponseEntity<List<Producto>> listarProductos(
-	        @RequestParam(required = false) String categoria) {
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO', 'VOLUNTARIO')")
+    @GetMapping("/productos/{id}")
+    public ResponseEntity<Producto> obtenerProducto(@PathVariable Long id) {
+        return ResponseEntity.ok(servicio.obtenerProductoPorId(id));
+    }
 
-	    if (categoria != null) {
-	        CategoriaProducto cat = CategoriaProducto.valueOf(categoria.toUpperCase());
-	        return ResponseEntity.ok(servicio.listarProductosPorCategoria(cat));
-	    }
-	    return ResponseEntity.ok(servicio.listarProductos());
-	}
+    @PostMapping("/productos")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO')")
+    public ResponseEntity<Producto> crearProducto(@RequestBody ProductoNuevoDTO dto) {
+        return ResponseEntity.ok(servicio.crearProducto(dto.toDominio()));
+    }
 
+    @PutMapping("/productos/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO')")
+    public ResponseEntity<Producto> editarProducto(@PathVariable Long id, @RequestBody ProductoNuevoDTO dto) {
+        return ResponseEntity.ok(servicio.editarProducto(id, dto.toDominio()));
+    }
 
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO', 'VOLUNTARIO')")
-	@GetMapping("/productos/{id}")
-	public ResponseEntity<Producto> obtenerProducto(@PathVariable Long id) {
-		return ResponseEntity.ok(servicio.obtenerProductoPorId(id));
-	}
+    @DeleteMapping("/productos/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Void> eliminarProducto(@PathVariable Long id) {
+        servicio.eliminarProducto(id);
+        return ResponseEntity.noContent().build();
+    }
 
-	@PostMapping("/productos")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO')")
-	public ResponseEntity<Producto> crearProducto(@RequestBody Producto producto) {
-		return ResponseEntity.ok(servicio.crearProducto(producto));
-	}
+    // --- SOLICITUDES ---
 
-	@PutMapping("/productos/{id}")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO')")
-	public ResponseEntity<Producto> editarProducto(@PathVariable Long id, @RequestBody Producto datosNuevos) {
-		return ResponseEntity.ok(servicio.editarProducto(id, datosNuevos));
-	}
+    @GetMapping("/solicitudes")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO')")
+    public ResponseEntity<List<SolicitudProducto>> listarSolicitudes() {
+        return ResponseEntity.ok(servicio.obtenerSolicitudes());
+    }
 
-	@DeleteMapping("/productos/{id}")
-	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<Void> eliminarProducto(@PathVariable Long id) {
-		servicio.eliminarProducto(id);
-		return ResponseEntity.noContent().build();
-	}
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO', 'VOLUNTARIO')")
+    @PostMapping("/solicitudes")
+    public ResponseEntity<SolicitudProducto> crearSolicitud(@RequestBody SolicitudNuevaDTO dto) {
+        return ResponseEntity.ok(servicio.crearSolicitud(
+                dto.getVoluntarioId(), dto.getProductoId(), dto.getCantidad(), dto.getMotivo()));
+    }
 
-	// --- SOLICITUDES ---
+    @PutMapping("/solicitudes/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO')")
+    public ResponseEntity<SolicitudProducto> decidirSolicitud(@PathVariable Long id,
+            @RequestBody DecisionSolicitudDTO dto) {
+        return ResponseEntity.ok(servicio.decidirSolicitud(id, dto.getDecision(), dto.getEncargadoId()));
+    }
 
-	@GetMapping("/solicitudes")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO')")
-	public ResponseEntity<List<SolicitudProducto>> listarSolicitudes() {
-		return ResponseEntity.ok(servicio.obtenerSolicitudes());
-	}
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO', 'VOLUNTARIO')")
+    @PutMapping("/solicitudes/{id}/devolucion")
+    public ResponseEntity<AsignacionProducto> registrarDevolucion(@PathVariable Long id) {
+        return ResponseEntity.ok(servicio.registrarDevolucion(id));
+    }
 
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO', 'VOLUNTARIO')")
-	@PostMapping("/solicitudes")
-	public ResponseEntity<SolicitudProducto> crearSolicitud(@RequestBody SolicitudNuevaDTO dto) {
-		return ResponseEntity.ok(servicio.crearSolicitud(dto.getVoluntarioId(), dto.getProductoId(), dto.getCantidad(),
-				dto.getMotivo()));
-	}
+    @PutMapping("/solicitudes/{id}/confirmacion")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO')")
+    public ResponseEntity<AsignacionProducto> confirmarDevolucion(@PathVariable Long id,
+            @RequestBody ConfirmacionDevolucionDTO dto) {
+        return ResponseEntity.ok(servicio.confirmarDevolucion(id, dto.getEncargadoId()));
+    }
 
-	@PutMapping("/solicitudes/{id}")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO')")
-	public ResponseEntity<SolicitudProducto> decidirSolicitud(@PathVariable Long id,
-			@RequestBody DecisionSolicitudDTO dto) {
-		return ResponseEntity.ok(servicio.decidirSolicitud(id, dto.getDecision(), dto.getEncargadoId()));
-	}
+    // --- ASIGNACIONES ---
 
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO', 'VOLUNTARIO')")
-	@PutMapping("/solicitudes/{id}/devolucion")
-	public ResponseEntity<AsignacionProducto> registrarDevolucion(@PathVariable Long id) {
-		return ResponseEntity.ok(servicio.registrarDevolucion(id));
-	}
-
-	@PutMapping("/solicitudes/{id}/confirmacion")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO')")
-	public ResponseEntity<AsignacionProducto> confirmarDevolucion(@PathVariable Long id,
-			@RequestBody ConfirmacionDevolucionDTO dto) {
-		return ResponseEntity.ok(servicio.confirmarDevolucion(id, dto.getEncargadoId()));
-	}
-
-	// --- ASIGNACIONES ---
-
-	@GetMapping("/asignaciones")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO')")
-	public ResponseEntity<List<AsignacionProducto>> listarAsignaciones() {
-		return ResponseEntity.ok(servicio.obtenerAsignaciones());
-	}
+    @GetMapping("/asignaciones")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO')")
+    public ResponseEntity<List<AsignacionProducto>> listarAsignaciones() {
+        return ResponseEntity.ok(servicio.obtenerAsignaciones());
+    }
 }

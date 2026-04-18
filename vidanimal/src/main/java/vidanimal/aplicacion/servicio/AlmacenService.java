@@ -36,19 +36,18 @@ public class AlmacenService implements AlmacenUseCase {
         this.usuarioRepo = usuarioRepo;
     }
 
-    // CU-13
     @Override
     public List<Producto> listarProductos() {
         return productoRepo.buscarTodosOrdenados();
     }
 
-    // CU-17
     @Override
     public Producto crearProducto(Producto producto) {
+        // stockDisponible = stockTotal al crear
+        producto.setStockDisponible(producto.getStockTotal());
         return productoRepo.guardar(producto);
     }
 
-    // CU-18
     @Override
     public Producto editarProducto(Long id, Producto datosNuevos) {
         Producto producto = productoRepo.buscarPorId(id)
@@ -58,12 +57,15 @@ public class AlmacenService implements AlmacenUseCase {
         if (datosNuevos.getDescripcion() != null) producto.setDescripcion(datosNuevos.getDescripcion());
         if (datosNuevos.getCategoria() != null) producto.setCategoria(datosNuevos.getCategoria());
 
+        // Ajustar stockDisponible proporcionalmente al cambio de stockTotal
+        int diferencia = datosNuevos.getStockTotal() - producto.getStockTotal();
         producto.setStockTotal(datosNuevos.getStockTotal());
+        int nuevoDisponible = Math.max(0, producto.getStockDisponible() + diferencia);
+        producto.setStockDisponible(nuevoDisponible);
 
         return productoRepo.guardar(producto);
     }
 
-    // CU-19
     @Override
     public void eliminarProducto(Long id) {
         Producto producto = productoRepo.buscarPorId(id)
@@ -71,7 +73,6 @@ public class AlmacenService implements AlmacenUseCase {
         productoRepo.eliminar(producto);
     }
 
-    // CU-14
     @Override
     public SolicitudProducto crearSolicitud(Long voluntarioId, Long productoId, int cantidad, String motivo) {
         Usuario voluntario = usuarioRepo.buscarPorId(voluntarioId)
@@ -80,8 +81,8 @@ public class AlmacenService implements AlmacenUseCase {
         Producto producto = productoRepo.buscarPorId(productoId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
 
-        if (producto.getStockTotal() < cantidad) {
-            throw new RuntimeException("Stock insuficiente. Disponible: " + producto.getStockTotal());
+        if (producto.getStockDisponible() < cantidad) {
+            throw new RuntimeException("Stock insuficiente. Disponible: " + producto.getStockDisponible());
         }
 
         SolicitudProducto solicitud = new SolicitudProducto();
@@ -89,24 +90,19 @@ public class AlmacenService implements AlmacenUseCase {
         solicitud.setProducto(producto);
         solicitud.setCantidad(cantidad);
         solicitud.setMotivo(motivo);
-
-        // tu entidad tiene fechaSolicitud porque la ordenas por ella
         solicitud.setFechaSolicitud(LocalDateTime.now());
         solicitud.setEstado(EstadoSolicitudProducto.PENDIENTE);
 
         return solicitudRepo.guardar(solicitud);
     }
 
-    // CU-15
     @Override
     public List<SolicitudProducto> listarSolicitudesDeVoluntario(Long voluntarioId) {
         usuarioRepo.buscarPorId(voluntarioId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Voluntario no encontrado"));
-
         return solicitudRepo.buscarPorVoluntarioId(voluntarioId);
     }
 
-    // CU-20
     @Override
     public SolicitudProducto decidirSolicitud(Long solicitudId, String decision, Long encargadoId) {
         SolicitudProducto solicitud = solicitudRepo.buscarPorId(solicitudId)
@@ -121,15 +117,15 @@ public class AlmacenService implements AlmacenUseCase {
         if ("ACEPTADA".equalsIgnoreCase(decision)) {
             solicitud.setEstado(EstadoSolicitudProducto.ACEPTADA);
 
+            // Descontar del stockDisponible, no del stockTotal
             Producto producto = solicitud.getProducto();
-            producto.setStockTotal(producto.getStockTotal() - solicitud.getCantidad());
+            producto.setStockDisponible(producto.getStockDisponible() - solicitud.getCantidad());
             productoRepo.guardar(producto);
 
             AsignacionProducto asignacion = new AsignacionProducto();
             asignacion.setSolicitud(solicitud);
             asignacion.setFechaEntrega(LocalDateTime.now());
             asignacion.setDevuelto(false);
-
             asignacionRepo.guardar(asignacion);
 
         } else {
@@ -139,23 +135,19 @@ public class AlmacenService implements AlmacenUseCase {
         return solicitudRepo.guardar(solicitud);
     }
 
-    // CU-21
     @Override
     public List<AsignacionProducto> listarAsignaciones() {
         return asignacionRepo.buscarTodasOrdenadas();
     }
 
-    // CU-16
     @Override
     public AsignacionProducto notificarDevolucion(Long solicitudId) {
         AsignacionProducto asignacion = asignacionRepo.buscarPorSolicitudId(solicitudId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Asignación no encontrada"));
-
         asignacion.setFechaDevolucion(LocalDateTime.now());
         return asignacionRepo.guardar(asignacion);
     }
 
-    // CU-22
     @Override
     public AsignacionProducto confirmarDevolucion(Long solicitudId, Long encargadoId) {
         AsignacionProducto asignacion = asignacionRepo.buscarPorSolicitudId(solicitudId)
@@ -167,13 +159,14 @@ public class AlmacenService implements AlmacenUseCase {
         asignacion.setDevuelto(true);
         asignacion.setEncargadoConfirmacion(encargado);
 
+        // Devolver al stockDisponible, no al stockTotal
         Producto producto = asignacion.getSolicitud().getProducto();
-        producto.setStockTotal(producto.getStockTotal() + asignacion.getSolicitud().getCantidad());
+        producto.setStockDisponible(producto.getStockDisponible() + asignacion.getSolicitud().getCantidad());
         productoRepo.guardar(producto);
 
         return asignacionRepo.guardar(asignacion);
     }
-    
+
     @Override
     public Producto obtenerProductoPorId(Long id) {
         return productoRepo.buscarPorId(id)
