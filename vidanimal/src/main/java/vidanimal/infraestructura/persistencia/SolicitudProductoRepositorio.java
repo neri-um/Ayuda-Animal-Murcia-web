@@ -13,7 +13,7 @@ public interface SolicitudProductoRepositorio extends JpaRepository<SolicitudPro
 
     List<SolicitudProducto> findByEstadoOrderByFechaSolicitudDesc(EstadoSolicitudProducto estado);
 
-    List<SolicitudProducto> findByVoluntarioIdOrderByFechaSolicitudDesc(Long voluntarioId);
+    List<SolicitudProducto> findByVoluntario_IdOrderByFechaSolicitudDesc(Long voluntarioId);
 
     List<SolicitudProducto> findByProductoIdOrderByFechaSolicitudDesc(Long productoId);
 }
