@@ -12,5 +12,6 @@ public enum Tratamiento {
     REVISION,
     MICROCHIP,
     VACUNACION_RABIA,
-    COPROLÓGICO
+    COPROLÓGICO,
+    ANALÍTICA
 }
