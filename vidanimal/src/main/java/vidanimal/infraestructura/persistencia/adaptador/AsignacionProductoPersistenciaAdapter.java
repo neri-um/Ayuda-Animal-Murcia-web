@@ -25,7 +25,7 @@ public class AsignacionProductoPersistenciaAdapter implements AsignacionProducto
 
     @Override
     public Optional<AsignacionProducto> buscarPorSolicitudId(Long solicitudId) {
-        return jpa.findBySolicitudId(solicitudId);
+        return jpa.findBySolicitud_Id(solicitudId);
     }
 
     @Override
