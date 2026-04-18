@@ -2,6 +2,7 @@ package vidanimal.infraestructura.config;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -17,6 +18,11 @@ public class GlobalExceptionHandler {
             RecursoNoEncontradoException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                 Map.of("codigo", 404, "mensaje", e.getMessage()));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> accesoDenegado(AccessDeniedException e) {
+        throw e; // Deja que Spring Security lo maneje correctamente
     }
 
     @ExceptionHandler(RuntimeException.class)
