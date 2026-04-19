@@ -15,4 +15,6 @@ public interface AsignacionProductoRepositorioPort {
 	List<AsignacionProducto> buscarPendientesDeDevolucion();
 
 	List<AsignacionProducto> buscarDevueltas();
+
+	List<AsignacionProducto> buscarActivasPorVoluntarioId(Long voluntarioId);
 }
