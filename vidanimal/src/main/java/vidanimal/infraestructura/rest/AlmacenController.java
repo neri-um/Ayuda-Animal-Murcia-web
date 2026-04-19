@@ -121,4 +121,15 @@ public class AlmacenController {
     public ResponseEntity<List<AsignacionProducto>> listarAsignaciones() {
         return ResponseEntity.ok(servicio.obtenerAsignaciones());
     }
+
+    /**
+     * CU-nuevo: productos actualmente asignados a un voluntario (no devueltos).
+     * Accesible por el propio voluntario, encargado y admin.
+     * GET /vidanimal/almacen/asignaciones/voluntario/{id}
+     */
+    @GetMapping("/asignaciones/voluntario/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO', 'VOLUNTARIO')")
+    public ResponseEntity<List<AsignacionProducto>> listarAsignacionesDeVoluntario(@PathVariable Long id) {
+        return ResponseEntity.ok(servicio.listarAsignacionesDeVoluntario(id));
+    }
 }
