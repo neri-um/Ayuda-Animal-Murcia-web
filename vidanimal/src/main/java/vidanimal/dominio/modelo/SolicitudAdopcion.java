@@ -11,7 +11,10 @@ public class SolicitudAdopcion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long animalId;
+    @ManyToOne
+    @JoinColumn(name = "animal_id")
+    private Animal animal;
+
     private String nombreAdoptante;
     private String email;
     private String telefono;
@@ -29,8 +32,10 @@ public class SolicitudAdopcion {
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    public Long getAnimalId() { return animalId; }
-    public void setAnimalId(Long animalId) { this.animalId = animalId; }
+    public Animal getAnimal() { return animal; }
+    public void setAnimal(Animal animal) { this.animal = animal; }
+
+    public Long getAnimalId() { return animal != null ? animal.getId() : null; }
 
     public String getNombreAdoptante() { return nombreAdoptante; }
     public void setNombreAdoptante(String nombreAdoptante) { this.nombreAdoptante = nombreAdoptante; }

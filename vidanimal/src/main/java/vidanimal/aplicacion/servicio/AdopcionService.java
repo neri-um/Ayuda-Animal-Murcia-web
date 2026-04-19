@@ -57,8 +57,11 @@ public class AdopcionService {
     }
 
     public SolicitudAdopcionRespuestaDTO crearSolicitud(SolicitudAdopcionDTO dto) {
+        Animal animal = animalRepo.findById(dto.getAnimalId())
+            .orElseThrow(() -> new RuntimeException("Animal no encontrado"));
+
         SolicitudAdopcion s = new SolicitudAdopcion();
-        s.setAnimalId(dto.getAnimalId());
+        s.setAnimal(animal);
         s.setNombreAdoptante(dto.getNombreAdoptante());
         s.setEmail(dto.getEmail());
         s.setTelefono(dto.getTelefono());
@@ -104,8 +107,9 @@ public class AdopcionService {
         SolicitudAdopcionRespuestaDTO dto = new SolicitudAdopcionRespuestaDTO();
         dto.setId(s.getId());
         dto.setAnimalId(s.getAnimalId());
-        animalRepo.findById(s.getAnimalId())
-            .ifPresent(a -> dto.setAnimalNombre(a.getNombre()));
+        if (s.getAnimal() != null) {
+            dto.setAnimalNombre(s.getAnimal().getNombre());
+        }
         dto.setNombreAdoptante(s.getNombreAdoptante());
         dto.setEmail(s.getEmail());
         dto.setTelefono(s.getTelefono());
