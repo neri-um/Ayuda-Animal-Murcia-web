@@ -36,6 +36,9 @@ public interface AlmacenUseCase {
 	// CU-21
 	List<AsignacionProducto> listarAsignaciones();
 
+	// CU-nuevo: productos actualmente asignados al voluntario autenticado
+	List<AsignacionProducto> listarAsignacionesDeVoluntario(Long voluntarioId);
+
 	// CU-16
 	AsignacionProducto notificarDevolucion(Long solicitudId);
 
