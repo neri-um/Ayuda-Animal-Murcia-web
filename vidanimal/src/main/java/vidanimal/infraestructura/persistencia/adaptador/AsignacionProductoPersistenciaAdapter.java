@@ -42,4 +42,9 @@ public class AsignacionProductoPersistenciaAdapter implements AsignacionProducto
     public List<AsignacionProducto> buscarDevueltas() {
         return jpa.findByDevueltoTrueOrderByFechaDevolucionDesc();
     }
+
+    @Override
+    public List<AsignacionProducto> buscarActivasPorVoluntarioId(Long voluntarioId) {
+        return jpa.findBySolicitud_Voluntario_IdAndDevueltoFalseOrderByFechaEntregaDesc(voluntarioId);
+    }
 }
