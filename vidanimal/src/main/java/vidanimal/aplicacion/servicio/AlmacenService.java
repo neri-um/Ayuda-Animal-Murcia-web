@@ -138,15 +138,20 @@ public class AlmacenService implements AlmacenUseCase {
     }
 
     @Override
+    public List<AsignacionProducto> listarAsignacionesDeVoluntario(Long voluntarioId) {
+        usuarioRepo.buscarPorId(voluntarioId)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Voluntario no encontrado"));
+        return asignacionRepo.buscarActivasPorVoluntarioId(voluntarioId);
+    }
+
+    @Override
     public AsignacionProducto notificarDevolucion(Long solicitudId) {
         AsignacionProducto asignacion = asignacionRepo.buscarPorSolicitudId(solicitudId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Asignación no encontrada"));
 
-        // Marcar en la asignación
         asignacion.setFechaDevolucion(LocalDateTime.now());
         asignacionRepo.guardar(asignacion);
 
-        // Marcar en la solicitud para que el frontend lo vea
         SolicitudProducto solicitud = asignacion.getSolicitud();
         solicitud.setDevolucionNotificada(true);
         solicitudRepo.guardar(solicitud);
@@ -166,7 +171,6 @@ public class AlmacenService implements AlmacenUseCase {
         asignacion.setEncargadoConfirmacion(encargado);
         asignacionRepo.guardar(asignacion);
 
-        // Marcar en la solicitud para que el frontend lo vea
         SolicitudProducto solicitud = asignacion.getSolicitud();
         solicitud.setDevolucionConfirmada(true);
         productoRepo.guardar(solicitud.getProducto() != null
