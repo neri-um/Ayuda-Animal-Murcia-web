@@ -16,4 +16,6 @@ public interface AsignacionProductoRepositorio extends JpaRepository<AsignacionP
     List<AsignacionProducto> findByDevueltoFalseOrderByFechaEntregaDesc();
 
     List<AsignacionProducto> findByDevueltoTrueOrderByFechaDevolucionDesc();
+
+    List<AsignacionProducto> findBySolicitud_Voluntario_IdAndDevueltoFalseOrderByFechaEntregaDesc(Long voluntarioId);
 }
