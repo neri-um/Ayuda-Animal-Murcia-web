@@ -42,6 +42,9 @@ public class Usuario {
 
 	private LocalDate fechaAlta;
 
+	@Column(nullable = false)
+	private boolean activo = true;
+
 	@OneToMany(mappedBy = "responsable")
 	@JsonIgnore
 	private List<Animal> animalesACargo = new LinkedList<>();
@@ -60,6 +63,7 @@ public class Usuario {
 		this.telefono = telefono;
 		this.rol = rol;
 		this.fechaAlta = LocalDate.now();
+		this.activo = true;
 	}
 
 	// --- Getters y Setters ---
@@ -126,6 +130,14 @@ public class Usuario {
 
 	public void setFechaAlta(LocalDate fechaAlta) {
 		this.fechaAlta = fechaAlta;
+	}
+
+	public boolean isActivo() {
+		return activo;
+	}
+
+	public void setActivo(boolean activo) {
+		this.activo = activo;
 	}
 
 	public List<Animal> getAnimalesACargo() {
