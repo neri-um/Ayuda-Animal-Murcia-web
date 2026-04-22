@@ -20,4 +20,7 @@ public interface UsuariosAdminUseCase {
     void eliminarUsuario(Long id);
 
     List<Usuario> listarUsuarios(Rol rol, String nombre);
+
+    // Activar/desactivar usuario
+    Usuario cambiarActivo(Long id, boolean activo);
 }

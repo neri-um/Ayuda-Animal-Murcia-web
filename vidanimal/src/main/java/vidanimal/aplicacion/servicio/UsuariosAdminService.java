@@ -46,6 +46,15 @@ public class UsuariosAdminService implements UsuariosAdminUseCase {
     }
 
     @Override
+    public Usuario cambiarActivo(Long id, boolean activo) {
+        Usuario usuario = usuarioRepo.buscarPorId(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                        "Usuario con id " + id + " no encontrado"));
+        usuario.setActivo(activo);
+        return usuarioRepo.guardar(usuario);
+    }
+
+    @Override
     public void eliminarUsuario(Long id) {
         Usuario usuario = usuarioRepo.buscarPorId(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException(
@@ -59,7 +68,7 @@ public class UsuariosAdminService implements UsuariosAdminUseCase {
         if (nombre != null && !nombre.isBlank()) return usuarioRepo.buscarPorNombre(nombre);
         return usuarioRepo.buscarTodosOrdenados();
     }
-    
+
     @Override
     public Usuario obtenerPorId(Long id) {
         return usuarioRepo.buscarPorId(id)
