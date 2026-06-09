@@ -2,3 +2,4 @@
 
 # Secretos — nunca subir al repositorio
 .env
+node_modules/
