@@ -1,1 +1,4 @@
 /.metadata/
+
+# Secretos — nunca subir al repositorio
+.env
