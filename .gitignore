@@ -1,5 +1,35 @@
-/.metadata/
-
-# Secretos — nunca subir al repositorio
+# Variables de entorno (nunca subir al repositorio)
 .env
-node_modules/
+.env.local
+.env.*.local
+
+# Dependencias y compilados
+cliente/node_modules/
+cliente/dist/
+servidor/target/
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# Versiones intermedias del documento Word (solo se sube TFG_final.docx)
+TFG 22-04_revPaco.docx
+TFG_completo.docx
+TFG_corregido.docx
+TFG_reestructurado.docx
+
+# Scripts de procesamiento del documento (uso interno)
+completar_documento.py
+restructurar_tfg.py
+corregir_tablas.py
+corregir_bibliografia.py
+corregir_imgbb.py
+optimizar_paginas.py
+fix_cu_comments.py
+
+# Archivos temporales de LibreOffice/Word
+.~lock.*
+
+# Documento de referencia externo
+trabajoFin_JuanPablo.pdf

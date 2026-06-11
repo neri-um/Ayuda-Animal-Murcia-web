@@ -9,40 +9,40 @@ import vidanimal.dominio.modelo.SolicitudProducto;
 
 public interface AlmacenUseCase {
 
-	// CU-13
+	// CU-15
 	List<Producto> listarProductos();
 
-	// CU-13 filtrado
+	// CU-15 filtrado
 	List<Producto> listarProductosPorCategoria(CategoriaProducto categoria);
 
-	// CU-17
+	// CU-23
 	Producto crearProducto(Producto producto);
 
-	// CU-18
+	// CU-24
 	Producto editarProducto(Long id, Producto datosNuevos);
 
-	// CU-19
+	// CU-25
 	void eliminarProducto(Long id);
 
-	// CU-14
+	// CU-17
 	SolicitudProducto crearSolicitud(Long voluntarioId, Long productoId, int cantidad, String motivo);
 
-	// CU-15
+	// CU-18
 	List<SolicitudProducto> listarSolicitudesDeVoluntario(Long voluntarioId);
 
-	// CU-20
+	// CU-26
 	SolicitudProducto decidirSolicitud(Long solicitudId, String decision, Long encargadoId);
 
-	// CU-21
+	// CU-27
 	List<AsignacionProducto> listarAsignaciones();
 
-	// CU-nuevo: productos actualmente asignados al voluntario autenticado
+	// CU-19: Ver mis productos recogidos
 	List<AsignacionProducto> listarAsignacionesDeVoluntario(Long voluntarioId);
 
-	// CU-16
+	// CU-20
 	AsignacionProducto notificarDevolucion(Long solicitudId);
 
-	// CU-22
+	// CU-28
 	AsignacionProducto confirmarDevolucion(Long solicitudId, Long encargadoId);
 
 	Producto obtenerProductoPorId(Long id);

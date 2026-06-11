@@ -33,7 +33,7 @@ services:
 
   frontend:
     build:
-      context: ./cliente/frontend
+      context: ./cliente
       args:
         VITE_API_URL: ${VITE_API_URL:-http://localhost:8080/vidanimal}
         VITE_IMGBB_KEY: ${VITE_IMGBB_KEY:-}

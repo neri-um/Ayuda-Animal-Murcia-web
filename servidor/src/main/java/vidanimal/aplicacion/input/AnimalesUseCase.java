@@ -17,25 +17,25 @@ public interface AnimalesUseCase {
     // CU-03
     Animal obtenerPorId(Long id);
 
-    // CU-07
+    // CU-08
     Animal crear(Animal animal);
 
-    // CU-08
+    // CU-09
     Animal editar(Long id, Animal datosNuevos);
 
-    // CU-09
+    // CU-10
     void eliminar(Long id);
 
-    // CU-10
+    // CU-11
     Animal cambiarEstado(Long id, Estado nuevoEstado);
 
-    // CU-11
+    // CU-12
     CitaVeterinaria agregarCita(Long animalId, CitaVeterinaria cita);
 
-    // CU-12
+    // CU-13
     List<CitaVeterinaria> listarCitas(Long animalId);
 
-    // CU-13: Marcar una cita del protocolo como completada
+    // CU-14: Marcar una cita del protocolo como completada
     CitaVeterinaria completarCita(Long animalId, Long citaId);
 
     List<Animal> listarPorResponsable(Long responsableId);

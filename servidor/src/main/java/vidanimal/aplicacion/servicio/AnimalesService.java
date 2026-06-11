@@ -48,7 +48,7 @@ public class AnimalesService implements AnimalesUseCase {
                 .orElseThrow(() -> new RecursoNoEncontradoException("Animal con id " + id + " no encontrado"));
     }
 
-    // CU-07
+    // CU-08
     @Override
     public Animal crear(Animal animal) {
         Animal animalConProtocolo = AnimalFactory.crear(
@@ -74,7 +74,7 @@ public class AnimalesService implements AnimalesUseCase {
         return animalRepo.guardar(animalConProtocolo);
     }
 
-    // CU-08
+    // CU-09
     @Override
     public Animal editar(Long id, Animal datosNuevos) {
         Animal animal = obtenerPorId(id);
@@ -99,14 +99,14 @@ public class AnimalesService implements AnimalesUseCase {
         return animalRepo.guardar(animal);
     }
 
-    // CU-09
+    // CU-10
     @Override
     public void eliminar(Long id) {
         Animal animal = obtenerPorId(id);
         animalRepo.eliminar(animal);
     }
 
-    // CU-10
+    // CU-11
     @Override
     public Animal cambiarEstado(Long id, Estado nuevoEstado) {
         Animal animal = obtenerPorId(id);
@@ -114,7 +114,7 @@ public class AnimalesService implements AnimalesUseCase {
         return animalRepo.guardar(animal);
     }
 
-    // CU-11
+    // CU-12
     @Override
     public CitaVeterinaria agregarCita(Long animalId, CitaVeterinaria cita) {
         Animal animal = obtenerPorId(animalId);
@@ -122,14 +122,14 @@ public class AnimalesService implements AnimalesUseCase {
         return citaRepo.guardar(cita);
     }
 
-    // CU-12
+    // CU-13
     @Override
     public List<CitaVeterinaria> listarCitas(Long animalId) {
         obtenerPorId(animalId);
         return citaRepo.buscarPorAnimalId(animalId);
     }
 
-    // CU-13
+    // CU-14
     @Override
     public CitaVeterinaria completarCita(Long animalId, Long citaId) {
         obtenerPorId(animalId);

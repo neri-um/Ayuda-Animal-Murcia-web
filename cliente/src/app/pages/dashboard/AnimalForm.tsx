@@ -7,7 +7,7 @@ import { formatEnum, getEnums } from '../../services/enums';
 
 const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8080/vidanimal';
 
-const IMGBB_KEY = import.meta.env.VITE_IMGBB_KEY ?? 'c1d8511ac93df0c674959a92651085ec';
+const IMGBB_KEY = import.meta.env.VITE_IMGBB_KEY as string | undefined;
 
 type FormData = Omit<Animal, 'id' | 'volunteerId' | 'protocolo'>;
 
@@ -31,6 +31,7 @@ const defaultForm: FormData = {
 };
 
 async function uploadToImgBB(file: File): Promise<string> {
+  if (!IMGBB_KEY) throw new Error('La variable VITE_IMGBB_KEY no está configurada');
   const data = new FormData();
   data.append('image', file);
   const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {

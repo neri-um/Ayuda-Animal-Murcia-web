@@ -4,9 +4,9 @@ import vidanimal.dominio.modelo.Usuario;
 
 public interface AuthUseCase {
 
-    // CU-05
+    // CU-06
     Usuario login(String email, String password);
 
-    // CU-06
+    // CU-07
     void logout();
 }
