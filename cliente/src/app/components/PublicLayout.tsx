@@ -10,12 +10,12 @@ export default function PublicLayout() {
   const isAdmin = Boolean(currentUser?.roles?.includes('ROLE_ADMIN'));
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="w-full min-h-screen bg-slate-50">
       <header className="border-b border-slate-200 bg-white/80 backdrop-blur">
-        {/* ... tu header tal como lo tenías ... */}
+        {/* ... tu header tal como lo tenias ... */}
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 py-8">
+      <main className="w-full">
         <Outlet />
       </main>
     </div>
