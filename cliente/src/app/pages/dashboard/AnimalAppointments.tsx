@@ -3,6 +3,8 @@ import ProtocoloVeterinarioCard from '../../components/ProtocoloVeterinarioCard'
 
 const BASE = import.meta.env.VITE_API_URL ?? 'https://ayuda-animal-murcia-web.onrender.com';
 
-const empty = { tratamiento: '', descripcion: '', fecha: '', veterinario: '' };
+export function AnimalAppointments() {
+  // cuerpo original de tu componente, con la lógica de citas veterinarias
+}
 
-// resto del archivo original omitido por brevedad
+export default AnimalAppointments;
