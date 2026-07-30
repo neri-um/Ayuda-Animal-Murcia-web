@@ -1,48 +1,8 @@
-version: "3.9"
-
 services:
-  db:
-    image: mysql:8.0
-    container_name: vidanimal_db
-    restart: always
-    environment:
-      MYSQL_DATABASE: vidanimal
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "3306:3306"
-    volumes:
-      - db_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  backend:
-    build: ./vidanimal
-    container_name: vidanimal_backend
-    restart: always
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      DB_URL: jdbc:mysql://db:3306/vidanimal?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      DB_USERNAME: root
-      DB_PASSWORD: ${DB_PASSWORD}
-      JWT_SECRET: ${JWT_SECRET}
-    ports:
-      - "8080:8080"
-
   frontend:
-    build: ./frontend
-    container_name: vidanimal_frontend
-    restart: always
     depends_on:
       - backend
     environment:
-      VITE_API_URL: http://localhost:8080/vidanimal
+      VITE_API_URL: https://ayuda-animal-murcia-web.onrender.com
     ports:
       - "80:80"
-
-volumes:
-  db_data:
