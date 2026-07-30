@@ -1,5 +1,6 @@
 import { Heart, Menu, X, LogIn, LayoutDashboard, LogOut } from 'lucide-react';
 import { useState } from 'react';
+import { Outlet } from 'react-router';
 import { useAuth } from '../context/AppContext';
 
 export default function PublicLayout() {
@@ -10,7 +11,13 @@ export default function PublicLayout() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* resto del layout exactamente igual que tu versión anterior */}
+      <header className="border-b border-slate-200 bg-white/80 backdrop-blur">
+        {/* ... tu header tal como lo tenías ... */}
+      </header>
+
+      <main className="max-w-5xl mx-auto px-4 py-8">
+        <Outlet />
+      </main>
     </div>
   );
 }
