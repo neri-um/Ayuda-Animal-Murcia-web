@@ -2,7 +2,14 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import type { Animal, Appointment, AdoptionRequest, RequestStatus, UserRole } from '../types';
 import { TratamientoItem as ProtocoloItem } from '../components/ProtocoloVeterinarioCard';
 
-// ... resto del contexto y del AppProvider tal como ya lo tienes ...
+// ... aquí va todo tu código existente de estado global, efectos, etc. ...
+
+const AppContext = createContext<AppContextValue | null>(null);
+
+export function AppProvider({ children }: { children: React.ReactNode }) {
+  // implementación actual de tu provider, con useState/useEffect y value
+  // (mantén exactamente la lógica que ya tenías, solo añadiendo export)
+}
 
 export function useApp() {
   const ctx = useContext(AppContext);
