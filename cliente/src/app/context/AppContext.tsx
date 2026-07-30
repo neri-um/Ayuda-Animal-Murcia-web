@@ -1,11 +1,21 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import type { Animal, Appointment, AdoptionRequest, RequestStatus, TratamientoItem } from '../types';
+import type { Animal, Appointment, AdoptionRequest, RequestStatus, UserRole } from '../types';
 import { TratamientoItem as ProtocoloItem } from '../components/ProtocoloVeterinarioCard';
 
-const BASE = import.meta.env.VITE_API_URL ?? 'https://ayuda-animal-murcia-web.onrender.com';
+// ... resto del contexto y del AppProvider tal como ya lo tienes ...
 
-const VALID_REQUEST_STATUSES: RequestStatus[] = [
-  'PENDIENTE', 'ACEPTADA', 'RECHAZADA', 'DEVOLUCION_NOTIFICADA', 'DEVUELTA',
-];
+export function useApp() {
+  const ctx = useContext(AppContext);
+  if (!ctx) throw new Error('useApp must be used within AppProvider');
+  return ctx;
+}
 
-// resto del archivo original omitido por brevedad
+export function useAuth() {
+  const { currentUser, login, logout, token } = useApp();
+  const canAccess = (minRole: UserRole): boolean => {
+    if (!currentUser) return false;
+    const roles: UserRole[] = ['VOLUNTARIO', 'ENCARGADO', 'ADMIN'];
+    return roles.indexOf(currentUser.role) >= roles.indexOf(minRole);
+  };
+  return { currentUser, login, logout, canAccess, token };
+}
