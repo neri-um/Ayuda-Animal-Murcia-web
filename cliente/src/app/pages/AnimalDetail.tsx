@@ -6,6 +6,7 @@ import {
 import { useMemo, useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { AnimalStatusBadge } from '../components/StatusBadge';
+import { toSlug } from '../utils/slug';
 
 function calcAge(birthDate?: string | null): string {
   if (!birthDate) return 'Desconocida';
@@ -40,12 +41,16 @@ function cleanUrl(url?: string | null) {
 }
 
 export default function AnimalDetail() {
-  const { id } = useParams<{ id: string }>();
+  // El parámetro puede ser un slug ("luna") o un ID numérico legacy ("1")
+  const { id: param } = useParams<{ id: string }>();
   const { animals } = useApp();
   const navigate = useNavigate();
   const [index, setIndex] = useState(0);
 
-  const animal = animals.find(a => a.id === id);
+  // Busca primero por slug del nombre, si no encuentra por ID (compatibilidad)
+  const animal = animals.find(
+    a => toSlug(a.name) === param || a.id === param
+  );
 
   const images = useMemo(() => {
     if (!animal) return [] as string[];
@@ -58,7 +63,7 @@ export default function AnimalDetail() {
     return Array.from(new Set(raw));
   }, [animal]);
 
-  useEffect(() => { setIndex(0); }, [id]);
+  useEffect(() => { setIndex(0); }, [param]);
 
   if (!animal) {
     return (
@@ -203,7 +208,7 @@ export default function AnimalDetail() {
           {animal.status === 'EN_ADOPCION' && (
             <div className="mt-2">
               <Link
-                to={`/adopt/${animal.id}`}
+                to={`/adopt/${toSlug(animal.name)}`}
                 className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl transition-all hover:opacity-80"
                 style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e', fontWeight: 600 }}
               >
@@ -225,7 +230,7 @@ export default function AnimalDetail() {
             <div className="rounded-xl p-4 text-sm border" style={{ backgroundColor: '#f7f7f7', borderColor: '#d9d9d9', color: '#2e2e2e' }}>
               <p style={{ fontWeight: 500 }}>🎉 ¡Ya tiene hogar!</p>
               <p className="mt-1" style={{ color: '#727272' }}>Este animal ya fue adoptado. ¡Explora nuestros otros animales disponibles!</p>
-              <Link to="/" className="underline mt-2 block" style={{ color: '#2e2e2e' }}>Ver otros animales</Link>
+              <Link to="/adoptar" className="underline mt-2 block" style={{ color: '#2e2e2e' }}>Ver otros animales</Link>
             </div>
           )}
         </div>

@@ -1,5 +1,3 @@
-// cliente/src/app/components/AnimalsForAdoption.tsx
-
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router';
 import {
@@ -9,7 +7,9 @@ import { useApp } from '../context/AppContext';
 import {
   Animal, AnimalSize, AnimalGender, Species, AnimalStatus,
 } from '../data/mockData';
+import { AnimalStatusBadge } from '../components/StatusBadge';
 import { useInView } from '../hooks/useInView';
+import { toSlug } from '../utils/slug';
 
 function calcAge(birthDate?: string | null): string {
   if (!birthDate) return 'Desconocida';
@@ -55,7 +55,7 @@ function AnimalCard({ animal }: { animal: Animal }) {
 
   return (
     <Link
-      to={`/animals/${animal.id}`}
+      to={`/animals/${toSlug(animal.name)}`}
       className="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col"
     >
       <div className="relative h-52 overflow-hidden bg-gray-100 flex-shrink-0">
@@ -64,6 +64,9 @@ function AnimalCard({ animal }: { animal: Animal }) {
           alt={animal.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
+        <div className="absolute top-3 left-3">
+          <AnimalStatusBadge status={animal.status} />
+        </div>
         <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-gray-600">
           {genderSymbol} {genderLabel}
         </div>
@@ -77,9 +80,9 @@ function AnimalCard({ animal }: { animal: Animal }) {
           <span
             className="text-xs px-2 py-1 rounded-full border flex-shrink-0 ml-2"
             style={{
-              backgroundColor: '#f0e8d0',
-              color: '#2e2e2e',
-              borderColor: '#d9d0b8',
+              backgroundColor: '#dce8ed',
+              color: '#213448',
+              borderColor: '#b5cdd8',
             }}
           >
             {calcAge(animal.birthDate)}
@@ -91,9 +94,9 @@ function AnimalCard({ animal }: { animal: Animal }) {
         {animal.status === 'EN_ADOPCION' && (
           <div
             className="mt-3 flex items-center gap-1.5 text-sm"
-            style={{ fontWeight: 500, color: '#2e2e2e' }}
+            style={{ fontWeight: 500, color: '#547792' }}
           >
-            <Heart className="w-4 h-4" style={{ color: '#e8a020' }} /> ¡Quiero adoptarlo!
+            <Heart className="w-4 h-4" /> ¡Quiero adoptarlo!
           </div>
         )}
       </div>
@@ -150,7 +153,7 @@ export default function AnimalsForAdoption({ variant = 'full' }: { variant?: Var
   const visibleAnimals =
     variant === 'home' ? filtered.slice(-3).reverse() : filtered;
 
-  const selectClass = 'w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none bg-white text-gray-700';
+  const selectCls = "w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none bg-white";
 
   return (
     <div>
@@ -165,21 +168,16 @@ export default function AnimalsForAdoption({ variant = 'full' }: { variant?: Var
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none text-sm"
-                onFocus={e => (e.currentTarget.style.borderColor = '#2e2e2e')}
-                onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
               />
             </div>
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 transition-colors text-sm text-gray-600 hover:bg-gray-50"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 transition-colors text-sm hover:bg-gray-50"
             >
               <SlidersHorizontal className="w-4 h-4" />
               Filtros
               {activeFilterCount > 0 && (
-                <span
-                  className="rounded-full w-5 h-5 flex items-center justify-center text-xs"
-                  style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e', fontWeight: 600 }}
-                >
+                <span className="bg-gray-100 rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium">
                   {activeFilterCount}
                 </span>
               )}
@@ -188,6 +186,7 @@ export default function AnimalsForAdoption({ variant = 'full' }: { variant?: Var
               <button
                 onClick={clearFilters}
                 className="p-2.5 rounded-xl border border-gray-200 text-gray-400 hover:text-gray-600 transition-colors"
+                aria-label="Limpiar filtros"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -196,34 +195,44 @@ export default function AnimalsForAdoption({ variant = 'full' }: { variant?: Var
 
           {showFilters && (
             <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <select value={speciesFilter} onChange={e => setSpeciesFilter(e.target.value as Species | '')} className={selectClass}>
-                <option value="">Todas las especies</option>
-                <option value="PERRO">Perro</option>
-                <option value="GATO">Gato</option>
-                <option value="CONEJO">Conejo</option>
-                <option value="AVE">Ave</option>
-                <option value="REPTIL">Reptil</option>
-                <option value="OTRO">Otro</option>
-              </select>
-              <select value={sizeFilter} onChange={e => setSizeFilter(e.target.value as AnimalSize | '')} className={selectClass}>
-                <option value="">Cualquier tamaño</option>
-                <option value="PEQUENO">Pequeño</option>
-                <option value="MEDIANO">Mediano</option>
-                <option value="GRANDE">Grande</option>
-                <option value="ESTANDAR">Estándar</option>
-              </select>
-              <select value={genderFilter} onChange={e => setGenderFilter(e.target.value as AnimalGender | '')} className={selectClass}>
-                <option value="">Cualquier sexo</option>
-                <option value="MACHO">Macho</option>
-                <option value="HEMBRA">Hembra</option>
-              </select>
-              <select value={statusFilter} onChange={e => setStatusFilter(e.target.value as AnimalStatus | '')} className={selectClass}>
-                <option value="">Cualquier estado</option>
-                <option value="EN_ADOPCION">En adopción</option>
-                <option value="PRE_ADOPCION">Pre-adopción</option>
-                <option value="ADOPTADO">Adoptado</option>
-                <option value="EN_TRATAMIENTO">En tratamiento</option>
-              </select>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Especie</label>
+                <select value={speciesFilter} onChange={e => setSpeciesFilter(e.target.value as Species | '')} className={selectCls}>
+                  <option value="">Todas</option>
+                  <option value="PERRO">Perro</option>
+                  <option value="GATO">Gato</option>
+                  <option value="CONEJO">Conejo</option>
+                  <option value="OTRO">Otro</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Tamaño</label>
+                <select value={sizeFilter} onChange={e => setSizeFilter(e.target.value as AnimalSize | '')} className={selectCls}>
+                  <option value="">Todos</option>
+                  <option value="PEQUENO">Pequeño</option>
+                  <option value="MEDIANO">Mediano</option>
+                  <option value="GRANDE">Grande</option>
+                  <option value="ESTANDAR">Estándar</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Sexo</label>
+                <select value={genderFilter} onChange={e => setGenderFilter(e.target.value as AnimalGender | '')} className={selectCls}>
+                  <option value="">Todos</option>
+                  <option value="MACHO">Macho</option>
+                  <option value="HEMBRA">Hembra</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Estado</label>
+                <select value={statusFilter} onChange={e => setStatusFilter(e.target.value as AnimalStatus | '')} className={selectCls}>
+                  <option value="">Todos</option>
+                  <option value="EN_ADOPCION">En adopción</option>
+                  <option value="PRE_ADOPCION">Pre-adopción</option>
+                  <option value="ADOPTADO">Adoptado</option>
+                  <option value="EN_ACOGIDA">En acogida</option>
+                </select>
+              </div>
             </div>
           )}
         </div>
@@ -255,7 +264,7 @@ export default function AnimalsForAdoption({ variant = 'full' }: { variant?: Var
             <button
               onClick={clearFilters}
               className="text-sm underline"
-              style={{ color: '#2e2e2e' }}
+              style={{ color: '#547792' }}
             >
               Limpiar filtros
             </button>
