@@ -9,7 +9,6 @@ import { useApp } from '../context/AppContext';
 import {
   Animal, AnimalSize, AnimalGender, Species, AnimalStatus,
 } from '../data/mockData';
-import { AnimalStatusBadge } from '../components/StatusBadge';
 import { useInView } from '../hooks/useInView';
 
 function calcAge(birthDate?: string | null): string {
@@ -65,9 +64,6 @@ function AnimalCard({ animal }: { animal: Animal }) {
           alt={animal.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
-        <div className="absolute top-3 left-3">
-          <AnimalStatusBadge status={animal.status} />
-        </div>
         <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-gray-600">
           {genderSymbol} {genderLabel}
         </div>
