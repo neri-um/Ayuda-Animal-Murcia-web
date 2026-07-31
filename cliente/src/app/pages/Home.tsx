@@ -96,25 +96,20 @@ export default function Home() {
                     loading="lazy"
                     decoding="async"
                   />
-                  {/* Badge Animal del mes */}
+                  {/* Badge Animal del mes — derecha */}
                   <div
-                    className="absolute top-3 left-3 flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
+                    className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
                     style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e' }}
                   >
                     <Star className="w-3 h-3" fill="#2e2e2e" />
                     Animal del mes
                   </div>
                 </div>
-                {/* Info */}
+                {/* Info — solo nombre y botón, sin raza */}
                 <div className="p-4 flex items-center justify-between">
-                  <div>
-                    <p className="font-bold text-base" style={{ color: '#ffffff' }}>
-                      {animalDelMes.name}
-                    </p>
-                    <p className="text-xs" style={{ color: '#727272' }}>
-                      {animalDelMes.breed}
-                    </p>
-                  </div>
+                  <p className="font-bold text-base" style={{ color: '#ffffff' }}>
+                    {animalDelMes.name}
+                  </p>
                   <Link
                     to={`/animals/${animalDelMes.id}`}
                     className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all hover:opacity-80"
