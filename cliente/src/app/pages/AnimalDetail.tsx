@@ -66,7 +66,11 @@ export default function AnimalDetail() {
         <div className="text-6xl mb-4">🐾</div>
         <h2 className="text-gray-700 mb-2">Animal no encontrado</h2>
         <p className="text-gray-500 mb-6 text-sm">Este animal ya no está disponible o no existe.</p>
-        <Link to="/" className="text-white px-6 py-2 rounded-xl transition-colors inline-block" style={{ backgroundColor: '#547792' }}>
+        <Link
+          to="/"
+          className="inline-block text-sm px-6 py-2 rounded-xl transition-all hover:opacity-80"
+          style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e', fontWeight: 600 }}
+        >
           Volver al inicio
         </Link>
       </div>
@@ -131,7 +135,9 @@ export default function AnimalDetail() {
             <div className="grid grid-cols-4 gap-2">
               {images.map((img, i) => (
                 <button key={`${img}-${i}`} type="button" onClick={() => setIndex(i)}
-                  className={`relative rounded-xl overflow-hidden aspect-square border transition-all ${i === index ? 'border-[#547792] ring-2 ring-[#547792]/30' : 'border-gray-200'}`}>
+                  className={`relative rounded-xl overflow-hidden aspect-square border-2 transition-all ${
+                    i === index ? 'border-[#2e2e2e]' : 'border-gray-200'
+                  }`}>
                   <img src={img} alt={`${animal.name} ${i + 1}`} className="w-full h-full object-cover" />
                 </button>
               ))}
@@ -150,14 +156,14 @@ export default function AnimalDetail() {
 
           <div className="grid grid-cols-3 gap-3">
             {[
-              { icon: <Calendar className="w-4 h-4" style={{ color: '#547792' }} />, label: 'Edad',   value: calcAge(animal.birthDate) },
-              { icon: <Ruler    className="w-4 h-4" style={{ color: '#547792' }} />, label: 'Tamaño', value: sizeLabel[animal.size] ?? animal.size ?? '—' },
-              { icon: <User2    className="w-4 h-4" style={{ color: '#547792' }} />, label: 'Sexo',   value: animal.gender?.toUpperCase() === 'MACHO' ? 'Macho' : 'Hembra' },
+              { icon: <Calendar className="w-4 h-4" style={{ color: '#727272' }} />, label: 'Edad',   value: calcAge(animal.birthDate) },
+              { icon: <Ruler    className="w-4 h-4" style={{ color: '#727272' }} />, label: 'Tamaño', value: sizeLabel[animal.size] ?? animal.size ?? '—' },
+              { icon: <User2    className="w-4 h-4" style={{ color: '#727272' }} />, label: 'Sexo',   value: animal.gender?.toUpperCase() === 'MACHO' ? 'Macho' : 'Hembra' },
             ].map((info, i) => (
-              <div key={i} className="rounded-xl p-3 text-center" style={{ backgroundColor: '#dce8ed' }}>
+              <div key={i} className="rounded-xl p-3 text-center" style={{ backgroundColor: '#f7f7f7', border: '1px solid #d9d9d9' }}>
                 <div className="flex justify-center mb-1">{info.icon}</div>
-                <div className="text-xs text-gray-400 mb-0.5">{info.label}</div>
-                <div className="text-sm text-gray-700" style={{ fontWeight: 500 }}>{info.value}</div>
+                <div className="text-xs mb-0.5" style={{ color: '#727272' }}>{info.label}</div>
+                <div className="text-sm" style={{ color: '#2e2e2e', fontWeight: 500 }}>{info.value}</div>
               </div>
             ))}
           </div>
@@ -176,8 +182,9 @@ export default function AnimalDetail() {
                 {traits.map((t, i) => (
                   <div key={i}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm border"
-                    style={{ backgroundColor: '#dce8ed', color: '#213448', borderColor: '#b5cdd8' }}>
-                    <CheckCircle className="w-3.5 h-3.5" style={{ color: '#547792' }} />
+                    style={{ backgroundColor: '#f0e8d0', color: '#2e2e2e', borderColor: '#d9d0b8' }}
+                  >
+                    <CheckCircle className="w-3.5 h-3.5" style={{ color: '#e8a020' }} />
                     {t.label}
                   </div>
                 ))}
@@ -195,11 +202,11 @@ export default function AnimalDetail() {
 
           {animal.status === 'EN_ADOPCION' && (
             <div className="mt-2">
-              <Link to={`/adopt/${animal.id}`}
-                className="flex items-center justify-center gap-2 w-full text-white py-3.5 rounded-xl transition-colors"
-                style={{ backgroundColor: '#547792', fontWeight: 600 }}
-                onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#3d6180')}
-                onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#547792')}>
+              <Link
+                to={`/adopt/${animal.id}`}
+                className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl transition-all hover:opacity-80"
+                style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e', fontWeight: 600 }}
+              >
                 <Heart className="w-5 h-5" />
                 Quiero adoptar a {animal.name}
               </Link>
@@ -208,17 +215,17 @@ export default function AnimalDetail() {
           )}
 
           {animal.status === 'PRE_ADOPCION' && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-sm text-yellow-700">
+            <div className="rounded-xl p-4 text-sm border" style={{ backgroundColor: '#f0e8d0', borderColor: '#d9d0b8', color: '#2e2e2e' }}>
               <p style={{ fontWeight: 500 }}>🏠 En pre-adopción</p>
-              <p className="mt-1 text-yellow-600">Este animal está reservado temporalmente. Si te interesa, puedes consultarnos por su disponibilidad.</p>
+              <p className="mt-1" style={{ color: '#727272' }}>Este animal está reservado temporalmente. Si te interesa, puedes consultarnos por su disponibilidad.</p>
             </div>
           )}
 
           {animal.status === 'ADOPTADO' && (
-            <div className="rounded-xl p-4 text-sm border" style={{ backgroundColor: '#d0e4f0', borderColor: '#a8c8e0', color: '#1e4d6e' }}>
+            <div className="rounded-xl p-4 text-sm border" style={{ backgroundColor: '#f7f7f7', borderColor: '#d9d9d9', color: '#2e2e2e' }}>
               <p style={{ fontWeight: 500 }}>🎉 ¡Ya tiene hogar!</p>
-              <p className="mt-1" style={{ color: '#2e5c7e' }}>Este animal ya fue adoptado. ¡Explora nuestros otros animales disponibles!</p>
-              <Link to="/" className="underline mt-2 block" style={{ color: '#547792' }}>Ver otros animales</Link>
+              <p className="mt-1" style={{ color: '#727272' }}>Este animal ya fue adoptado. ¡Explora nuestros otros animales disponibles!</p>
+              <Link to="/" className="underline mt-2 block" style={{ color: '#2e2e2e' }}>Ver otros animales</Link>
             </div>
           )}
         </div>

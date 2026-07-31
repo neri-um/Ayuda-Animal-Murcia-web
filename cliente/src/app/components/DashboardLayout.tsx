@@ -34,10 +34,14 @@ function NavLink({ item, onClick }: { item: NavItem; onClick?: () => void }) {
     <Link
       to={item.to}
       onClick={onClick}
-      className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all text-sm group ${
-        isActive ? 'text-white shadow-md' : 'text-slate-300 hover:bg-slate-700 hover:text-white'
-      }`}
-      style={isActive ? { backgroundColor: '#547792', boxShadow: '0 4px 12px rgba(84,119,146,0.35)' } : {}}
+      className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all text-sm group`}
+      style={
+        isActive
+          ? { backgroundColor: '#f7e3b0', color: '#2e2e2e', fontWeight: 600 }
+          : { color: '#d9d9d9' }
+      }
+      onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLElement).style.backgroundColor = '#3f3f3f'; }}
+      onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; }}
     >
       {item.icon}
       <span>{item.label}</span>
@@ -47,7 +51,6 @@ function NavLink({ item, onClick }: { item: NavItem; onClick?: () => void }) {
 }
 
 const roleLabels = { voluntario: 'Voluntario/a', encargado: 'Encargado/a', administrador: 'Administrador/a' };
-const roleColors = { voluntario: 'bg-[#94B4C1]', encargado: 'bg-[#94B4C1]', administrador: 'bg-[#547792]' };
 
 export default function DashboardLayout() {
   const { currentUser, logout, canAccess } = useAuth();
@@ -65,7 +68,7 @@ export default function DashboardLayout() {
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
-      <div className="px-6 py-5 border-b border-slate-700">
+      <div className="px-6 py-5" style={{ borderBottom: '1px solid #3f3f3f' }}>
         <Link to="/" className="flex items-center gap-2.5">
           <img src={LOGO_URL} alt="Logo Ayuda Animal Murcia" className="h-9 w-auto flex-shrink-0" />
           <span className="text-white" style={{ fontWeight: 600 }}>Vidanimal</span>
@@ -78,18 +81,26 @@ export default function DashboardLayout() {
         ))}
       </nav>
 
-      <div className="px-4 py-4 border-t border-slate-700">
+      <div className="px-4 py-4" style={{ borderTop: '1px solid #3f3f3f' }}>
         <div className="flex items-center gap-3 mb-3">
-          <div className={`w-9 h-9 ${roleColors[currentUser.role]} rounded-full flex items-center justify-center text-white text-sm`} style={{ fontWeight: 600 }}>
+          <div
+            className="w-9 h-9 rounded-full flex items-center justify-center text-sm"
+            style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e', fontWeight: 600 }}
+          >
             {currentUser.name.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-white text-sm truncate" style={{ fontWeight: 500 }}>{currentUser.name}</p>
-            <p className="text-slate-400 text-xs">{roleLabels[currentUser.role]}</p>
+            <p className="text-xs" style={{ color: '#727272' }}>{roleLabels[currentUser.role]}</p>
           </div>
         </div>
-        <button onClick={handleLogout}
-          className="flex items-center gap-2 text-slate-400 hover:text-red-400 transition-colors text-sm w-full px-1">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-2 transition-colors text-sm w-full px-1"
+          style={{ color: '#727272' }}
+          onMouseEnter={e => (e.currentTarget.style.color = '#fca5a5')}
+          onMouseLeave={e => (e.currentTarget.style.color = '#727272')}
+        >
           <LogOut className="w-4 h-4" />Cerrar sesión
         </button>
       </div>
@@ -97,15 +108,15 @@ export default function DashboardLayout() {
   );
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
-      <aside className="hidden lg:flex w-64 bg-slate-800 flex-col flex-shrink-0">
+    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: '#f7f7f7' }}>
+      <aside className="hidden lg:flex w-64 flex-col flex-shrink-0" style={{ backgroundColor: '#2e2e2e' }}>
         <SidebarContent />
       </aside>
 
       {sidebarOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
           <div className="fixed inset-0 bg-black/50" onClick={() => setSidebarOpen(false)} />
-          <aside className="relative w-64 bg-slate-800 flex flex-col z-10">
+          <aside className="relative w-64 flex flex-col z-10" style={{ backgroundColor: '#2e2e2e' }}>
             <SidebarContent />
           </aside>
         </div>
@@ -120,12 +131,19 @@ export default function DashboardLayout() {
           </button>
           <div className="hidden lg:block" />
           <div className="flex items-center gap-3">
-            <Link to="/" className="text-sm text-gray-500 transition-colors hidden sm:block"
-              onMouseEnter={e => (e.currentTarget.style.color = '#547792')}
-              onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
+            <Link
+              to="/"
+              className="text-sm transition-colors hidden sm:block"
+              style={{ color: '#727272' }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#2e2e2e')}
+              onMouseLeave={e => (e.currentTarget.style.color = '#727272')}
+            >
               ← Ver web pública
             </Link>
-            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs text-white ${roleColors[currentUser.role]}`}>
+            <div
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs"
+              style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e', fontWeight: 600 }}
+            >
               {roleLabels[currentUser.role]}
             </div>
           </div>

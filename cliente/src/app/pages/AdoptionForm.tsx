@@ -6,7 +6,6 @@ import type { SolicitudAdopcionRequest } from '../types/adoption';
 
 const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8080/vidanimal';
 
-// IDs que ya recoge el bloque fijo de datos personales
 const IDS_PERSONALES = new Set(['email_usuario', 'nombre_apellidos', 'dni_nif', 'telefonos']);
 
 function calcAge(birthDate?: string | null): string {
@@ -56,9 +55,7 @@ interface SeccionFormulario {
 }
 
 function extraerSecciones(raw: any, tituloFormulario?: string): SeccionFormulario[] {
-  const secciones: any[] | undefined =
-    raw?.formulario?.secciones ?? raw?.secciones;
-
+  const secciones: any[] | undefined = raw?.formulario?.secciones ?? raw?.secciones;
   if (secciones && Array.isArray(secciones)) {
     return secciones.map((s: any) => ({
       nro: s.nro,
@@ -67,32 +64,17 @@ function extraerSecciones(raw: any, tituloFormulario?: string): SeccionFormulari
       preguntas: (s.preguntas ?? []).filter((p: any) => !IDS_PERSONALES.has(p.id)),
     })).filter(s => s.preguntas.length > 0);
   }
-
-  const preguntasPlanas: any[] | undefined =
-    raw?.formulario?.preguntas ?? raw?.preguntas;
-
+  const preguntasPlanas: any[] | undefined = raw?.formulario?.preguntas ?? raw?.preguntas;
   if (preguntasPlanas && Array.isArray(preguntasPlanas)) {
     const preguntas = preguntasPlanas.filter((p: any) => !IDS_PERSONALES.has(p.id));
     if (preguntas.length === 0) return [];
-    return [{
-      nro: 1,
-      titulo: raw?.formulario?.titulo ?? tituloFormulario ?? 'Cuestionario',
-      descripcion: undefined,
-      preguntas,
-    }];
+    return [{ nro: 1, titulo: raw?.formulario?.titulo ?? tituloFormulario ?? 'Cuestionario', descripcion: undefined, preguntas }];
   }
-
   if (Array.isArray(raw)) {
     const preguntas = raw.filter((p: any) => !IDS_PERSONALES.has(p.id));
     if (preguntas.length === 0) return [];
-    return [{
-      nro: 1,
-      titulo: tituloFormulario ?? 'Cuestionario',
-      descripcion: undefined,
-      preguntas,
-    }];
+    return [{ nro: 1, titulo: tituloFormulario ?? 'Cuestionario', descripcion: undefined, preguntas }];
   }
-
   return [];
 }
 
@@ -119,21 +101,16 @@ export default function AdoptionForm() {
     fetch(`${BASE}/adopciones/formulario/${id}`)
       .then(res => res.ok ? res.json() : null)
       .then(data => {
-        console.log('[AdoptionForm] DATA completa:', data);
         if (data) {
           const nombre = data.nombre ?? 'Cuestionario de adopción';
           setNombreFormulario(nombre);
-          const rawPreguntas =
-            typeof data.preguntas === 'string'
-              ? JSON.parse(data.preguntas ?? '{}')
-              : data.preguntas ?? {};
-          console.log('[AdoptionForm] rawPreguntas:', rawPreguntas);
-          const secs = extraerSecciones(rawPreguntas, nombre);
-          console.log('[AdoptionForm] secciones resultado:', secs);
-          setSecciones(secs);
+          const rawPreguntas = typeof data.preguntas === 'string'
+            ? JSON.parse(data.preguntas ?? '{}')
+            : data.preguntas ?? {};
+          setSecciones(extraerSecciones(rawPreguntas, nombre));
         }
       })
-      .catch(err => { console.error('[AdoptionForm] ERROR fetch:', err); setSecciones([]); })
+      .catch(() => setSecciones([]))
       .finally(() => setLoadingForm(false));
   }, [id]);
 
@@ -142,7 +119,8 @@ export default function AdoptionForm() {
       <div className="max-w-2xl mx-auto px-4 py-20 text-center">
         <div className="text-6xl mb-4">🐾</div>
         <h2 className="text-gray-700 mb-4">Animal no encontrado</h2>
-        <Link to="/" className="text-white px-6 py-2 rounded-xl transition-colors" style={{ backgroundColor: '#547792' }}>
+        <Link to="/" className="inline-block text-sm px-6 py-2 rounded-xl transition-all hover:opacity-80"
+          style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e', fontWeight: 600 }}>
           Volver al inicio
         </Link>
       </div>
@@ -155,7 +133,8 @@ export default function AdoptionForm() {
         <div className="text-6xl mb-4">😔</div>
         <h2 className="text-gray-700 mb-2">Este animal no está disponible</h2>
         <p className="text-gray-500 mb-6 text-sm">Solo puedes solicitar la adopción de animales en estado «En adopción».</p>
-        <Link to="/" className="text-white px-6 py-2 rounded-xl transition-colors" style={{ backgroundColor: '#547792' }}>
+        <Link to="/" className="inline-block text-sm px-6 py-2 rounded-xl transition-all hover:opacity-80"
+          style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e', fontWeight: 600 }}>
           Ver otros animales
         </Link>
       </div>
@@ -191,7 +170,6 @@ export default function AdoptionForm() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       setError('No se pudo enviar la solicitud. Inténtalo de nuevo.');
-      console.error(err);
     } finally {
       setSubmitting(false);
     }
@@ -200,8 +178,9 @@ export default function AdoptionForm() {
   if (submitted) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-20 text-center">
-        <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6" style={{ backgroundColor: '#dce8ed' }}>
-          <CheckCircle className="w-10 h-10" style={{ color: '#547792' }} />
+        <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+          style={{ backgroundColor: '#f7e3b0' }}>
+          <CheckCircle className="w-10 h-10" style={{ color: '#2e2e2e' }} />
         </div>
         <h2 className="text-gray-900 mb-3">¡Solicitud enviada con éxito!</h2>
         <p className="text-gray-600 mb-2">
@@ -211,10 +190,12 @@ export default function AdoptionForm() {
           Nuestro equipo revisará tu formulario y se pondrá en contacto contigo en los próximos 2 días hábiles en el email <strong>{personal.email}</strong>.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Link to="/" className="text-white px-6 py-3 rounded-xl transition-colors" style={{ backgroundColor: '#547792' }}>
+          <Link to="/" className="inline-block text-sm px-6 py-3 rounded-xl transition-all hover:opacity-80"
+            style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e', fontWeight: 600 }}>
             Ver más animales
           </Link>
-          <Link to={`/animals/${animal.id}`} className="border border-gray-200 text-gray-600 px-6 py-3 rounded-xl hover:bg-gray-50 transition-colors">
+          <Link to={`/animals/${animal.id}`}
+            className="border border-gray-200 text-gray-600 px-6 py-3 rounded-xl hover:bg-gray-50 transition-colors text-sm">
             Volver a la ficha
           </Link>
         </div>
@@ -222,8 +203,14 @@ export default function AdoptionForm() {
     );
   }
 
+  const focusStyle = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+    (e.currentTarget.style.borderColor = '#2e2e2e');
+  const blurStyle = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+    (e.currentTarget.style.borderColor = '#e5e7eb');
+
+  const baseClass = 'w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none';
+
   const renderCampo = (p: PreguntaRaw) => {
-    const baseClass = 'w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none';
     const val = respuestas[p.id] ?? '';
     const onChange = (v: string) => updateRespuesta(p.id, v);
     const tipo = mapTipo(p.tipo, !!(p.opciones && p.opciones.length > 0));
@@ -231,9 +218,8 @@ export default function AdoptionForm() {
     switch (tipo) {
       case 'select':
         return (
-          <select value={val} onChange={e => onChange(e.target.value)} required={p.obligatoria} className={baseClass}
-            onFocus={e => (e.currentTarget.style.borderColor = '#547792')}
-            onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}>
+          <select value={val} onChange={e => onChange(e.target.value)} required={p.obligatoria}
+            className={baseClass} onFocus={focusStyle} onBlur={blurStyle}>
             <option value="">Selecciona una opción</option>
             {(p.opciones ?? []).map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
@@ -245,7 +231,7 @@ export default function AdoptionForm() {
               <label key={o.value} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
                 <input type="radio" name={p.id} value={o.value} checked={val === o.value}
                   onChange={() => onChange(o.value)} required={p.obligatoria}
-                  style={{ accentColor: '#547792' }} />
+                  style={{ accentColor: '#2e2e2e' }} />
                 {o.label}
               </label>
             ))}
@@ -255,18 +241,23 @@ export default function AdoptionForm() {
         return (
           <textarea value={val} onChange={e => onChange(e.target.value)} required={p.obligatoria}
             placeholder={p.placeholder} rows={4} className={`${baseClass} resize-none`}
-            onFocus={e => (e.currentTarget.style.borderColor = '#547792')}
-            onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')} />
+            onFocus={focusStyle} onBlur={blurStyle} />
         );
       default:
         return (
           <input type={tipo} value={val} onChange={e => onChange(e.target.value)}
             required={p.obligatoria} placeholder={p.placeholder} className={baseClass}
-            onFocus={e => (e.currentTarget.style.borderColor = '#547792')}
-            onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')} />
+            onFocus={focusStyle} onBlur={blurStyle} />
         );
     }
   };
+
+  const sectionBadge = (titulo: string) => (
+    <span className="text-xs font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full"
+      style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e' }}>
+      {titulo}
+    </span>
+  );
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
@@ -276,12 +267,13 @@ export default function AdoptionForm() {
       </button>
 
       {/* Header */}
-      <div className="rounded-2xl p-6 mb-8 flex items-center gap-5 border" style={{ backgroundColor: '#dce8ed', borderColor: '#b5cdd8' }}>
+      <div className="rounded-2xl p-6 mb-8 flex items-center gap-5 border"
+        style={{ backgroundColor: '#f0e8d0', borderColor: '#d9d0b8' }}>
         <img src={animal.imageUrl} alt={animal.name} className="w-20 h-20 rounded-xl object-cover flex-shrink-0" />
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Heart className="w-4 h-4" style={{ color: '#547792', fill: '#547792' }} />
-            <span className="text-sm" style={{ color: '#213448' }}>Formulario de adopción</span>
+            <Heart className="w-4 h-4" style={{ color: '#e8a020' }} />
+            <span className="text-sm" style={{ color: '#2e2e2e' }}>Formulario de adopción</span>
           </div>
           <h2 className="text-gray-900">Adoptar a {animal.name}</h2>
           <p className="text-gray-500 text-sm mt-0.5">
@@ -291,10 +283,10 @@ export default function AdoptionForm() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Datos personales fijos */}
+        {/* Datos personales */}
         <section className="bg-white rounded-2xl border border-gray-100 p-6">
           <div className="flex items-center gap-2 mb-5 pb-3 border-b border-gray-100">
-            <span className="text-xs font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: '#547792' }}>Datos personales</span>
+            {sectionBadge('Datos personales')}
           </div>
           <div className="flex flex-col gap-4">
             {[
@@ -308,9 +300,8 @@ export default function AdoptionForm() {
                 <input type={type} value={(personal as any)[field]}
                   onChange={e => updatePersonal(field, e.target.value)}
                   placeholder={placeholder} required
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none"
-                  onFocus={e => (e.currentTarget.style.borderColor = '#547792')}
-                  onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')} />
+                  className={baseClass}
+                  onFocus={focusStyle} onBlur={blurStyle} />
               </div>
             ))}
           </div>
@@ -323,51 +314,37 @@ export default function AdoptionForm() {
             <span className="text-sm">Cargando cuestionario...</span>
           </div>
         ) : secciones.length > 0 ? (
-          <>
-            {secciones.map(seccion => (
-              <section key={seccion.nro} className="bg-white rounded-2xl border border-gray-100 p-6">
-                <div className="flex items-center gap-2 mb-5 pb-3 border-b border-gray-100">
-                  <span className="text-xs font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: '#547792' }}>
-                    {seccion.titulo}
-                  </span>
-                </div>
-                {seccion.descripcion && (
-                  <p className="text-xs text-gray-500 mb-4 leading-relaxed">{seccion.descripcion}</p>
-                )}
-                <div className="flex flex-col gap-4">
-                  {seccion.preguntas.map(p => (
-                    <div key={p.id}>
-                      <label className="block text-sm text-gray-700 mb-1">
-                        {p.pregunta}{p.obligatoria ? ' *' : ''}
-                      </label>
-                      {renderCampo(p)}
-                    </div>
-                  ))}
-                </div>
-              </section>
-            ))}
-          </>
+          secciones.map(seccion => (
+            <section key={seccion.nro} className="bg-white rounded-2xl border border-gray-100 p-6">
+              <div className="flex items-center gap-2 mb-5 pb-3 border-b border-gray-100">
+                {sectionBadge(seccion.titulo)}
+              </div>
+              {seccion.descripcion && (
+                <p className="text-sm text-gray-500 mb-4">{seccion.descripcion}</p>
+              )}
+              <div className="flex flex-col gap-4">
+                {seccion.preguntas.map(p => (
+                  <div key={p.id}>
+                    <label className="block text-sm text-gray-700 mb-1">
+                      {p.pregunta}{p.obligatoria ? ' *' : ''}
+                    </label>
+                    {renderCampo(p)}
+                  </div>
+                ))}
+              </div>
+            </section>
+          ))
         ) : null}
 
-        {/* Términos */}
-        <div className="flex items-start gap-3 rounded-xl p-4" style={{ backgroundColor: '#dce8ed' }}>
-          <input type="checkbox" id="terms" required style={{ marginTop: '4px', accentColor: '#547792' }} />
-          <label htmlFor="terms" className="text-sm text-gray-600" style={{ fontWeight: 400 }}>
-            Confirmo que la información proporcionada es veraz y acepto que la protectora Vidanimal
-            realice las comprobaciones necesarias para garantizar el bienestar del animal.
-          </label>
-        </div>
-
-        {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+        {error && (
+          <p className="text-sm text-red-600 bg-red-50 rounded-xl px-4 py-3 border border-red-200">{error}</p>
+        )}
 
         <button type="submit" disabled={submitting}
-          className="w-full flex items-center justify-center gap-2 text-white py-4 rounded-xl transition-colors disabled:opacity-60"
-          style={{ backgroundColor: '#547792', fontWeight: 600 }}
-          onMouseEnter={e => !submitting && (e.currentTarget.style.backgroundColor = '#3d6180')}
-          onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#547792')}>
-          {submitting
-            ? <><Loader2 className="w-5 h-5 animate-spin" /> Enviando...</>
-            : <><Send className="w-5 h-5" /> Enviar solicitud de adopción</>}
+          className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl transition-all hover:opacity-80 disabled:opacity-50"
+          style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e', fontWeight: 600 }}>
+          {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+          {submitting ? 'Enviando...' : 'Enviar solicitud de adopción'}
         </button>
       </form>
     </div>
