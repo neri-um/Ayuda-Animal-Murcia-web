@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import {
   Animal,
   User,
@@ -247,7 +247,7 @@ function recargarCitas(
     .catch(() => {});
 }
 
-// ── Caché de animal del mes en localStorage (persiste entre refresco/pestañas) ─
+// ── Caché localStorage: fallback mientras Render arranca (cold start ~30s) ──
 function loadAnimalDelMesCache(): string | null {
   try { return localStorage.getItem('va_animal_del_mes'); } catch { return null; }
 }
@@ -258,10 +258,34 @@ function saveAnimalDelMesCache(id: string | null) {
   } catch { /* noop */ }
 }
 
-// Normaliza cualquier valor de ID a string | null de forma segura
 function normalizeId(raw: any): string | null {
   if (raw == null || raw === '' || raw === 'null') return null;
   return String(raw);
+}
+
+/**
+ * Reintenta el GET /configuracion/animal-del-mes hasta MAX_RETRIES veces
+ * con RETRY_DELAY_MS entre intentos. Resuelve en cuanto el servidor responde
+ * con 2xx, o rechaza tras agotar los intentos.
+ * Diseñado para absorber el cold start de Render (~30s).
+ */
+async function fetchAnimalDelMesConRetry(
+  maxRetries = 8,
+  delayMs = 4000
+): Promise<string | null> {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const res = await fetch(`${BASE}/configuracion/animal-del-mes`);
+      if (res.ok) {
+        const data = await res.json();
+        return normalizeId(data?.animalId);
+      }
+    } catch { /* red caída o servidor no listo aún */ }
+    if (i < maxRetries - 1) {
+      await new Promise(r => setTimeout(r, delayMs));
+    }
+  }
+  return null; // se agotaron los intentos
 }
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
@@ -281,29 +305,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [requests, setRequests] = useState<ProductRequest[]>([]);
   const [requestsLoading, setRequestsLoading] = useState(false);
 
-  // ── Animal del mes: arranca desde localStorage, luego la API sobreescribe ──
+  // Arranca desde localStorage (visible instantáneamente), luego la BD sobreescribe
   const [animalDelMesId, setAnimalDelMesIdState] = useState<string | null>(() =>
     normalizeId(loadAnimalDelMesCache())
   );
 
-  // Carga desde la API en cada mount (pública, sin token)
-  // Si el servidor responde → actualiza estado + caché
-  // Si falla (cold start Render) → mantiene el valor de localStorage
+  // Ref para cancelar reintentos si el componente se desmonta
+  const cancelRetry = useRef(false);
+
   useEffect(() => {
-    fetch(`${BASE}/configuracion/animal-del-mes`)
-      .then(res => res.ok ? res.json() : null)
-      .then((data: { animalId?: any } | null) => {
-        const id = normalizeId(data?.animalId);
-        setAnimalDelMesIdState(id);
-        saveAnimalDelMesCache(id);
-      })
-      .catch(() => { /* mantiene localStorage si no hay red */ });
+    cancelRetry.current = false;
+
+    fetchAnimalDelMesConRetry(8, 4000).then(id => {
+      if (cancelRetry.current) return;
+      setAnimalDelMesIdState(id);
+      saveAnimalDelMesCache(id);
+    });
+
+    return () => { cancelRetry.current = true; };
   }, []);
 
-  /**
-   * Persiste el animal del mes en la BD y actualiza estado + caché.
-   * Solo ADMIN/ENCARGADO pueden llamar al PUT.
-   */
   const setAnimalDelMesId = useCallback((id: string | null) => {
     const normalized = normalizeId(id);
     setAnimalDelMesIdState(normalized);
