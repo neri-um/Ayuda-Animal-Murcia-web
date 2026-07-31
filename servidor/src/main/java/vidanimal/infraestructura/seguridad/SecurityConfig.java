@@ -41,7 +41,8 @@ public class SecurityConfig {
                 // Orígenes permitidos: React (dev con Vite) y la URL de producción
                 config.setAllowedOrigins(List.of(
                         "http://localhost:5173",
-                        "http://localhost"));
+                        "http://localhost",
+                        "https://ayuda-animal-murcia-web.vercel.app"));
                 config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
                 config.setAllowedHeaders(List.of("*"));
                 return config;
