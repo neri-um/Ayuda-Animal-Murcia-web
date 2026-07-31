@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
 import { Eye, EyeOff, LogIn, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AppContext';
-import LOGO_URL from '../public/logo.jpg';
+import LOGO_URL from '../public/logopng.png';
 
 // Paleta extraída 1:1 del Home.tsx
 // fondo:      #f7f7f7
@@ -38,7 +38,7 @@ export default function Login() {
       alignItems: 'center',
       justifyContent: 'center',
       padding: '3rem 1rem',
-      backgroundColor: '#f7f7f7',   // igual que el fondo del Home
+      backgroundColor: '#f7f7f7',
     }}>
       <div style={{ width: '100%', maxWidth: '22rem' }}>
 
@@ -51,10 +51,14 @@ export default function Login() {
           overflow: 'hidden',
         }}>
 
-          {/* Cabecera oscura — igual que el hero del Home */}
+          {/* Cabecera oscura */}
           <div style={{ backgroundColor: '#2e2e2e', padding: '2rem', textAlign: 'center' }}>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.875rem' }}>
-              <img src={LOGO_URL} alt="Logo Ayuda Animal Murcia" style={{ height: '52px', width: 'auto' }} />
+              <img
+                src={LOGO_URL}
+                alt="Logo Ayuda Animal Murcia"
+                style={{ height: '52px', width: 'auto' }}
+              />
             </div>
             <h1 style={{ margin: 0, color: '#f7e3b0', fontSize: '1.15rem', fontWeight: 700 }}>
               Ayuda Animal Murcia
@@ -145,7 +149,7 @@ export default function Login() {
                 </div>
               )}
 
-              {/* Botón — crema con texto oscuro, igual que el CTA del hero del Home */}
+              {/* Botón crema */}
               <button
                 type="submit"
                 disabled={loading}
@@ -154,7 +158,7 @@ export default function Login() {
                 style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
                   width: '100%',
-                  backgroundColor: loading ? '#e8d49a' : '#f7e3b0',  // crema del Home
+                  backgroundColor: loading ? '#e8d49a' : '#f7e3b0',
                   color: '#2e2e2e',
                   fontWeight: 600, fontSize: '0.9rem',
                   padding: '0.8rem', borderRadius: '0.75rem',
