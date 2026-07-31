@@ -22,7 +22,7 @@ const NOVEDADES: Novedad[] = [
     resumen:
       '¡El juego ya está terminado! Rellena el formulario que encontrarás abajo para poder escoger un punto de recogida o envío.',
     // Pega aquí la URL directa de ImgBB (el link que termina en .jpg/.png, no la página del álbum)
-    // imagen: 'https://i.ibb.co/xxxxxxxx/catfeteria.jpg',
+    imagen: 'https://i.ibb.co/d40Qdb2C/582410926-1151235673836988-4102690978920453888-n-1.jpg',
   },
   {
     id: 2,
