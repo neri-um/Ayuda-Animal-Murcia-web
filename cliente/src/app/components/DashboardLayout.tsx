@@ -5,8 +5,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../context/AppContext';
-
-const LOGO_URL = '/logo.jpg';
+import LOGO_URL from '../public/logo.jpg';
 
 interface NavItem {
   to: string;

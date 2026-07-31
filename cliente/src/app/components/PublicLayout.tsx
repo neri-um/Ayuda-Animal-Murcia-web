@@ -1,11 +1,8 @@
-// cliente/src/app/components/PublicLayout.tsx
-
 import { Link, Outlet, useNavigate, NavLink } from 'react-router';
 import { Menu, X, LogIn, LayoutDashboard, LogOut, Instagram, Facebook, MapPin, Mail, Phone } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../context/AppContext';
-
-const LOGO_URL = '/logo.jpg';
+import LOGO_URL from '../public/logo.jpg';
 
 function SiteFooter() {
   const year = new Date().getFullYear();
@@ -13,7 +10,6 @@ function SiteFooter() {
     <footer style={{ backgroundColor: '#2e2e2e', color: '#d9d9d9' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-
           <div>
             <div className="flex items-center gap-2 mb-4">
               <img src={LOGO_URL} alt="Ayuda Animal Murcia" className="h-7 w-auto flex-shrink-0" />
