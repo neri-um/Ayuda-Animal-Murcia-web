@@ -63,11 +63,11 @@ function SiteFooter() {
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4 flex-shrink-0" style={{ color: '#727272' }} />
-                <a href="mailto:ayudaanimalm@gmail.com" className="transition-colors hover:text-white" style={{ color: '#727272' }}>info@ayudaanimalmurcia.org</a>
+                <a href="mailto:ayudaanimalm@gmail.com" className="transition-colors hover:text-white" style={{ color: '#727272' }}>ayudaanimalm@gmail.com</a>
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="w-4 h-4 flex-shrink-0" style={{ color: '#727272' }} />
-                <a href="tel:+34 722196933" className="transition-colors hover:text-white" style={{ color: '#727272' }}>+34 600 000 000</a>
+                <a href="tel:+34 722196933" className="transition-colors hover:text-white" style={{ color: '#727272' }}>+34 722 196 933</a>
               </li>
             </ul>
           </div>
