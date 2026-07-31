@@ -29,19 +29,14 @@ const NOVEDADES: Novedad[] = [
   },
 ];
 
-// TODO: cuando el backend tenga el concepto de "animal del mes",
-// sustituir este ID hardcodeado por el que devuelva el endpoint correspondiente.
-const ANIMAL_DEL_MES_ID: string | null = null;
-
 export default function Home() {
-  const { animals } = useApp();
+  const { animals, animalDelMesId } = useApp();
 
-  // Resolvemos el animal del mes: primero buscamos por ID configurado,
-  // si no hay, usamos el primero disponible como demo visual.
-  const animalDelMes =
-    (ANIMAL_DEL_MES_ID
-      ? animals.find((a) => a.id === ANIMAL_DEL_MES_ID)
-      : animals[0]) ?? null;
+  // Resolvemos el animal del mes desde el contexto global.
+  // Si no hay ninguno seleccionado aún, mostramos el placeholder.
+  const animalDelMes = animalDelMesId
+    ? (animals.find((a) => a.id === animalDelMesId) ?? null)
+    : null;
 
   return (
     <div style={{ backgroundColor: '#f7f7f7' }}>
@@ -130,7 +125,7 @@ export default function Home() {
                 </div>
               </div>
             ) : (
-              /* ── Placeholder cuando no hay animales aún ── */
+              /* ── Placeholder cuando no hay animal del mes seleccionado ── */
               <div
                 className="w-full max-w-sm rounded-3xl flex flex-col items-center justify-center gap-4"
                 style={{
@@ -150,7 +145,7 @@ export default function Home() {
                     Animal del mes
                   </p>
                   <p className="text-xs mt-1" style={{ color: '#727272' }}>
-                    Próximamente aquí aparecerá el animal al que damos visibilidad especial este mes.
+                    Selecciónalo desde el panel de administración.
                   </p>
                 </div>
               </div>

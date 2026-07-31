@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router';
-import { Plus, Search, Edit2, Trash2, Stethoscope, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Stethoscope, ChevronDown, ChevronUp, Star } from 'lucide-react';
 import { useApp, useAuth } from '../../context/AppContext';
 import { Animal } from '../../data/mockData';
 import { AnimalStatusBadge } from '../../components/StatusBadge';
@@ -70,15 +70,20 @@ function StatusDropdown({ animal, statusOptions, onChange }: {
   );
 }
 
-function AnimalRow({ animal, puedeEditar, puedeEliminar, responsable, statusOptions, onStatusChange, onDelete }: {
+function AnimalRow({ animal, puedeEditar, puedeEliminar, esAdmin, responsable, statusOptions, onStatusChange, onDelete, animalDelMesId, onSetAnimalDelMes }: {
   animal: Animal;
   puedeEditar: boolean;
   puedeEliminar: boolean;
+  esAdmin: boolean;
   responsable?: string;
   statusOptions: string[];
   onStatusChange: (s: string) => void;
   onDelete: () => void;
+  animalDelMesId: string | null;
+  onSetAnimalDelMes: (id: string | null) => void;
 }) {
+  const esMes = animalDelMesId === animal.id;
+
   return (
     <div style={{ ...ROW_STYLE, paddingTop: '0.875rem', paddingBottom: '0.875rem' }} className="hover:bg-gray-50 transition-colors">
       <div className="flex items-center gap-3 min-w-0">
@@ -87,7 +92,17 @@ function AnimalRow({ animal, puedeEditar, puedeEliminar, responsable, statusOpti
           : <div className="w-10 h-10 rounded-lg bg-gray-100 flex-shrink-0 flex items-center justify-center text-gray-400">🐾</div>
         }
         <div className="min-w-0">
-          <p className="text-sm font-medium text-gray-800 truncate">{animal.name}</p>
+          <p className="text-sm font-medium text-gray-800 truncate flex items-center gap-1.5">
+            {animal.name}
+            {esMes && (
+              <span
+                className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-xs font-semibold"
+                style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e' }}
+              >
+                <Star className="w-2.5 h-2.5" fill="#2e2e2e" /> mes
+              </span>
+            )}
+          </p>
           <div className="flex items-center gap-2 flex-wrap">
             <p className="text-xs text-gray-400">{formatEnum(animal.species)}</p>
             {responsable && <span className="text-xs" style={{ color: '#547792' }}>· 👤 {responsable}</span>}
@@ -107,6 +122,32 @@ function AnimalRow({ animal, puedeEditar, puedeEliminar, responsable, statusOpti
         )}
       </div>
       <div className="flex items-center gap-1.5">
+        {/* Botón Animal del mes — solo ADMIN o ENCARGADO */}
+        {esAdmin && (
+          <button
+            onClick={() => onSetAnimalDelMes(esMes ? null : animal.id)}
+            title={esMes ? 'Quitar como animal del mes' : 'Marcar como animal del mes'}
+            className="p-2 rounded-lg transition-colors"
+            style={esMes
+              ? { backgroundColor: '#f7e3b0', color: '#2e2e2e' }
+              : { color: '#9ca3af' }
+            }
+            onMouseEnter={e => {
+              if (!esMes) {
+                e.currentTarget.style.backgroundColor = '#fef9ec';
+                e.currentTarget.style.color = '#2e2e2e';
+              }
+            }}
+            onMouseLeave={e => {
+              if (!esMes) {
+                e.currentTarget.style.backgroundColor = '';
+                e.currentTarget.style.color = '#9ca3af';
+              }
+            }}
+          >
+            <Star className="w-4 h-4" fill={esMes ? '#2e2e2e' : 'none'} />
+          </button>
+        )}
         <Link to={`/dashboard/animals/${animal.id}/appointments`}
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap"
           style={{ backgroundColor: '#dce8ed', color: '#213448' }}
@@ -133,7 +174,7 @@ function AnimalRow({ animal, puedeEditar, puedeEliminar, responsable, statusOpti
 }
 
 export default function AnimalsManagement() {
-  const { animals, animalsLoading, deleteAnimal, changeAnimalStatus, users } = useApp();
+  const { animals, animalsLoading, deleteAnimal, changeAnimalStatus, users, animalDelMesId, setAnimalDelMesId } = useApp();
   const { currentUser } = useAuth();
   const { enums } = useEnums();
 
@@ -148,6 +189,7 @@ export default function AnimalsManagement() {
 
   const rol = (currentUser?.role ?? '').toUpperCase();
   const esAdmin      = rol === 'ADMIN';
+  const esEncargado  = rol === 'ENCARGADO';
   const esVoluntario = rol === 'VOLUNTARIO';
 
   const getNombreResponsable = (volunteerId: string | undefined): string | undefined => {
@@ -196,6 +238,30 @@ export default function AnimalsManagement() {
           </Link>
         )}
       </div>
+
+      {/* Aviso de animal del mes activo */}
+      {animalDelMesId && (() => {
+        const adm = animals.find(a => a.id === animalDelMesId);
+        return adm ? (
+          <div
+            className="flex items-center justify-between gap-3 rounded-2xl px-5 py-3 text-sm"
+            style={{ backgroundColor: '#fef9ec', border: '1px solid #f7e3b0', color: '#2e2e2e' }}
+          >
+            <span className="flex items-center gap-2">
+              <Star className="w-4 h-4" fill="#2e2e2e" />
+              <strong>Animal del mes:</strong> {adm.name}
+            </span>
+            {(esAdmin || esEncargado) && (
+              <button
+                onClick={() => setAnimalDelMesId(null)}
+                className="text-xs underline opacity-60 hover:opacity-100 transition-opacity"
+              >
+                Quitar
+              </button>
+            )}
+          </div>
+        ) : null;
+      })()}
 
       {/* Filtros */}
       <div className="bg-white rounded-2xl border border-gray-100 p-4 flex flex-col sm:flex-row gap-3">
@@ -249,9 +315,12 @@ export default function AnimalsManagement() {
                   <AnimalRow key={animal.id} animal={animal}
                     puedeEditar={puedeEditarAnimal(animal)}
                     puedeEliminar={esAdmin}
+                    esAdmin={esAdmin || esEncargado}
                     statusOptions={statusOptions}
                     onStatusChange={s => changeAnimalStatus(animal.id, s)}
                     onDelete={() => setDeleteConfirm(animal.id)}
+                    animalDelMesId={animalDelMesId}
+                    onSetAnimalDelMes={setAnimalDelMesId}
                   />
                 ))}
               </div>
@@ -283,10 +352,13 @@ export default function AnimalsManagement() {
                       <AnimalRow key={animal.id} animal={animal}
                         puedeEditar={puedeEditarAnimal(animal)}
                         puedeEliminar={esAdmin}
+                        esAdmin={esAdmin || esEncargado}
                         responsable={getNombreResponsable(animal.volunteerId)}
                         statusOptions={statusOptions}
                         onStatusChange={s => changeAnimalStatus(animal.id, s)}
                         onDelete={() => setDeleteConfirm(animal.id)}
+                        animalDelMesId={animalDelMesId}
+                        onSetAnimalDelMes={setAnimalDelMesId}
                       />
                     ))}
                   </div>

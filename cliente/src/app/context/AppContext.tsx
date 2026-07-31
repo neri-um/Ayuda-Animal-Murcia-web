@@ -69,6 +69,9 @@ interface AppContextType {
   updateRequestStatus: (id: string, status: RequestStatus, managerId: string, note?: string) => Promise<void>;
   notifyReturn: (id: string) => Promise<void>;
   confirmReturn: (id: string, managerId: string) => Promise<void>;
+  // ── Animal del mes ────────────────────────────────────────────────────────
+  animalDelMesId: string | null;
+  setAnimalDelMesId: (id: string | null) => void;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -244,6 +247,17 @@ function recargarCitas(
     .catch(() => {});
 }
 
+// ── Persistencia del animal del mes en sessionStorage ────────────────────────
+function loadAnimalDelMesId(): string | null {
+  try { return sessionStorage.getItem('va_animal_del_mes'); } catch { return null; }
+}
+function saveAnimalDelMesId(id: string | null) {
+  try {
+    if (id) sessionStorage.setItem('va_animal_del_mes', id);
+    else sessionStorage.removeItem('va_animal_del_mes');
+  } catch { /* noop */ }
+}
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const session = loadSession();
   const [token, setToken] = useState<string | null>(session.token);
@@ -260,6 +274,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const [requests, setRequests] = useState<ProductRequest[]>([]);
   const [requestsLoading, setRequestsLoading] = useState(false);
+
+  // ── Animal del mes ────────────────────────────────────────────────────────
+  const [animalDelMesId, setAnimalDelMesIdState] = useState<string | null>(loadAnimalDelMesId);
+
+  const setAnimalDelMesId = useCallback((id: string | null) => {
+    setAnimalDelMesIdState(id);
+    saveAnimalDelMesId(id);
+  }, []);
 
   const fetchAnimals = useCallback(async (tkn?: string | null) => {
     const t = tkn !== undefined ? tkn : token;
@@ -586,6 +608,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       products, productsLoading, fetchProducts, addProduct, updateProduct, deleteProduct,
       requests, requestsLoading, fetchRequests, addRequest, updateRequestStatus,
       notifyReturn, confirmReturn,
+      animalDelMesId, setAnimalDelMesId,
     }}>
       {children}
     </AppContext.Provider>
