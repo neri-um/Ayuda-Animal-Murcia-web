@@ -2,7 +2,7 @@ import { Link, Outlet, useNavigate, NavLink } from 'react-router';
 import { Menu, X, LogIn, LayoutDashboard, LogOut, Instagram, Facebook, MapPin, Mail, Phone } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../context/AppContext';
-import LOGO_URL from '../public/logo.jpg';
+import LOGO_URL from '../public/logopng.png';
 
 function SiteFooter() {
   const year = new Date().getFullYear();
