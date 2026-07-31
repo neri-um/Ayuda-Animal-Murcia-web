@@ -5,16 +5,12 @@ import {
   Send, CheckCircle2, ArrowRight, AlertCircle
 } from 'lucide-react';
 
-// ─── Cómo activar el envío real ───────────────────────────────────────────────────────────────────────────────
-// 1. Ve a https://formspree.io → crea cuenta gratuita → "New Form"
-// 2. Pon como email de destino: ayudaanimalm@gmail.com
-// 3. Copia el código del formulario, que será algo como: xkgwabcd
-// 4. Sustituye FORMSPREE_ID en la línea de abajo por ese código
-// 5. La primera vez que se envíe un formulario, Formspree manda un
-//    email de verificación a ayudaanimalm@gmail.com — hay que aceptarlo.
+// ─── Formspree: los mensajes del formulario llegan a ayudaanimalm@gmail.com ────────
+// Si necesitas cambiar el destino, ve a https://formspree.io y actualiza
+// el formulario con ID: mvzejpjd
 // Plan gratuito: 50 envíos/mes, sin tarjeta de crédito.
 // ───────────────────────────────────────────────────────────────────────────────
-const FORMSPREE_ID = 'XXXXXXXX'; // ← cambia esto por tu ID real
+const FORMSPREE_ID = 'mvzejpjd';
 // ───────────────────────────────────────────────────────────────────────────────
 
 const CONTACT_INFO = [
