@@ -67,7 +67,7 @@ export default function DashboardHome() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-gray-900">👋 Bienvenido/a, {currentUser?.name.split(' ')[0]}</h1>
+        <h1 className="text-gray-900">Bienvenido/a, {currentUser?.name.split(' ')[0]}</h1>
         <p className="text-gray-500 text-sm mt-1">Aquí tienes un resumen del estado de la protectora.</p>
       </div>
 
