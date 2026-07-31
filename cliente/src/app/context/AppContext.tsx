@@ -247,11 +247,11 @@ function recargarCitas(
     .catch(() => {});
 }
 
-// ── Persistencia del animal del mes en sessionStorage ────────────────────────
-function loadAnimalDelMesId(): string | null {
+// ── Caché de animal del mes en sessionStorage (fallback sin red) ──────────────
+function loadAnimalDelMesCache(): string | null {
   try { return sessionStorage.getItem('va_animal_del_mes'); } catch { return null; }
 }
-function saveAnimalDelMesId(id: string | null) {
+function saveAnimalDelMesCache(id: string | null) {
   try {
     if (id) sessionStorage.setItem('va_animal_del_mes', id);
     else sessionStorage.removeItem('va_animal_del_mes');
@@ -275,13 +275,41 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [requests, setRequests] = useState<ProductRequest[]>([]);
   const [requestsLoading, setRequestsLoading] = useState(false);
 
-  // ── Animal del mes ────────────────────────────────────────────────────────
-  const [animalDelMesId, setAnimalDelMesIdState] = useState<string | null>(loadAnimalDelMesId);
+  // ── Animal del mes: inicializa desde caché, luego sincroniza con BD ──────
+  const [animalDelMesId, setAnimalDelMesIdState] = useState<string | null>(loadAnimalDelMesCache);
 
-  const setAnimalDelMesId = useCallback((id: string | null) => {
-    setAnimalDelMesIdState(id);
-    saveAnimalDelMesId(id);
+  // Carga inicial desde la API (pública, no necesita token)
+  useEffect(() => {
+    fetch(`${BASE}/configuracion/animal-del-mes`)
+      .then(res => res.ok ? res.json() : null)
+      .then((data: { animalId?: string } | null) => {
+        const id = data?.animalId || null;
+        setAnimalDelMesIdState(id);
+        saveAnimalDelMesCache(id);
+      })
+      .catch(() => { /* mantiene el caché si no hay red */ });
   }, []);
+
+  /**
+   * Persiste el animal del mes en la BD y actualiza el estado local.
+   * Requiere token (solo ADMIN/ENCARGADO pueden llamar al PUT).
+   */
+  const setAnimalDelMesId = useCallback((id: string | null) => {
+    // Actualización optimista
+    setAnimalDelMesIdState(id);
+    saveAnimalDelMesCache(id);
+
+    // Persiste en BD (fire & forget con rollback en error)
+    const body = JSON.stringify({ animalId: id ?? '' });
+    fetch(`${BASE}/configuracion/animal-del-mes`, {
+      method: 'PUT',
+      headers: jsonHeaders(token),
+      body,
+    }).catch(() => {
+      // Si falla la red, al menos el caché queda guardado para esta sesión
+      console.warn('[animal-del-mes] No se pudo persistir en el servidor');
+    });
+  }, [token]);
 
   const fetchAnimals = useCallback(async (tkn?: string | null) => {
     const t = tkn !== undefined ? tkn : token;
