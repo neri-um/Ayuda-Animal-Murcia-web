@@ -1,12 +1,7 @@
 // cliente/src/app/pages/Home.tsx
 
-type AnimalResumen = {
-  id: number;
-  nombre: string;
-  especie: string;
-  imagenUrl?: string;
-  descripcionCorta?: string;
-};
+import { Link } from 'react-router';
+import AnimalsForAdoption from '../components/AnimalsForAdoption';
 
 type Novedad = {
   id: number;
@@ -14,27 +9,6 @@ type Novedad = {
   fecha: string;
   resumen: string;
 };
-
-const ULTIMOS_ANIMALES: AnimalResumen[] = [
-  {
-    id: 1,
-    nombre: 'Luna',
-    especie: 'Perro',
-    descripcionCorta: 'Rescatada de la calle, muy cariñosa.',
-  },
-  {
-    id: 2,
-    nombre: 'Misi',
-    especie: 'Gato',
-    descripcionCorta: 'Gatita joven, perfecta para piso tranquilo.',
-  },
-  {
-    id: 3,
-    nombre: 'Toby',
-    especie: 'Perro',
-    descripcionCorta: 'Adulto tranquilo, ideal para familias.',
-  },
-];
 
 const NOVEDADES: Novedad[] = [
   {
@@ -73,19 +47,19 @@ export default function Home() {
               cuidado y adopción responsable de animales en Murcia.
             </p>
             <div className="flex flex-wrap gap-3">
-              <a
-                href="/adoptar"
+              <Link
+                to="/adoptar"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all hover:opacity-90"
                 style={{ backgroundColor: '#E3CFA9', color: '#1E1E1E' }}
               >
                 Ver animales en adopción
-              </a>
-              <a
-                href="/colaborar"
+              </Link>
+              <Link
+                to="/colaborar"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold border border-cremaDorado text-cremaDorado hover:bg-[#2a2a2a]"
               >
                 Formas de colaborar
-              </a>
+              </Link>
             </div>
           </div>
           <div className="hidden lg:block">
@@ -146,45 +120,20 @@ export default function Home() {
                 Estos son algunos de los animales que han llegado recientemente al refugio.
               </p>
             </div>
-            <a
-              href="/adoptar"
+            <Link
+              to="/adoptar"
               className="text-sm font-semibold text-negroCarbon hover:text-dorado"
             >
-              Ver todos
-            </a>
+              Ver todos →
+            </Link>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {ULTIMOS_ANIMALES.map((animal) => (
-              <article
-                key={animal.id}
-                className="bg-fondoBlanco rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-              >
-                <div className="h-40 bg-[#e1ded4] flex items-center justify-center text-gray-500 text-xs">
-                  Foto de {animal.especie}
-                </div>
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold mb-1">{animal.nombre}</h3>
-                  <p className="text-xs text-gray-500 mb-2">{animal.especie}</p>
-                  <p className="text-sm text-gray-700 mb-3">
-                    {animal.descripcionCorta}
-                  </p>
-                  <a
-                    href="/adoptar"
-                    className="inline-block text-xs font-semibold text-negroCarbon hover:text-dorado"
-                  >
-                    Más detalles y proceso de adopción
-                  </a>
-                </div>
-              </article>
-            ))}
-          </div>
+          <AnimalsForAdoption variant="home" />
         </div>
       </section>
 
       {/* Últimas novedades */}
       <section className="py-14 bg-fondoBlanco">
-        <div className="max-w-7xl mx_auto px-4">
+        <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-2xl font-bold mb-1">Últimas novedades</h2>
           <p className="text-sm text-gray-600 mb-6">
             Noticias, campañas y pequeños grandes logros del refugio.
