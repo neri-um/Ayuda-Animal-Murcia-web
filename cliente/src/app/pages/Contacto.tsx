@@ -25,7 +25,7 @@ const CONTACT_INFO = [
     icon: Mail,
     label: 'Correo electrónico',
     value: 'ayudaanimalm@gmail.com',
-    sub: 'Respondemos en 24–48 h',
+    sub: 'Respondemos lo antes posible',
     href: 'mailto:ayudaanimalm@gmail.com',
   },
 ];
@@ -99,15 +99,12 @@ export default function Contacto() {
           <PawPrint className="absolute" style={{ width: '18rem', height: '18rem', top: '-2rem', right: '-1rem', transform: 'rotate(20deg)', color: 'rgba(255,255,255,0.04)' }} />
         </div>
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm mb-6" style={{ backgroundColor: 'rgba(255,255,255,0.12)', color: '#f0e8d0' }}>
-            <Heart className="w-4 h-4" style={{ fill: '#f0e8d0', color: '#f0e8d0' }} />
-            Estamos aquí para ayudarte
-          </div>
+
           <h1 className="mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 700, color: '#f0e8d0', lineHeight: 1.2 }}>
             Contacta con nosotros
           </h1>
           <p className="text-lg max-w-xl mx-auto" style={{ color: 'rgba(240,232,208,0.75)' }}>
-            ¿Tienes dudas sobre adopción, acogida o quieres colaborar? Escríbenos y te respondemos en menos de 48 horas.
+            ¿Tienes dudas sobre adopción, acogida o quieres colaborar? Estas son nuestras formas de contacto.
           </p>
         </div>
         <div className="absolute bottom-0 left-0 right-0">
@@ -125,7 +122,7 @@ export default function Contacto() {
             {/* Info de contacto */}
             <div>
               <h2 className="text-gray-900 mb-2" style={{ fontSize: '1.5rem', fontWeight: 700 }}>Información de contacto</h2>
-              <p className="text-gray-500 text-sm mb-8">Puedes escribirnos, llamarnos o visitarnos en nuestras instalaciones.</p>
+              <p className="text-gray-500 text-sm mb-8">Puedes escribirnos un WhatsApp o enviarnos un e-mail.</p>
 
               <div className="space-y-4 mb-10">
                 {CONTACT_INFO.map((item, i) => {
@@ -173,7 +170,7 @@ export default function Contacto() {
                       <CheckCircle2 className="w-8 h-8" style={{ color: '#2e2e2e' }} />
                     </div>
                     <h3 className="text-gray-900 mb-2" style={{ fontWeight: 700 }}>¡Mensaje enviado!</h3>
-                    <p className="text-gray-500 text-sm mb-6">Gracias por escribirnos. Te responderemos en menos de 48 horas.</p>
+                    <p className="text-gray-500 text-sm mb-6">Gracias por escribirnos. Te responderemos lo antes posible.</p>
                     <button
                       onClick={() => { setSent(false); setForm({ nombre: '', email: '', asunto: '', mensaje: '' }); }}
                       className="text-sm underline"
@@ -320,10 +317,10 @@ export default function Contacto() {
       <section className="py-16" style={{ backgroundColor: '#f0e8d0' }}>
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="mb-3" style={{ fontWeight: 700, fontSize: 'clamp(1.3rem, 3vw, 1.8rem)', color: '#2e2e2e' }}>
-            ¿Prefieres venir a conocernos?
+            ¿Estas pensando en adoptar?
           </h2>
           <p className="text-sm mb-6 max-w-lg mx-auto" style={{ color: '#5a5a5a' }}>
-            Puedes visitarnos durante nuestro horario de atención. ¡Los animales estarán encantados de conocerte!
+            Conoce a todos los animales que tenemos en adopción. 
           </p>
           <Link
             to="/adoptar"

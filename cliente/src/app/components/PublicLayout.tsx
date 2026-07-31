@@ -67,7 +67,7 @@ function SiteFooter() {
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="w-4 h-4 flex-shrink-0" style={{ color: '#727272' }} />
-                <a href="tel:+34 722 19 69 33" className="transition-colors hover:text-white" style={{ color: '#727272' }}>+34 600 000 000</a>
+                <a href="tel:+34 722196933" className="transition-colors hover:text-white" style={{ color: '#727272' }}>+34 600 000 000</a>
               </li>
             </ul>
           </div>
