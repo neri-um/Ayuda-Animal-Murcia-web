@@ -62,7 +62,6 @@ export default function Contacto() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // En producción esto enviaría el formulario a un backend o servicio de email
     setSent(true);
   };
 
@@ -71,19 +70,19 @@ export default function Contacto() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative py-24 text-white overflow-hidden" style={{ backgroundColor: '#213448' }}>
+      <section className="relative py-24 overflow-hidden" style={{ backgroundColor: '#2e2e2e' }}>
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <PawPrint className="absolute text-white/5" style={{ width: '18rem', height: '18rem', top: '-2rem', right: '-1rem', transform: 'rotate(20deg)' }} />
+          <PawPrint className="absolute" style={{ width: '18rem', height: '18rem', top: '-2rem', right: '-1rem', transform: 'rotate(20deg)', color: 'rgba(255,255,255,0.04)' }} />
         </div>
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm mb-6" style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}>
-            <Heart className="w-4 h-4 fill-white" />
+          <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm mb-6" style={{ backgroundColor: 'rgba(255,255,255,0.12)', color: '#f0e8d0' }}>
+            <Heart className="w-4 h-4" style={{ fill: '#f0e8d0', color: '#f0e8d0' }} />
             Estamos aquí para ayudarte
           </div>
-          <h1 className="text-white mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 700 }}>
+          <h1 className="mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 700, color: '#f0e8d0', lineHeight: 1.2 }}>
             Contacta con nosotros
           </h1>
-          <p className="text-white/75 text-lg max-w-xl mx-auto">
+          <p className="text-lg max-w-xl mx-auto" style={{ color: 'rgba(240,232,208,0.75)' }}>
             ¿Tienes dudas sobre adopción, acogida o quieres colaborar? Escríbenos y te respondemos en menos de 48 horas.
           </p>
         </div>
@@ -109,8 +108,8 @@ export default function Contacto() {
                   const Icon = item.icon;
                   const content = (
                     <div className="flex items-start gap-4 p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                      <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#dce8ed' }}>
-                        <Icon className="w-5 h-5" style={{ color: '#547792' }} />
+                      <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#f0e8d0' }}>
+                        <Icon className="w-5 h-5" style={{ color: '#2e2e2e' }} />
                       </div>
                       <div>
                         <div className="text-xs text-gray-400 mb-0.5">{item.label}</div>
@@ -128,7 +127,7 @@ export default function Contacto() {
               </div>
 
               {/* Redes sociales */}
-              <div className="p-6 rounded-2xl" style={{ backgroundColor: '#f0f6f9' }}>
+              <div className="p-6 rounded-2xl" style={{ backgroundColor: '#faf7f0' }}>
                 <h4 className="text-gray-900 mb-3 text-sm" style={{ fontWeight: 600 }}>Síguenos en redes</h4>
                 <div className="flex gap-3">
                   {['Facebook', 'Instagram'].map(red => (
@@ -146,15 +145,15 @@ export default function Contacto() {
               <div className="bg-white rounded-3xl border border-gray-100 shadow-lg p-8">
                 {sent ? (
                   <div className="text-center py-12">
-                    <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#dce8ed' }}>
-                      <CheckCircle2 className="w-8 h-8" style={{ color: '#547792' }} />
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#f0e8d0' }}>
+                      <CheckCircle2 className="w-8 h-8" style={{ color: '#2e2e2e' }} />
                     </div>
                     <h3 className="text-gray-900 mb-2" style={{ fontWeight: 700 }}>¡Mensaje enviado!</h3>
                     <p className="text-gray-500 text-sm mb-6">Gracias por escribirnos. Te responderemos en menos de 48 horas.</p>
                     <button
                       onClick={() => { setSent(false); setForm({ nombre: '', email: '', asunto: '', mensaje: '' }); }}
                       className="text-sm underline"
-                      style={{ color: '#547792' }}
+                      style={{ color: '#2e2e2e' }}
                     >
                       Enviar otro mensaje
                     </button>
@@ -174,7 +173,7 @@ export default function Contacto() {
                             value={form.nombre}
                             onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))}
                             className={inputCls}
-                            onFocus={e => (e.currentTarget.style.borderColor = '#547792')}
+                            onFocus={e => (e.currentTarget.style.borderColor = '#2e2e2e')}
                             onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
                           />
                         </div>
@@ -187,7 +186,7 @@ export default function Contacto() {
                             value={form.email}
                             onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
                             className={inputCls}
-                            onFocus={e => (e.currentTarget.style.borderColor = '#547792')}
+                            onFocus={e => (e.currentTarget.style.borderColor = '#2e2e2e')}
                             onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
                           />
                         </div>
@@ -199,7 +198,7 @@ export default function Contacto() {
                           value={form.asunto}
                           onChange={e => setForm(f => ({ ...f, asunto: e.target.value }))}
                           className={inputCls}
-                          onFocus={e => (e.currentTarget.style.borderColor = '#547792')}
+                          onFocus={e => (e.currentTarget.style.borderColor = '#2e2e2e')}
                           onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
                         >
                           <option value="">Selecciona un asunto</option>
@@ -221,14 +220,14 @@ export default function Contacto() {
                           onChange={e => setForm(f => ({ ...f, mensaje: e.target.value }))}
                           className={inputCls}
                           style={{ resize: 'none' }}
-                          onFocus={e => (e.currentTarget.style.borderColor = '#547792')}
+                          onFocus={e => (e.currentTarget.style.borderColor = '#2e2e2e')}
                           onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
                         />
                       </div>
                       <button
                         type="submit"
-                        className="w-full flex items-center justify-center gap-2 text-white py-3.5 rounded-xl transition-all hover:opacity-90 hover:shadow-lg"
-                        style={{ backgroundColor: '#547792', fontWeight: 600 }}
+                        className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl transition-all hover:opacity-90 hover:shadow-lg"
+                        style={{ backgroundColor: '#2e2e2e', color: '#f0e8d0', fontWeight: 600 }}
                       >
                         <Send className="w-4 h-4" />
                         Enviar mensaje
@@ -273,18 +272,18 @@ export default function Contacto() {
       </section>
 
       {/* CTA */}
-      <section className="py-16" style={{ backgroundColor: '#dce8ed' }}>
+      <section className="py-16" style={{ backgroundColor: '#f0e8d0' }}>
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-gray-900 mb-3" style={{ fontWeight: 700, fontSize: 'clamp(1.3rem, 3vw, 1.8rem)' }}>
+          <h2 className="mb-3" style={{ fontWeight: 700, fontSize: 'clamp(1.3rem, 3vw, 1.8rem)', color: '#2e2e2e' }}>
             ¿Prefieres venir a conocernos?
           </h2>
-          <p className="text-gray-600 text-sm mb-6 max-w-lg mx-auto">
+          <p className="text-sm mb-6 max-w-lg mx-auto" style={{ color: '#5a5a5a' }}>
             Puedes visitarnos durante nuestro horario de atención. ¡Los animales estarán encantados de conocerte!
           </p>
           <Link
-            to="/"
-            className="inline-flex items-center gap-2 text-white px-8 py-3.5 rounded-xl transition-all hover:shadow-lg hover:opacity-90"
-            style={{ backgroundColor: '#547792', fontWeight: 600 }}
+            to="/adoptar"
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl transition-all hover:shadow-lg hover:opacity-90"
+            style={{ backgroundColor: '#2e2e2e', color: '#f0e8d0', fontWeight: 600 }}
           >
             <PawPrint className="w-5 h-5" />
             Ver animales disponibles
