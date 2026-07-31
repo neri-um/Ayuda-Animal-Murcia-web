@@ -1,10 +1,12 @@
 import { Link, Outlet, useNavigate, useLocation } from 'react-router';
 import {
-  Heart, LayoutDashboard, PawPrint, Package,
+  LayoutDashboard, PawPrint, Package,
   ClipboardList, Users, LogOut, ChevronRight, ClipboardCheck, FileText,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../context/AppContext';
+
+const LOGO_URL = 'https://i.ibb.co/BHC8hVCV/LOGO-CON-FONDO-removebg-preview.png';
 
 interface NavItem {
   to: string;
@@ -72,9 +74,11 @@ export default function DashboardLayout() {
       {/* Logo */}
       <div className="px-6 py-5 border-b border-slate-700">
         <Link to="/" className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#547792' }}>
-            <Heart className="w-5 h-5 text-white fill-white" />
-          </div>
+          <img
+            src={LOGO_URL}
+            alt="Logo Ayuda Animal Murcia"
+            className="h-9 w-auto flex-shrink-0"
+          />
           <span className="text-white" style={{ fontWeight: 600 }}>Vidanimal</span>
         </Link>
       </div>

@@ -1,9 +1,11 @@
 // cliente/src/app/components/PublicLayout.tsx
 
 import { Link, Outlet, useNavigate, NavLink } from 'react-router';
-import { Heart, Menu, X, LogIn, LayoutDashboard, LogOut, Instagram, Facebook, MapPin, Mail, Phone } from 'lucide-react';
+import { Menu, X, LogIn, LayoutDashboard, LogOut, Instagram, Facebook, MapPin, Mail, Phone } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../context/AppContext';
+
+const LOGO_URL = 'https://i.ibb.co/BHC8hVCV/LOGO-CON-FONDO-removebg-preview.png';
 
 function SiteFooter() {
   const year = new Date().getFullYear();
@@ -16,7 +18,11 @@ function SiteFooter() {
           {/* Columna 1 — Marca */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Heart className="h-5 w-5 flex-shrink-0" style={{ color: '#f7e3b0' }} fill="#f7e3b0" />
+              <img
+                src={LOGO_URL}
+                alt="Ayuda Animal Murcia"
+                className="h-7 w-auto flex-shrink-0"
+              />
               <span className="font-bold text-base" style={{ color: '#f7e3b0' }}>
                 Ayuda Animal Murcia
               </span>
@@ -176,8 +182,13 @@ export default function PublicLayout() {
       >
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
-            <Link to="/" className="flex items-center gap-2">
-              <Heart className="h-6 w-6 flex-shrink-0" style={{ color: '#f7e3b0' }} fill="#f7e3b0" />
+            {/* Logo */}
+            <Link to="/" className="flex items-center gap-2.5">
+              <img
+                src={LOGO_URL}
+                alt="Logo Ayuda Animal Murcia"
+                className="h-9 w-auto flex-shrink-0"
+              />
               <span className="font-bold text-lg" style={{ color: '#f7e3b0' }}>
                 Ayuda Animal Murcia
               </span>
@@ -262,7 +273,7 @@ export default function PublicLayout() {
         <Outlet />
       </main>
 
-      {/* Footer global — aparece en todas las páginas públicas */}
+      {/* Footer global */}
       <SiteFooter />
     </div>
   );
