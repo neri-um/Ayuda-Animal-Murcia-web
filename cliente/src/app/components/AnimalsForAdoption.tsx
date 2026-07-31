@@ -7,7 +7,6 @@ import { useApp } from '../context/AppContext';
 import {
   Animal, AnimalSize, AnimalGender, Species, AnimalStatus,
 } from '../data/mockData';
-import { AnimalStatusBadge } from '../components/StatusBadge';
 import { useInView } from '../hooks/useInView';
 import { toSlug } from '../utils/slug';
 
@@ -64,9 +63,7 @@ function AnimalCard({ animal }: { animal: Animal }) {
           alt={animal.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
-        <div className="absolute top-3 left-3">
-          <AnimalStatusBadge status={animal.status} />
-        </div>
+        {/* Badge género arriba a la derecha */}
         <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-gray-600">
           {genderSymbol} {genderLabel}
         </div>
@@ -77,12 +74,13 @@ function AnimalCard({ animal }: { animal: Animal }) {
             <h3 className="text-gray-900">{animal.name}</h3>
             <p className="text-sm text-gray-500">{animal.breed}</p>
           </div>
+          {/* Badge edad: neutro blanco, sin amarillo */}
           <span
             className="text-xs px-2 py-1 rounded-full border flex-shrink-0 ml-2"
             style={{
-              backgroundColor: '#dce8ed',
-              color: '#213448',
-              borderColor: '#b5cdd8',
+              backgroundColor: '#f7f7f7',
+              color: '#727272',
+              borderColor: '#d9d9d9',
             }}
           >
             {calcAge(animal.birthDate)}
