@@ -247,14 +247,14 @@ function recargarCitas(
     .catch(() => {});
 }
 
-// ── Caché de animal del mes en sessionStorage (fallback sin red) ──────────────
+// ── Caché de animal del mes en localStorage (persiste entre refresco/pestañas) ─
 function loadAnimalDelMesCache(): string | null {
-  try { return sessionStorage.getItem('va_animal_del_mes'); } catch { return null; }
+  try { return localStorage.getItem('va_animal_del_mes'); } catch { return null; }
 }
 function saveAnimalDelMesCache(id: string | null) {
   try {
-    if (id) sessionStorage.setItem('va_animal_del_mes', id);
-    else sessionStorage.removeItem('va_animal_del_mes');
+    if (id) localStorage.setItem('va_animal_del_mes', id);
+    else localStorage.removeItem('va_animal_del_mes');
   } catch { /* noop */ }
 }
 
@@ -281,40 +281,38 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [requests, setRequests] = useState<ProductRequest[]>([]);
   const [requestsLoading, setRequestsLoading] = useState(false);
 
-  // ── Animal del mes: inicializa desde caché, luego sincroniza con BD ──────
+  // ── Animal del mes: arranca desde localStorage, luego la API sobreescribe ──
   const [animalDelMesId, setAnimalDelMesIdState] = useState<string | null>(() =>
     normalizeId(loadAnimalDelMesCache())
   );
 
-  // Carga inicial desde la API (pública, no necesita token)
+  // Carga desde la API en cada mount (pública, sin token)
+  // Si el servidor responde → actualiza estado + caché
+  // Si falla (cold start Render) → mantiene el valor de localStorage
   useEffect(() => {
     fetch(`${BASE}/configuracion/animal-del-mes`)
       .then(res => res.ok ? res.json() : null)
       .then((data: { animalId?: any } | null) => {
-        // Normalizar a string para que coincida con Animal.id (siempre string)
         const id = normalizeId(data?.animalId);
         setAnimalDelMesIdState(id);
         saveAnimalDelMesCache(id);
       })
-      .catch(() => { /* mantiene el caché si no hay red */ });
+      .catch(() => { /* mantiene localStorage si no hay red */ });
   }, []);
 
   /**
-   * Persiste el animal del mes en la BD y actualiza el estado local.
-   * Requiere token (solo ADMIN/ENCARGADO pueden llamar al PUT).
+   * Persiste el animal del mes en la BD y actualiza estado + caché.
+   * Solo ADMIN/ENCARGADO pueden llamar al PUT.
    */
   const setAnimalDelMesId = useCallback((id: string | null) => {
     const normalized = normalizeId(id);
-    // Actualización optimista
     setAnimalDelMesIdState(normalized);
     saveAnimalDelMesCache(normalized);
 
-    // Persiste en BD (fire & forget)
-    const body = JSON.stringify({ animalId: normalized ?? '' });
     fetch(`${BASE}/configuracion/animal-del-mes`, {
       method: 'PUT',
       headers: jsonHeaders(token),
-      body,
+      body: JSON.stringify({ animalId: normalized ?? '' }),
     }).catch(() => {
       console.warn('[animal-del-mes] No se pudo persistir en el servidor');
     });
