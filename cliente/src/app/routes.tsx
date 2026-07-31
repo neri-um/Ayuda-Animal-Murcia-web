@@ -11,6 +11,9 @@ import Contacto from './pages/Contacto';
 import Colaborar from './pages/Colaborar';
 import Donar from './pages/Donar';
 import Apadrinar from './pages/Apadrinar';
+import AvisoLegal from './pages/AvisoLegal';
+import PoliticaPrivacidad from './pages/PoliticaPrivacidad';
+import PoliticaCookies from './pages/PoliticaCookies';
 import DashboardHome from './pages/dashboard/DashboardHome';
 import AnimalsManagement from './pages/dashboard/AnimalsManagement';
 import AnimalForm from './pages/dashboard/AnimalForm';
@@ -29,20 +32,24 @@ export const router = createBrowserRouter([
     element: <PublicLayout />,
     children: [
       { index: true, element: <Home /> },
-      // Listado de adopción — accesible por /adoptar y /animales
+      // Adopción
       { path: 'adoptar', element: <Adoptar /> },
       { path: 'animales', element: <Navigate to="/adoptar" replace /> },
-      // Detalle y formulario de animal
       { path: 'animals/:id', element: <AnimalDetail /> },
       { path: 'adopt/:id', element: <AdoptionForm /> },
-      // Páginas de colaboración
+      // Colaboración
       { path: 'colaborar', element: <Colaborar /> },
       { path: 'donar', element: <Donar /> },
       { path: 'apadrinar', element: <Apadrinar /> },
-      // Resto
-      { path: 'login', element: <Login /> },
+      // Información
       { path: 'quienes-somos', element: <QuienesSomos /> },
       { path: 'contacto', element: <Contacto /> },
+      // Autenticación
+      { path: 'login', element: <Login /> },
+      // Páginas legales
+      { path: 'aviso-legal', element: <AvisoLegal /> },
+      { path: 'privacidad', element: <PoliticaPrivacidad /> },
+      { path: 'cookies', element: <PoliticaCookies /> },
     ],
   },
   {
