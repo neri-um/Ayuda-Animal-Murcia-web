@@ -47,7 +47,7 @@ export default function Home() {
           {/* Columna izquierda: texto y CTAs */}
           <div>
             <p className="mb-3 italic font-medium" style={{ color: '#f7e3b0' }}>
-              Refugio Ayuda Animal Murcia
+              Ayuda Animal Murcia
             </p>
             <h1
               className="text-3xl sm:text-5xl font-black leading-tight mb-5"
