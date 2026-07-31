@@ -51,6 +51,7 @@ function AnimalCard({ animal }: { animal: Animal }) {
   const genderSymbol = animal.gender?.toUpperCase() === 'MACHO' ? '♂' : '♀';
   const genderLabel =
     GENDER_LABEL[animal.gender?.toUpperCase() ?? ''] ?? animal.gender;
+  const isHembra = animal.gender?.toUpperCase() === 'HEMBRA';
 
   return (
     <Link
@@ -63,24 +64,20 @@ function AnimalCard({ animal }: { animal: Animal }) {
           alt={animal.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
-        {/* Badge género arriba a la derecha */}
         <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-gray-600">
           {genderSymbol} {genderLabel}
         </div>
       </div>
       <div className="p-4 flex flex-col flex-1">
         <div className="flex items-start justify-between mb-2">
-          <div>
-            <h3 className="text-gray-900">{animal.name}</h3>
-            <p className="text-sm text-gray-500">{animal.breed}</p>
-          </div>
-          {/* Badge edad: neutro blanco, sin amarillo */}
+          <h3 className="text-gray-900">{animal.name}</h3>
+          {/* Badge edad: amarillito corporativo */}
           <span
             className="text-xs px-2 py-1 rounded-full border flex-shrink-0 ml-2"
             style={{
-              backgroundColor: '#f7f7f7',
-              color: '#727272',
-              borderColor: '#d9d9d9',
+              backgroundColor: '#f7e3b0',
+              color: '#2e2e2e',
+              borderColor: '#e8d090',
             }}
           >
             {calcAge(animal.birthDate)}
@@ -94,7 +91,8 @@ function AnimalCard({ animal }: { animal: Animal }) {
             className="mt-3 flex items-center gap-1.5 text-sm"
             style={{ fontWeight: 500, color: '#547792' }}
           >
-            <Heart className="w-4 h-4" /> ¡Quiero adoptarlo!
+            <Heart className="w-4 h-4" />
+            {isHembra ? '¡Quiero adoptarla!' : '¡Quiero adoptarlo!'}
           </div>
         )}
       </div>
