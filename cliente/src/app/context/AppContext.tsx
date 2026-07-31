@@ -258,6 +258,12 @@ function saveAnimalDelMesCache(id: string | null) {
   } catch { /* noop */ }
 }
 
+// Normaliza cualquier valor de ID a string | null de forma segura
+function normalizeId(raw: any): string | null {
+  if (raw == null || raw === '' || raw === 'null') return null;
+  return String(raw);
+}
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const session = loadSession();
   const [token, setToken] = useState<string | null>(session.token);
@@ -276,14 +282,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [requestsLoading, setRequestsLoading] = useState(false);
 
   // ── Animal del mes: inicializa desde caché, luego sincroniza con BD ──────
-  const [animalDelMesId, setAnimalDelMesIdState] = useState<string | null>(loadAnimalDelMesCache);
+  const [animalDelMesId, setAnimalDelMesIdState] = useState<string | null>(() =>
+    normalizeId(loadAnimalDelMesCache())
+  );
 
   // Carga inicial desde la API (pública, no necesita token)
   useEffect(() => {
     fetch(`${BASE}/configuracion/animal-del-mes`)
       .then(res => res.ok ? res.json() : null)
-      .then((data: { animalId?: string } | null) => {
-        const id = data?.animalId || null;
+      .then((data: { animalId?: any } | null) => {
+        // Normalizar a string para que coincida con Animal.id (siempre string)
+        const id = normalizeId(data?.animalId);
         setAnimalDelMesIdState(id);
         saveAnimalDelMesCache(id);
       })
@@ -295,18 +304,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
    * Requiere token (solo ADMIN/ENCARGADO pueden llamar al PUT).
    */
   const setAnimalDelMesId = useCallback((id: string | null) => {
+    const normalized = normalizeId(id);
     // Actualización optimista
-    setAnimalDelMesIdState(id);
-    saveAnimalDelMesCache(id);
+    setAnimalDelMesIdState(normalized);
+    saveAnimalDelMesCache(normalized);
 
-    // Persiste en BD (fire & forget con rollback en error)
-    const body = JSON.stringify({ animalId: id ?? '' });
+    // Persiste en BD (fire & forget)
+    const body = JSON.stringify({ animalId: normalized ?? '' });
     fetch(`${BASE}/configuracion/animal-del-mes`, {
       method: 'PUT',
       headers: jsonHeaders(token),
       body,
     }).catch(() => {
-      // Si falla la red, al menos el caché queda guardado para esta sesión
       console.warn('[animal-del-mes] No se pudo persistir en el servidor');
     });
   }, [token]);
