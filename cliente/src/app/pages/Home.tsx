@@ -13,10 +13,10 @@ type Novedad = {
 const NOVEDADES: Novedad[] = [
   {
     id: 1,
-    titulo: 'Nueva campaña de adopción en verano',
+    titulo: 'Catfetería ya es una realidad',
     fecha: 'Julio 2026',
     resumen:
-      'Ampliamos horarios y actividades para facilitar las adopciones durante los meses de verano.',
+      'Ya podéis contactar con nosotras para recoger vuestro juego de mesa',
   },
   {
     id: 2,
@@ -35,7 +35,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           <div>
             <p className="mb-3 italic font-medium" style={{ color: '#f7e3b0' }}>
-              Refugio Ayuda Animal Murcia
+              Ayuda Animal Murcia
             </p>
             <h1 className="text-3xl sm:text-5xl font-black leading-tight mb-5" style={{ color: '#ffffff' }}>
               Cada animal merece
@@ -138,7 +138,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-2xl font-bold mb-1" style={{ color: '#2e2e2e' }}>Últimas novedades</h2>
           <p className="text-sm mb-6" style={{ color: '#727272' }}>
-            Noticias, campañas y pequeños grandes logros del refugio.
+            Noticias, campañas y pequeños grandes logros de la prote.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {NOVEDADES.map((novedad) => (
