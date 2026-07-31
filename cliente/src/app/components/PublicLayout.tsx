@@ -20,13 +20,13 @@ function SiteFooter() {
               adopción responsable de animales en la Región de Murcia.
             </p>
             <div className="flex gap-3 mt-5">
-              <a href="https://www.instagram.com/ayudaanimalmurcia" target="_blank" rel="noopener noreferrer"
+              <a href="https://www.instagram.com/ayuda_animal_murcia" target="_blank" rel="noopener noreferrer"
                 aria-label="Instagram de Ayuda Animal Murcia"
                 className="rounded-full p-2 transition-colors hover:bg-white/10"
                 style={{ border: '1px solid #727272' }}>
                 <Instagram className="w-4 h-4" style={{ color: '#d9d9d9' }} />
               </a>
-              <a href="https://www.facebook.com/ayudaanimalmurcia" target="_blank" rel="noopener noreferrer"
+              <a href="https://www.facebook.com/ayudanimalmurcia" target="_blank" rel="noopener noreferrer"
                 aria-label="Facebook de Ayuda Animal Murcia"
                 className="rounded-full p-2 transition-colors hover:bg-white/10"
                 style={{ border: '1px solid #727272' }}>
@@ -63,11 +63,11 @@ function SiteFooter() {
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4 flex-shrink-0" style={{ color: '#727272' }} />
-                <a href="mailto:info@ayudaanimalmurcia.org" className="transition-colors hover:text-white" style={{ color: '#727272' }}>info@ayudaanimalmurcia.org</a>
+                <a href="mailto:ayudaanimalm@gmail.com" className="transition-colors hover:text-white" style={{ color: '#727272' }}>info@ayudaanimalmurcia.org</a>
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="w-4 h-4 flex-shrink-0" style={{ color: '#727272' }} />
-                <a href="tel:+34600000000" className="transition-colors hover:text-white" style={{ color: '#727272' }}>+34 600 000 000</a>
+                <a href="tel:+34 722 19 69 33" className="transition-colors hover:text-white" style={{ color: '#727272' }}>+34 600 000 000</a>
               </li>
             </ul>
           </div>
@@ -86,7 +86,7 @@ function SiteFooter() {
               ))}
             </ul>
             <p className="text-xs mt-4 leading-relaxed" style={{ color: '#727272' }}>
-              Asociación inscrita en el Registro de Asociaciones de la Región de Murcia. CIF: G-XXXXXXXX
+              Asociación inscrita en el Registro de Asociaciones de la Región de Murcia. CIF: G-30148472
             </p>
           </div>
         </div>
@@ -94,8 +94,8 @@ function SiteFooter() {
 
       <div style={{ borderTop: '1px solid #3f3f3f' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs" style={{ color: '#727272' }}>
-          <p>© {year} Ayuda Animal Murcia. Todos los derechos reservados.</p>
-          <p>Hecho con ♥ por voluntarios.</p>
+          <p>© {year} Irene Moreno Cegarra. Todos los derechos reservados.</p>
+          <p>Hecho con ♥ por y para los animales.</p>
         </div>
       </div>
     </footer>

@@ -9,31 +9,18 @@ const CONTACT_INFO = [
   {
     icon: Phone,
     label: 'Teléfono',
-    value: '968 XX XX XX',
+    value: '722 19 69 33',
     sub: 'Lun–Vie 9:00–18:00',
-    href: 'tel:+34968000000',
+    href: 'tel:+34722196933',
   },
   {
     icon: Mail,
     label: 'Correo electrónico',
-    value: 'info@ayudaanimalmurcia.org',
+    value: 'ayudaanimalm@gmail.com',
     sub: 'Respondemos en 24–48 h',
-    href: 'mailto:info@ayudaanimalmurcia.org',
+    href: 'mailto:ayudaanimalm@gmail.com',
   },
-  {
-    icon: MapPin,
-    label: 'Ubicación',
-    value: 'Región de Murcia',
-    sub: 'Dirección exacta al concertar visita',
-    href: undefined,
-  },
-  {
-    icon: Clock,
-    label: 'Horario',
-    value: 'Lun–Vie 9:00–18:00',
-    sub: 'Sáb 10:00–14:00 · Dom cerrado',
-    href: undefined,
-  },
+
 ];
 
 const FAQS = [
