@@ -1,12 +1,16 @@
-import { createBrowserRouter } from 'react-router';
+import { createBrowserRouter, Navigate } from 'react-router';
 import PublicLayout from './components/PublicLayout';
 import DashboardLayout from './components/DashboardLayout';
 import Home from './pages/Home';
+import Adoptar from './pages/Adoptar';
 import AnimalDetail from './pages/AnimalDetail';
 import AdoptionForm from './pages/AdoptionForm';
 import Login from './pages/Login';
 import QuienesSomos from './pages/QuienesSomos';
 import Contacto from './pages/Contacto';
+import Colaborar from './pages/Colaborar';
+import Donar from './pages/Donar';
+import Apadrinar from './pages/Apadrinar';
 import DashboardHome from './pages/dashboard/DashboardHome';
 import AnimalsManagement from './pages/dashboard/AnimalsManagement';
 import AnimalForm from './pages/dashboard/AnimalForm';
@@ -25,8 +29,17 @@ export const router = createBrowserRouter([
     element: <PublicLayout />,
     children: [
       { index: true, element: <Home /> },
+      // Listado de adopción — accesible por /adoptar y /animales
+      { path: 'adoptar', element: <Adoptar /> },
+      { path: 'animales', element: <Navigate to="/adoptar" replace /> },
+      // Detalle y formulario de animal
       { path: 'animals/:id', element: <AnimalDetail /> },
       { path: 'adopt/:id', element: <AdoptionForm /> },
+      // Páginas de colaboración
+      { path: 'colaborar', element: <Colaborar /> },
+      { path: 'donar', element: <Donar /> },
+      { path: 'apadrinar', element: <Apadrinar /> },
+      // Resto
       { path: 'login', element: <Login /> },
       { path: 'quienes-somos', element: <QuienesSomos /> },
       { path: 'contacto', element: <Contacto /> },
