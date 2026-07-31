@@ -1,17 +1,24 @@
 // cliente/src/app/pages/Home.tsx
 
 import { Link } from 'react-router';
-import { Star } from 'lucide-react';
+import { Star, ArrowRight } from 'lucide-react';
 import AnimalsForAdoption from '../components/AnimalsForAdoption';
-import { useApp } from '../context/AppContext';
+
+// ─── Animal del mes — editar a mano una vez al mes ────────────────────────────
+// Cambia estos valores cuando quieras actualizar el animal del mes.
+// imageUrl: usa una URL directa de ImgBB u otro hosting de imágenes.
+const ANIMAL_DEL_MES = {
+  nombre: 'Luna',
+  imageUrl: 'https://placehold.co/480x360/2e2e2e/f7e3b0?text=Luna',
+  fichaUrl: '/animals/1', // ← cambia por el ID real del animal
+};
+// ─────────────────────────────────────────────────────────────────────────────
 
 type Novedad = {
   id: number;
   titulo: string;
   fecha: string;
   resumen: string;
-  /** URL de ImgBB u otro hosting. Si se omite, la tarjeta no muestra imagen. */
-  imagen?: string;
 };
 
 const NOVEDADES: Novedad[] = [
@@ -21,8 +28,6 @@ const NOVEDADES: Novedad[] = [
     fecha: 'Julio 2026',
     resumen:
       '¡El juego ya está terminado! Rellena el formulario que encontrarás abajo para poder escoger un punto de recogida o envío.',
-    // Pega aquí la URL directa de ImgBB (el link que termina en .jpg/.png, no la página del álbum)
-    imagen: 'https://i.ibb.co/d40Qdb2C/582410926-1151235673836988-4102690978920453888-n-1.jpg',
   },
   {
     id: 2,
@@ -34,12 +39,6 @@ const NOVEDADES: Novedad[] = [
 ];
 
 export default function Home() {
-  const { animals, animalDelMesId } = useApp();
-
-  const animalDelMes = animalDelMesId
-    ? (animals.find((a) => a.id === animalDelMesId) ?? null)
-    : null;
-
   return (
     <div style={{ backgroundColor: '#f7f7f7' }}>
       {/* ── Hero ── */}
@@ -81,67 +80,44 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Columna derecha: Animal del mes */}
+          {/* Columna derecha: Animal del mes — hardcodeado */}
           <div className="hidden lg:flex flex-col items-center">
-            {animalDelMes ? (
-              <div
-                className="w-full max-w-sm rounded-3xl overflow-hidden"
-                style={{ border: '1px solid #3f3f3f', backgroundColor: '#1c1c1c' }}
-              >
-                <div className="relative" style={{ aspectRatio: '4/3' }}>
-                  <img
-                    src={animalDelMes.imageUrl}
-                    alt={`Foto de ${animalDelMes.name}`}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <div
-                    className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
-                    style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e' }}
-                  >
-                    <Star className="w-3 h-3" fill="#2e2e2e" />
-                    Animal del mes
-                  </div>
-                </div>
-                <div className="p-4 flex items-center justify-between">
-                  <p className="font-bold text-base" style={{ color: '#ffffff' }}>
-                    {animalDelMes.name}
-                  </p>
-                  <Link
-                    to={`/animals/${animalDelMes.id}`}
-                    className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all hover:opacity-80"
-                    style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e' }}
-                  >
-                    Ver ficha →
-                  </Link>
-                </div>
-              </div>
-            ) : (
-              <div
-                className="w-full max-w-sm rounded-3xl flex flex-col items-center justify-center gap-4"
-                style={{
-                  aspectRatio: '4/3',
-                  border: '2px dashed #3f3f3f',
-                  backgroundColor: '#1c1c1c',
-                }}
-              >
+            <div
+              className="w-full max-w-sm rounded-3xl overflow-hidden"
+              style={{ border: '1px solid #3f3f3f', backgroundColor: '#1c1c1c' }}
+            >
+              {/* Foto */}
+              <div className="relative" style={{ aspectRatio: '4/3' }}>
+                <img
+                  src={ANIMAL_DEL_MES.imageUrl}
+                  alt={`Foto de ${ANIMAL_DEL_MES.nombre}`}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
+                {/* Badge */}
                 <div
-                  className="w-16 h-16 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: '#2e2e2e', border: '2px dashed #3f3f3f' }}
+                  className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
+                  style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e' }}
                 >
-                  <Star className="w-7 h-7" style={{ color: '#f7e3b0' }} />
-                </div>
-                <div className="text-center px-6">
-                  <p className="text-sm font-semibold" style={{ color: '#f7e3b0' }}>
-                    Animal del mes
-                  </p>
-                  <p className="text-xs mt-1" style={{ color: '#727272' }}>
-                    Selecciónalo desde el panel de administración.
-                  </p>
+                  <Star className="w-3 h-3" fill="#2e2e2e" />
+                  Animal del mes
                 </div>
               </div>
-            )}
+              {/* Nombre + botón */}
+              <div className="p-4 flex items-center justify-between">
+                <p className="font-bold text-base" style={{ color: '#ffffff' }}>
+                  {ANIMAL_DEL_MES.nombre}
+                </p>
+                <Link
+                  to={ANIMAL_DEL_MES.fichaUrl}
+                  className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all hover:opacity-80"
+                  style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e' }}
+                >
+                  Ver ficha →
+                </Link>
+              </div>
+            </div>
           </div>
 
         </div>
@@ -215,29 +191,22 @@ export default function Home() {
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {NOVEDADES.map((novedad) => (
-              <article
+              <Link
                 key={novedad.id}
-                className="rounded-2xl border overflow-hidden"
+                to={`/novedades/${novedad.id}`}
+                className="group rounded-2xl border p-5 flex flex-col gap-2 transition-shadow hover:shadow-md"
                 style={{ backgroundColor: '#f7f7f7', borderColor: '#d9d9d9' }}
               >
-                {/* Imagen opcional — pega la URL directa de ImgBB */}
-                {novedad.imagen && (
-                  <div style={{ aspectRatio: '16/7', overflow: 'hidden' }}>
-                    <img
-                      src={novedad.imagen}
-                      alt={novedad.titulo}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </div>
-                )}
-                <div className="p-5">
-                  <p className="text-xs mb-1" style={{ color: '#727272' }}>{novedad.fecha}</p>
-                  <h3 className="text-lg font-semibold mb-2" style={{ color: '#2e2e2e' }}>{novedad.titulo}</h3>
-                  <p className="text-sm" style={{ color: '#727272' }}>{novedad.resumen}</p>
-                </div>
-              </article>
+                <p className="text-xs" style={{ color: '#727272' }}>{novedad.fecha}</p>
+                <h3 className="text-lg font-semibold" style={{ color: '#2e2e2e' }}>{novedad.titulo}</h3>
+                <p className="text-sm flex-1" style={{ color: '#727272' }}>{novedad.resumen}</p>
+                <span
+                  className="inline-flex items-center gap-1 text-sm font-medium mt-1 transition-opacity group-hover:opacity-70"
+                  style={{ color: '#547792' }}
+                >
+                  Leer más <ArrowRight className="w-3.5 h-3.5" />
+                </span>
+              </Link>
             ))}
           </div>
         </div>

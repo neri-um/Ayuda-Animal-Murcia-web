@@ -14,6 +14,7 @@ import Apadrinar from './pages/Apadrinar';
 import AvisoLegal from './pages/AvisoLegal';
 import PoliticaPrivacidad from './pages/PoliticaPrivacidad';
 import PoliticaCookies from './pages/PoliticaCookies';
+import NovedadDetail from './pages/NovedadDetail';
 import DashboardHome from './pages/dashboard/DashboardHome';
 import AnimalsManagement from './pages/dashboard/AnimalsManagement';
 import AnimalForm from './pages/dashboard/AnimalForm';
@@ -37,6 +38,8 @@ export const router = createBrowserRouter([
       { path: 'animales', element: <Navigate to="/adoptar" replace /> },
       { path: 'animals/:id', element: <AnimalDetail /> },
       { path: 'adopt/:id', element: <AdoptionForm /> },
+      // Novedades
+      { path: 'novedades/:id', element: <NovedadDetail /> },
       // Colaboración
       { path: 'colaborar', element: <Colaborar /> },
       { path: 'donar', element: <Donar /> },
