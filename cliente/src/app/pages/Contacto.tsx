@@ -2,8 +2,20 @@ import { useState } from 'react';
 import { Link } from 'react-router';
 import {
   Phone, Mail, MapPin, Clock, Heart, PawPrint,
-  Send, CheckCircle2, ArrowRight
+  Send, CheckCircle2, ArrowRight, AlertCircle
 } from 'lucide-react';
+
+// ─── Cómo activar el envío real ───────────────────────────────────────────────────────────────────────────────
+// 1. Ve a https://formspree.io → crea cuenta gratuita → "New Form"
+// 2. Pon como email de destino: ayudaanimalm@gmail.com
+// 3. Copia el código del formulario, que será algo como: xkgwabcd
+// 4. Sustituye FORMSPREE_ID en la línea de abajo por ese código
+// 5. La primera vez que se envíe un formulario, Formspree manda un
+//    email de verificación a ayudaanimalm@gmail.com — hay que aceptarlo.
+// Plan gratuito: 50 envíos/mes, sin tarjeta de crédito.
+// ───────────────────────────────────────────────────────────────────────────────
+const FORMSPREE_ID = 'XXXXXXXX'; // ← cambia esto por tu ID real
+// ───────────────────────────────────────────────────────────────────────────────
 
 const CONTACT_INFO = [
   {
@@ -17,10 +29,9 @@ const CONTACT_INFO = [
     icon: Mail,
     label: 'Correo electrónico',
     value: 'ayudaanimalm@gmail.com',
-    sub: 'Respondemos en 24–48 h',
+    sub: 'Respondemos en 24–48 h',
     href: 'mailto:ayudaanimalm@gmail.com',
   },
-
 ];
 
 const FAQS = [
@@ -45,11 +56,41 @@ const FAQS = [
 export default function Contacto() {
   const [form, setForm] = useState({ nombre: '', email: '', asunto: '', mensaje: '' });
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSent(true);
+    setSending(true);
+    setError(null);
+
+    try {
+      const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          nombre: form.nombre,
+          email: form.email,
+          asunto: form.asunto,
+          mensaje: form.mensaje,
+        }),
+      });
+
+      if (res.ok) {
+        setSent(true);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setError(
+          data?.errors?.[0]?.message ??
+          'No se pudo enviar el mensaje. Inténtalo de nuevo o escríbenos directamente a ayudaanimalm@gmail.com'
+        );
+      }
+    } catch {
+      setError('Error de conexión. Comprueba tu internet e inténtalo de nuevo.');
+    } finally {
+      setSending(false);
+    }
   };
 
   const inputCls = "w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none transition-colors";
@@ -147,8 +188,16 @@ export default function Contacto() {
                   </div>
                 ) : (
                   <>
-                    <h3 className="text-gray-900 mb-1" style={{ fontWeight: 700, fontSize: '1.2rem' }}>Envíanos un mensaje</h3>
+                    <h3 className="text-gray-900 mb-1" style={{ fontWeight: 700, fontSize: '1.2rem' }}>Envínos un mensaje</h3>
                     <p className="text-gray-500 text-sm mb-6">Rellena el formulario y te contestamos pronto.</p>
+
+                    {error && (
+                      <div className="flex items-start gap-3 p-4 rounded-xl mb-4 text-sm" style={{ backgroundColor: '#fef2f2', color: '#991b1b' }}>
+                        <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                        <span>{error}</span>
+                      </div>
+                    )}
+
                     <form onSubmit={handleSubmit} className="space-y-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
@@ -213,11 +262,24 @@ export default function Contacto() {
                       </div>
                       <button
                         type="submit"
-                        className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl transition-all hover:opacity-90 hover:shadow-lg"
+                        disabled={sending}
+                        className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl transition-all hover:opacity-90 hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
                         style={{ backgroundColor: '#2e2e2e', color: '#f0e8d0', fontWeight: 600 }}
                       >
-                        <Send className="w-4 h-4" />
-                        Enviar mensaje
+                        {sending ? (
+                          <>
+                            <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                            </svg>
+                            Enviando...
+                          </>
+                        ) : (
+                          <>
+                            <Send className="w-4 h-4" />
+                            Enviar mensaje
+                          </>
+                        )}
                       </button>
                     </form>
                   </>
