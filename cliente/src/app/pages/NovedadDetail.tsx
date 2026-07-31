@@ -15,7 +15,7 @@ type Novedad = {
 const NOVEDADES: Novedad[] = [
   {
     id: 1,
-    titulo: 'Catfetería ya es una realidad 🐾',
+    titulo: 'Catfetería ya es una realidad',
     fecha: 'Julio 2026',
     resumen:
       '¡El juego ya está terminado! Rellena el formulario que encontrarás abajo para poder escoger un punto de recogida o envío.',

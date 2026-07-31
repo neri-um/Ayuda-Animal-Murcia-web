@@ -234,7 +234,7 @@ export default function PoliticaCookies() {
             <p>
               Para cualquier consulta relacionada con el uso de cookies, puedes contactar con nosotros
               en{' '}
-              <strong style={{ color: '#2e2e2e' }}>privacidad@ayudaanimalmurcia.org</strong>.
+              <strong style={{ color: '#2e2e2e' }}>ayudaanimalm@gmail.com</strong>.
             </p>
           </section>
 

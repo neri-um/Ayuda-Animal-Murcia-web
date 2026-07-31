@@ -29,9 +29,9 @@ export default function AvisoLegal() {
             <div className="mt-4 rounded-xl border p-4 space-y-1" style={{ backgroundColor: '#ffffff', borderColor: '#d9d9d9' }}>
               <p><strong style={{ color: '#2e2e2e' }}>Denominación social:</strong> Ayuda Animal Murcia</p>
               <p><strong style={{ color: '#2e2e2e' }}>Naturaleza jurídica:</strong> Asociación sin ánimo de lucro</p>
-              <p><strong style={{ color: '#2e2e2e' }}>CIF:</strong> G-XXXXXXXX (pendiente de actualización)</p>
+              <p><strong style={{ color: '#2e2e2e' }}>CIF:</strong> G-30148472</p>
               <p><strong style={{ color: '#2e2e2e' }}>Domicilio social:</strong> Murcia, Región de Murcia, España</p>
-              <p><strong style={{ color: '#2e2e2e' }}>Correo electrónico:</strong> info@ayudaanimalmurcia.org</p>
+              <p><strong style={{ color: '#2e2e2e' }}>Correo electrónico:</strong> ayudaanimalm@gmail.com</p>
               <p><strong style={{ color: '#2e2e2e' }}>Sitio web:</strong> https://ayuda-animal-murcia-web.vercel.app</p>
               <p><strong style={{ color: '#2e2e2e' }}>Inscripción:</strong> Registro de Asociaciones de la Región de Murcia</p>
             </div>

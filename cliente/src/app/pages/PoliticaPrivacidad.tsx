@@ -29,7 +29,7 @@ export default function PoliticaPrivacidad() {
               <p><strong style={{ color: '#2e2e2e' }}>Identidad:</strong> Ayuda Animal Murcia</p>
               <p><strong style={{ color: '#2e2e2e' }}>CIF:</strong> G-XXXXXXXX</p>
               <p><strong style={{ color: '#2e2e2e' }}>Domicilio:</strong> Murcia, Región de Murcia, España</p>
-              <p><strong style={{ color: '#2e2e2e' }}>Correo de contacto (privacidad):</strong> privacidad@ayudaanimalmurcia.org</p>
+              <p><strong style={{ color: '#2e2e2e' }}>Correo de contacto (privacidad):</strong> ayudaanimalm@gmail.com</p>
             </div>
           </section>
 
@@ -123,7 +123,7 @@ export default function PoliticaPrivacidad() {
             </h2>
             <p>
               Conforme al RGPD y la LOPDGDD (LO 3/2018), puedes ejercer los siguientes derechos
-              dirigiendo una comunicación escrita a <strong style={{ color: '#2e2e2e' }}>privacidad@ayudaanimalmurcia.org</strong>,
+              dirigiendo una comunicación escrita a <strong style={{ color: '#2e2e2e' }}>ayudaanimalm@gmail.com</strong>,
               adjuntando copia de tu DNI u otro documento identificativo:
             </p>
             <ul className="mt-3 space-y-1 list-disc list-inside">
@@ -165,7 +165,7 @@ export default function PoliticaPrivacidad() {
               Dada la naturaleza y volumen de tratamientos, actualmente no es obligatorio designar
               un DPD conforme al art. 37 RGPD. No obstante, cualquier consulta en materia de
               privacidad puede dirigirse a{' '}
-              <strong style={{ color: '#2e2e2e' }}>privacidad@ayudaanimalmurcia.org</strong>.
+              <strong style={{ color: '#2e2e2e' }}>ayudaanimalm@gmail.com</strong>.
             </p>
           </section>
 
