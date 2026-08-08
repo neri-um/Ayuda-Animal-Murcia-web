@@ -55,7 +55,7 @@ function AnimalCard({ animal }: { animal: Animal }) {
 
   return (
     <Link
-      to={`/animals/${toSlug(animal.name)}`}
+      to={`/animales/${toSlug(animal.name)}`}
       className="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col"
     >
       <div className="relative h-52 overflow-hidden bg-gray-100 flex-shrink-0">
@@ -71,7 +71,6 @@ function AnimalCard({ animal }: { animal: Animal }) {
       <div className="p-4 flex flex-col flex-1">
         <div className="flex items-start justify-between mb-2">
           <h3 className="text-gray-900">{animal.name}</h3>
-          {/* Badge edad: amarillito corporativo */}
           <span
             className="text-xs px-2 py-1 rounded-full border flex-shrink-0 ml-2"
             style={{
