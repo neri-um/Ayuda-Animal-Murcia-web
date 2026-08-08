@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { ArrowLeft, CheckCircle, Heart, Send, Loader2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import type { SolicitudAdopcionRequest } from '../types/adoption';
+import { toSlug } from '../utils/slug';
 
 const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8080/vidanimal';
 
@@ -93,26 +94,46 @@ export default function AdoptionForm() {
   const [personal, setPersonal] = useState({ name: '', email: '', phone: '', dni: '' });
   const [respuestas, setRespuestas] = useState<Record<string, string>>({});
 
-  const animal = animals.find(a => a.id === id);
+const animal = animals.find(
+  a => toSlug(a.name) === id || String(a.id) === id
+);
 
-  useEffect(() => {
-    if (!id) return;
-    setLoadingForm(true);
-    fetch(`${BASE}/adopciones/formulario/${id}`)
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        if (data) {
-          const nombre = data.nombre ?? 'Cuestionario de adopción';
-          setNombreFormulario(nombre);
-          const rawPreguntas = typeof data.preguntas === 'string'
-            ? JSON.parse(data.preguntas ?? '{}')
-            : data.preguntas ?? {};
-          setSecciones(extraerSecciones(rawPreguntas, nombre));
-        }
-      })
-      .catch(() => setSecciones([]))
-      .finally(() => setLoadingForm(false));
-  }, [id]);
+useEffect(() => {
+  if (!id || !animal) {
+    if (animals.length > 0) {
+      setLoadingForm(false);
+    }
+    return;
+  }
+
+  setLoadingForm(true);
+
+  fetch(`${BASE}/adopciones/formulario/${animal.id}`)
+    .then(res => {
+      if (!res.ok) {
+        throw new Error(`Error HTTP ${res.status}`);
+      }
+
+      return res.json();
+    })
+    .then(data => {
+      const nombre = data.nombre ?? 'Cuestionario de adopción';
+
+      setNombreFormulario(nombre);
+
+      const rawPreguntas = typeof data.preguntas === 'string'
+        ? JSON.parse(data.preguntas ?? '{}')
+        : data.preguntas ?? {};
+
+      setSecciones(extraerSecciones(rawPreguntas, nombre));
+    })
+    .catch(() => {
+      setSecciones([]);
+    })
+    .finally(() => {
+      setLoadingForm(false);
+    });
+}, [id, animal?.id, animals.length]);
 
   if (!animal) {
     return (
@@ -187,14 +208,14 @@ export default function AdoptionForm() {
           Gracias, <strong>{personal.name}</strong>. Hemos recibido tu solicitud de adopción para <strong>{animal.name}</strong>.
         </p>
         <p className="text-gray-500 text-sm mb-8">
-          Nuestro equipo revisará tu formulario y se pondrá en contacto contigo en los próximos 2 días hábiles en el email <strong>{personal.email}</strong>.
+          Nuestro equipo revisará tu formulario y se pondrá en contacto contigo lo antes posible <strong>{personal.email}</strong>.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link to="/" className="inline-block text-sm px-6 py-3 rounded-xl transition-all hover:opacity-80"
             style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e', fontWeight: 600 }}>
             Ver más animales
           </Link>
-          <Link to={`/animals/${animal.id}`}
+         <Link to={`/animales/${toSlug(animal.name)}`}
             className="border border-gray-200 text-gray-600 px-6 py-3 rounded-xl hover:bg-gray-50 transition-colors text-sm">
             Volver a la ficha
           </Link>
