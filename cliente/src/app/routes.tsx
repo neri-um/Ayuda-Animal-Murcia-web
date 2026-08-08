@@ -36,8 +36,10 @@ export const router = createBrowserRouter([
       // Adopción
       { path: 'adoptar', element: <Adoptar /> },
       { path: 'animales', element: <Navigate to="/adoptar" replace /> },
-      { path: 'animals/:id', element: <AnimalDetail /> },
-      { path: 'adopt/:id', element: <AdoptionForm /> },
+      { path: 'animales/:id', element: <AnimalDetail /> },
+      { path: 'adopcion/:id', element: <AdoptionForm /> },
+      { path: 'animals/:id', element: <Navigate to="/animales/:id" replace /> },
+      { path: 'adopt/:id', element: <Navigate to="/adopcion/:id" replace /> },
       // Novedades
       { path: 'novedades/:id', element: <NovedadDetail /> },
       // Colaboración
