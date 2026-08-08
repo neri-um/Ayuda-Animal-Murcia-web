@@ -43,6 +43,7 @@ public class SecurityConfig {
                 .requestMatchers("/vidanimal/enums/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/vidanimal/animales").permitAll()
                 .requestMatchers(HttpMethod.GET, "/vidanimal/animales/*").permitAll()
+                .requestMatchers(HttpMethod.GET, "/vidanimal/configuracion/animal-del-mes").permitAll()
                 .requestMatchers(HttpMethod.GET, "/vidanimal/adopciones/formulario/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/vidanimal/adopciones").permitAll()
                 .requestMatchers(HttpMethod.GET, "/vidanimal/adopciones").authenticated()
