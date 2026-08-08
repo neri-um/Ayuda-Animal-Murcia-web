@@ -23,15 +23,16 @@ public class SecurityConfig {
         http
             .cors(cors -> cors.configurationSource(request -> {
                 CorsConfiguration config = new CorsConfiguration();
-                config.setAllowedOrigins(List.of(
-                        "http://localhost:5173",
-                        "http://localhost",
-                        "https://ayuda-animal-murcia-web.vercel.app",
+                config.setAllowedOriginPatterns(List.of(
                         "https://ayudaanimalmurcia.org",
-                        "https://www.ayudaanimalmurcia.org"));
+                        "https://www.ayudaanimalmurcia.org",
+                        "https://*.ayudaanimalmurcia.org",
+                        "https://ayuda-animal-murcia-web.vercel.app",
+                        "http://localhost",
+                        "http://localhost:*"));
                 config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
                 config.setAllowedHeaders(List.of("*"));
-                config.setAllowCredentials(true);
+                config.setAllowCredentials(false);
                 return config;
             }))
             .csrf(csrf -> csrf.disable())
