@@ -1,0 +1,51 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: vidanimal_postgres
+    environment:
+      POSTGRES_DB: vidanimal
+      POSTGRES_USER: vidanimal
+      POSTGRES_PASSWORD: vidanimal
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vidanimal -d vidanimal"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./servidor
+    container_name: vidanimal_backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/vidanimal
+      SPRING_DATASOURCE_USERNAME: vidanimal
+      SPRING_DATASOURCE_PASSWORD: vidanimal
+      JWT_SECRET: ${JWT_SECRET:-vidanimal_secret_key_dev_only_not_for_production}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      RESEND_FROM: ${RESEND_FROM:-notificaciones@ayudaanimalmurcia.org}
+      EMAIL_DESTINO: ${EMAIL_DESTINO:-ayudaanimalm@gmail.com}
+      DASHBOARD_URL: ${DASHBOARD_URL:-https://www.ayudaanimalmurcia.org/dashboard/adopciones}
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./cliente
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8080/vidanimal}
+        VITE_IMGBB_KEY: ${VITE_IMGBB_KEY:-}
+    container_name: vidanimal_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
