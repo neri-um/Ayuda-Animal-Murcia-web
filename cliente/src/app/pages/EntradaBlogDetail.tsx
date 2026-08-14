@@ -161,7 +161,7 @@ export default function EntradaBlogDetail() {
           {cabecera}
 
           {images.length > 0 && (
-            <div className="relative rounded-2xl overflow-hidden bg-gray-100 aspect-[4/3] mb-8">
+            <div className="relative rounded-2xl overflow-hidden bg-gray-100 aspect-video max-h-[440px] mb-8">
               {currentImage ? (
                 <img src={currentImage} alt={entrada.titulo} className="w-full h-full object-cover" />
               ) : (
