@@ -182,7 +182,7 @@ export default function AnimalDetail() {
           <p className="text-sm mb-6" style={{ color: '#727272' }}>Entradas del blog relacionadas con su llegada y evolución.</p>
           <div className={`grid gap-6 ${entradas.length === 1 ? 'grid-cols-1 max-w-2xl mx-auto' : 'grid-cols-1 md:grid-cols-2'}`}>
             {entradas.map(e => (
-              <Link key={e.id} to={`/blog/${e.id}?origen=animal`} className="rounded-2xl border p-5 flex flex-col gap-3 transition-all hover:shadow-md hover:-translate-y-0.5" style={{ backgroundColor: '#f7f7f7', borderColor: '#d9d9d9' }}>
+              <Link key={e.id} to={`/blog/${toSlug(e.titulo)}?origen=animal`} className="rounded-2xl border p-5 flex flex-col gap-3 transition-all hover:shadow-md hover:-translate-y-0.5" style={{ backgroundColor: '#f7f7f7', borderColor: '#d9d9d9' }}>
                 {e.imagenUrl && <img src={e.imagenUrl} alt={e.titulo} className="rounded-xl w-full h-48 object-cover" loading="lazy" />}
                 <p className="text-xs" style={{ color: '#727272' }}>
                   <Calendar className="w-3.5 h-3.5 inline-block mr-1" style={{ color: '#547792' }} />

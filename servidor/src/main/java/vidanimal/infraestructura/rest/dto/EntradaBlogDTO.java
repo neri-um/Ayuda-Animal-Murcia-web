@@ -1,6 +1,7 @@
 package vidanimal.infraestructura.rest.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 import vidanimal.dominio.modelo.EntradaBlog;
@@ -12,6 +13,7 @@ public class EntradaBlogDTO {
 	private String contenido;
 	private LocalDate fecha;
 	private String imagenUrl;
+	private List<String> galeria;
 	private Set<String> etiquetas;
 	private Long animalId;
 	private String autorNombre;
@@ -23,6 +25,7 @@ public class EntradaBlogDTO {
 		dto.contenido = e.getContenido();
 		dto.fecha = e.getFecha();
 		dto.imagenUrl = e.getImagenUrl();
+		dto.galeria = e.getGaleria();
 		dto.etiquetas = e.getEtiquetas();
 		if (e.getAnimal() != null) {
 			dto.animalId = e.getAnimal().getId();
@@ -51,6 +54,10 @@ public class EntradaBlogDTO {
 
 	public String getImagenUrl() {
 		return imagenUrl;
+	}
+
+	public List<String> getGaleria() {
+		return galeria;
 	}
 
 	public Set<String> getEtiquetas() {

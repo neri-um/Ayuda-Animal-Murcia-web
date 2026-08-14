@@ -57,6 +57,7 @@ public class EntradaBlogService implements EntradaBlogUseCase {
         if (datosNuevos.getContenido() != null) entrada.setContenido(datosNuevos.getContenido());
         if (datosNuevos.getFecha() != null) entrada.setFecha(datosNuevos.getFecha());
         if (datosNuevos.getImagenUrl() != null) entrada.setImagenUrl(datosNuevos.getImagenUrl());
+        if (datosNuevos.getGaleria() != null) entrada.setGaleria(datosNuevos.getGaleria());
         if (datosNuevos.getEtiquetas() != null) entrada.setEtiquetas(datosNuevos.getEtiquetas());
         if (datosNuevos.getAutor() != null) entrada.setAutor(datosNuevos.getAutor());
         if (animal != null) entrada.setAnimal(animal);

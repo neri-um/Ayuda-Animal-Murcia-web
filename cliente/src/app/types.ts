@@ -61,6 +61,7 @@ export interface EntradaBlog {
   contenido: string;
   fecha: string;
   imagenUrl?: string;
+  galeria?: string[];
   etiquetas: string[];
   animalId?: number;
   autorNombre?: string;
@@ -71,6 +72,7 @@ export interface EntradaBlogInput {
   contenido: string;
   fecha: string;
   imagenUrl?: string;
+  galeria?: string[];
   etiquetas: string[];
   animalId?: number | null;
 }
