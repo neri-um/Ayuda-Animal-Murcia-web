@@ -20,6 +20,15 @@ export function usePageMeta(opts?: {
     upsertMeta('meta[property="og:title"]', 'property', 'og:title', title);
     upsertMeta('meta[property="og:description"]', 'property', 'og:description', description);
     upsertMeta('meta[property="og:image"]', 'property', 'og:image', image ?? DEFAULT_IMAGE);
+    upsertMeta('meta[name="twitter:card"]', 'name', 'twitter:card', 'summary_large_image'); // Twitter
+    upsertMeta('meta[name="twitter:title"]', 'name', 'twitter:title', title);
+    upsertMeta('meta[name="twitter:description"]', 'name', 'twitter:description', description);
+    upsertMeta('meta[name="twitter:image"]', 'name', 'twitter:image', image ?? DEFAULT_IMAGE); // Pulido para el resto de redes
+    upsertMeta('meta[property="og:locale"]', 'property', 'og:locale', 'es_ES');
+    upsertMeta('meta[property="og:site_name"]', 'property', 'og:site_name', 'Ayuda Animal Murcia');
+    upsertMeta('meta[property="og:image:width"]', 'property', 'og:image:width', '1200');
+    upsertMeta('meta[property="og:image:height"]', 'property', 'og:image:height', '630');
+
     upsertMeta('meta[property="og:type"]', 'property', 'og:type', type);
     upsertMeta('link[rel="canonical"]', 'rel', 'canonical', `${SITE_URL}${path ?? '/'}`, 'link');
     if (path) upsertMeta('meta[property="og:url"]', 'property', 'og:url', `${SITE_URL}${path}`);
