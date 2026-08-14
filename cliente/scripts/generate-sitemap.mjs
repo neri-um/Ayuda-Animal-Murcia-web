@@ -59,7 +59,7 @@ async function cargarDinamicas() {
       if (a?.name) urls.set(`/animales/${toSlug(a.name)}`, { lastmod: hoy, priority: '0.9' });
     }
     for (const e of Array.isArray(entradas) ? entradas : []) {
-      if (e?.id != null) urls.set(`/blog/${e.id}`, { lastmod: hoy, priority: '0.7' });
+      if (e?.titulo) urls.set(`/blog/${toSlug(e.titulo)}`, { lastmod: hoy, priority: '0.7' });
     }
   } catch (err) {
     console.warn(`[sitemap] No se pudieron cargar las URLs dinámicas (${err.message}); se genera solo el sitemap estático.`);

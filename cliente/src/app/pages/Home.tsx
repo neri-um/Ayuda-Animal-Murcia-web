@@ -8,6 +8,7 @@ import { useApp } from '../context/AppContext';
 import { getEntradasGenerales } from '../services/blog';
 import { textoConEnlaces } from '../components/TextoConEnlaces';
 import { usePageMeta, SITE_URL } from '../hooks/usePageMeta';
+import { toSlug } from '../utils/slug';
 import type { EntradaBlog } from '../types';
 
 function formatFecha(fecha: string): string {
@@ -247,7 +248,7 @@ export default function Home() {
               novedades.map((novedad) => (
                 <Link
                   key={novedad.id}
-                  to={`/blog/${novedad.id}`}
+                  to={`/blog/${toSlug(novedad.titulo)}`}
                   className="group rounded-2xl border p-5 flex flex-col gap-2 transition-shadow hover:shadow-md"
                   style={{ backgroundColor: '#f7f7f7', borderColor: '#d9d9d9' }}
                 >

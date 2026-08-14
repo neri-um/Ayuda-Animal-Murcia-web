@@ -1,7 +1,9 @@
 package vidanimal.dominio.modelo;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -37,6 +39,11 @@ public class EntradaBlog {
 	private LocalDate fecha;
 
 	private String imagenUrl;
+
+	@ElementCollection
+	@CollectionTable(name = "entrada_blog_galeria", joinColumns = @JoinColumn(name = "entrada_id"))
+	@Column(name = "foto_url")
+	private List<String> galeria = new ArrayList<>();
 
 	@ElementCollection
 	@CollectionTable(name = "entrada_blog_etiquetas", joinColumns = @JoinColumn(name = "entrada_id"))
@@ -93,6 +100,14 @@ public class EntradaBlog {
 
 	public void setImagenUrl(String imagenUrl) {
 		this.imagenUrl = imagenUrl;
+	}
+
+	public List<String> getGaleria() {
+		return galeria;
+	}
+
+	public void setGaleria(List<String> galeria) {
+		this.galeria = galeria != null ? galeria : new ArrayList<>();
 	}
 
 	public Set<String> getEtiquetas() {

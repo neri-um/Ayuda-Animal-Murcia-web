@@ -4,6 +4,7 @@ import { Calendar, Newspaper, ArrowRight } from 'lucide-react';
 import { getEntradasGenerales } from '../services/blog';
 import { textoConEnlaces } from '../components/TextoConEnlaces';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { toSlug } from '../utils/slug';
 import type { EntradaBlog } from '../types';
 
 function formatFecha(fecha: string): string {
@@ -123,19 +124,19 @@ export default function Blog() {
                     style={{ backgroundColor: '#f7f7f7', borderColor: '#d9d9d9' }}
                   >
                     {e.imagenUrl && (
-                      <Link to={`/blog/${e.id}`} className="block overflow-hidden rounded-xl">
+                      <Link to={`/blog/${toSlug(e.titulo)}`} className="block overflow-hidden rounded-xl">
                         <img src={e.imagenUrl} alt={e.titulo} className="w-full aspect-[4/3] object-cover transition-transform hover:scale-105" loading="lazy" />
                       </Link>
                     )}
                     <p className="text-xs flex items-center gap-1" style={{ color: '#727272' }}>
                       <Calendar className="w-3.5 h-3.5" />{formatFecha(e.fecha)}
                     </p>
-                    <Link to={`/blog/${e.id}`} className="hover:underline">
+                    <Link to={`/blog/${toSlug(e.titulo)}`} className="hover:underline">
                       <h3 className="text-lg font-semibold" style={{ color: '#2e2e2e' }}>{e.titulo}</h3>
                     </Link>
                     {texto && <p className="text-sm whitespace-pre-line flex-1" style={{ color: '#727272' }}>{textoConEnlaces(texto)}</p>}
                     <Link
-                      to={`/blog/${e.id}`}
+                      to={`/blog/${toSlug(e.titulo)}`}
                       className="inline-flex items-center gap-1 text-sm font-medium self-start hover:gap-2 transition-all"
                       style={{ color: '#547792' }}
                     >

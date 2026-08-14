@@ -10,16 +10,19 @@ const vacio: EntradaBlogInput = {
   contenido: '',
   fecha: new Date().toISOString().slice(0, 10),
   imagenUrl: '',
+  galeria: [],
   etiquetas: [],
   animalId: null,
 };
 
 function aInput(e: EntradaBlog): EntradaBlogInput {
   return {
+    id: e.id,
     titulo: e.titulo,
     contenido: e.contenido,
     fecha: e.fecha,
     imagenUrl: e.imagenUrl ?? '',
+    galeria: e.galeria ?? [],
     etiquetas: e.etiquetas ?? [],
     animalId: e.animalId ?? null,
   };
@@ -32,7 +35,24 @@ export default function BlogManagement() {
   const [editando, setEditando] = useState<EntradaBlogInput | null>(null);
   const [error, setError] = useState('');
   const [subiendoImg, setSubiendoImg] = useState(false);
+  const [subiendoGaleria, setSubiendoGaleria] = useState(false);
   const imgInputRef = useRef<HTMLInputElement>(null);
+  const galeriaInputRef = useRef<HTMLInputElement>(null);
+
+  const subirGaleria = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length || !editando) return;
+    setSubiendoGaleria(true);
+    try {
+      const urls = await Promise.all(files.map(uploadToImgBB));
+      setEditando({ ...editando, galeria: [...(editando.galeria || []), ...urls] });
+    } catch (err: any) {
+      setError(err?.message ?? 'No se pudieron subir algunas fotos');
+    } finally {
+      setSubiendoGaleria(false);
+      if (galeriaInputRef.current) galeriaInputRef.current.value = '';
+    }
+  };
 
   const load = async () => {
     setLoading(true);
@@ -219,6 +239,39 @@ export default function BlogManagement() {
                     )}
                   </button>
                 )}
+              </div>
+              <div>
+                <label className={labelCls}>Galería (opcional)</label>
+                <input ref={galeriaInputRef} type="file" accept="image/*" multiple className="hidden" onChange={subirGaleria} />
+                {(editando.galeria ?? []).length > 0 && (
+                  <div className="grid grid-cols-4 gap-2 mb-2">
+                    {(editando.galeria ?? []).map((url, i) => (
+                      <div key={i} className="relative rounded-xl overflow-hidden aspect-square">
+                        <img src={url} alt={`Foto ${i + 1}`} className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => setEditando({ ...editando, galeria: (editando.galeria ?? []).filter((_, j) => j !== i) })}
+                          className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 hover:bg-black/80"
+                          aria-label={`Quitar foto ${i + 1}`}
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => galeriaInputRef.current?.click()}
+                  disabled={subiendoGaleria}
+                  className="w-full border-2 border-dashed border-gray-200 rounded-xl py-6 flex flex-col items-center gap-2 text-gray-400 hover:border-[#547792] transition-colors disabled:opacity-60"
+                >
+                  {subiendoGaleria ? (
+                    <><div className="w-5 h-5 border-2 border-[#547792] border-t-transparent rounded-full animate-spin" /><span className="text-sm">Subiendo...</span></>
+                  ) : (
+                    <><ImagePlus className="w-6 h-6" /><span className="text-sm">Añadir fotos (puedes elegir varias)</span></>
+                  )}
+                </button>
               </div>
               <div>
                 <label className={labelCls}>Etiquetas (separadas por comas)</label>
