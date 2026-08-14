@@ -92,54 +92,57 @@ export default function EntradaBlogDetail() {
     );
   }
 
-  const contenido = (
-    <>
-      <div className="mb-6">
-        <div
-          className="inline-flex items-center gap-1.5 text-xs mb-4 px-2.5 py-1 rounded-full"
-          style={{ backgroundColor: '#f0ece6', color: '#727272' }}
-        >
-          <CalendarDays className="w-3.5 h-3.5" />
-          {formatFecha(entrada.fecha)}
-        </div>
-        <h1 className="text-3xl sm:text-4xl font-black leading-tight" style={{ color: '#2e2e2e' }}>
-          {entrada.titulo}
-        </h1>
-        {(entrada.etiquetas || []).length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-4">
-            {entrada.etiquetas.map(t => (
-              <Link
-                key={t}
-                to={`/blog?etiqueta=${encodeURIComponent(t)}`}
-                className="text-xs px-2.5 py-1 rounded-full transition-opacity hover:opacity-80"
-                style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e' }}
-              >
-                {t}
-              </Link>
-            ))}
-          </div>
-        )}
+  const cabecera = (
+    <div className="mb-6">
+      <div
+        className="inline-flex items-center gap-1.5 text-xs mb-4 px-2.5 py-1 rounded-full"
+        style={{ backgroundColor: '#f0ece6', color: '#727272' }}
+      >
+        <CalendarDays className="w-3.5 h-3.5" />
+        {formatFecha(entrada.fecha)}
       </div>
+      <h1 className="text-3xl sm:text-4xl font-black leading-tight" style={{ color: '#2e2e2e' }}>
+        {entrada.titulo}
+      </h1>
+      {(entrada.etiquetas || []).length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-4">
+          {entrada.etiquetas.map(t => (
+            <Link
+              key={t}
+              to={`/blog?etiqueta=${encodeURIComponent(t)}`}
+              className="text-xs px-2.5 py-1 rounded-full transition-opacity hover:opacity-80"
+              style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e' }}
+            >
+              {t}
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 
+  const cuerpo = (
+    <>
       <hr style={{ borderColor: '#d9d9d9', marginBottom: '2rem' }} />
-
       <article>
         <p className="text-base leading-relaxed whitespace-pre-line" style={{ color: '#4a4a4a' }}>
           {textoConEnlaces(entrada.contenido)}
         </p>
       </article>
-
-      <div className="mt-10 pt-6 border-t flex items-center justify-between" style={{ borderColor: '#d9d9d9' }}>
-        <Link to={desdeAnimal && entrada.animalId ? `/animales/${entrada.animalId}` : '/blog'} className="text-sm inline-flex items-center gap-1.5" style={{ color: '#547792' }}>
-          {desdeAnimal ? <><PawPrint className="w-4 h-4" /> Volver al animal</> : <><Newspaper className="w-4 h-4" /> Volver al blog</>}
-        </Link>
-        {!desdeAnimal && entrada.animalId && (
-          <Link to={`/animales/${entrada.animalId}`} className="text-sm underline" style={{ color: '#547792' }}>
-            Ver al animal
-          </Link>
-        )}
-      </div>
     </>
+  );
+
+  const pie = (
+    <div className="mt-10 pt-6 border-t flex items-center justify-between" style={{ borderColor: '#d9d9d9' }}>
+      <Link to={desdeAnimal && entrada.animalId ? `/animales/${entrada.animalId}` : '/blog'} className="text-sm inline-flex items-center gap-1.5" style={{ color: '#547792' }}>
+        {desdeAnimal ? <><PawPrint className="w-4 h-4" /> Volver al animal</> : <><Newspaper className="w-4 h-4" /> Volver al blog</>}
+      </Link>
+      {!desdeAnimal && entrada.animalId && (
+        <Link to={`/animales/${entrada.animalId}`} className="text-sm underline" style={{ color: '#547792' }}>
+          Ver al animal
+        </Link>
+      )}
+    </div>
   );
 
   return (
@@ -154,9 +157,11 @@ export default function EntradaBlogDetail() {
           {desdeAnimal ? 'Volver al animal' : 'Volver al blog'}
         </Link>
 
-        {images.length > 0 && (
-          <div className="max-w-3xl mx-auto mb-10 flex flex-col gap-3">
-            <div className="relative rounded-2xl overflow-hidden bg-gray-100 aspect-[4/3]">
+        <div className="max-w-3xl mx-auto">
+          {cabecera}
+
+          {images.length > 0 && (
+            <div className="relative rounded-2xl overflow-hidden bg-gray-100 aspect-[4/3] mb-8">
               {currentImage ? (
                 <img src={currentImage} alt={entrada.titulo} className="w-full h-full object-cover" />
               ) : (
@@ -168,18 +173,25 @@ export default function EntradaBlogDetail() {
                 <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">{images.map((_, i) => <button key={i} type="button" onClick={() => setIndex(i)} className={`w-2.5 h-2.5 rounded-full transition-all ${i === index ? 'bg-white scale-110' : 'bg-white/50'}`} aria-label={`Ir a imagen ${i + 1}`} />)}</div>
               </>}
             </div>
-            {images.length > 1 && (
-              <div className="grid grid-cols-4 gap-2">
+          )}
+
+          {cuerpo}
+
+          {images.length > 1 && (
+            <div className="mt-8">
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#2e2e2e' }}>Galería</h2>
+              <div className="grid grid-cols-3 gap-2">
                 {images.map((img, i) => (
                   <button key={`${img}-${i}`} type="button" onClick={() => setIndex(i)} className={`relative rounded-xl overflow-hidden aspect-square border-2 transition-all ${i === index ? 'border-[#2e2e2e]' : 'border-gray-200'}`}>
-                    <img src={img} alt={`${entrada.titulo} ${i + 1}`} className="w-full h-full object-cover" />
+                    <img src={img} alt={`${entrada.titulo} ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
                   </button>
                 ))}
               </div>
-            )}
-          </div>
-        )}
-        <div className="max-w-3xl mx-auto">{contenido}</div>
+            </div>
+          )}
+
+          {pie}
+        </div>
       </div>
     </div>
   );
