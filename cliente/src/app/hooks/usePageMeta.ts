@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 export const SITE_URL = 'https://www.ayudaanimalmurcia.org';
-const DEFAULT_IMAGE = `${SITE_URL}/favicon.png`;
+const DEFAULT_IMAGE = `${SITE_URL}/og-banner.png`;
 
 export function usePageMeta(opts?: {
   title?: string;
