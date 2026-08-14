@@ -154,36 +154,32 @@ export default function EntradaBlogDetail() {
           {desdeAnimal ? 'Volver al animal' : 'Volver al blog'}
         </Link>
 
-        {images.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 items-start">
-            <div className="order-2 lg:order-1">{contenido}</div>
-            <div className="order-1 lg:order-2 flex flex-col gap-3">
-              <div className="relative rounded-2xl overflow-hidden bg-gray-100 aspect-[4/3]">
-                {currentImage ? (
-                  <img src={currentImage} alt={entrada.titulo} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">Sin imágenes</div>
-                )}
-                {images.length > 1 && <>
-                  <button type="button" onClick={() => setIndex(prev => (prev - 1 + images.length) % images.length)} className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm border border-black/10 flex items-center justify-center text-gray-700 hover:bg-white transition-colors" aria-label="Imagen anterior"><ChevronLeft className="w-4 h-4" /></button>
-                  <button type="button" onClick={() => setIndex(prev => (prev + 1) % images.length)} className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm border border-black/10 flex items-center justify-center text-gray-700 hover:bg-white transition-colors" aria-label="Imagen siguiente"><ChevronRight className="w-4 h-4" /></button>
-                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">{images.map((_, i) => <button key={i} type="button" onClick={() => setIndex(i)} className={`w-2.5 h-2.5 rounded-full transition-all ${i === index ? 'bg-white scale-110' : 'bg-white/50'}`} aria-label={`Ir a imagen ${i + 1}`} />)}</div>
-                </>}
-              </div>
-              {images.length > 1 && (
-                <div className="grid grid-cols-4 gap-2">
-                  {images.map((img, i) => (
-                    <button key={`${img}-${i}`} type="button" onClick={() => setIndex(i)} className={`relative rounded-xl overflow-hidden aspect-square border-2 transition-all ${i === index ? 'border-[#2e2e2e]' : 'border-gray-200'}`}>
-                      <img src={img} alt={`${entrada.titulo} ${i + 1}`} className="w-full h-full object-cover" />
-                    </button>
-                  ))}
-                </div>
+        {images.length > 0 && (
+          <div className="max-w-3xl mx-auto mb-10 flex flex-col gap-3">
+            <div className="relative rounded-2xl overflow-hidden bg-gray-100 aspect-[4/3]">
+              {currentImage ? (
+                <img src={currentImage} alt={entrada.titulo} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">Sin imágenes</div>
               )}
+              {images.length > 1 && <>
+                <button type="button" onClick={() => setIndex(prev => (prev - 1 + images.length) % images.length)} className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm border border-black/10 flex items-center justify-center text-gray-700 hover:bg-white transition-colors" aria-label="Imagen anterior"><ChevronLeft className="w-4 h-4" /></button>
+                <button type="button" onClick={() => setIndex(prev => (prev + 1) % images.length)} className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm border border-black/10 flex items-center justify-center text-gray-700 hover:bg-white transition-colors" aria-label="Imagen siguiente"><ChevronRight className="w-4 h-4" /></button>
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">{images.map((_, i) => <button key={i} type="button" onClick={() => setIndex(i)} className={`w-2.5 h-2.5 rounded-full transition-all ${i === index ? 'bg-white scale-110' : 'bg-white/50'}`} aria-label={`Ir a imagen ${i + 1}`} />)}</div>
+              </>}
             </div>
+            {images.length > 1 && (
+              <div className="grid grid-cols-4 gap-2">
+                {images.map((img, i) => (
+                  <button key={`${img}-${i}`} type="button" onClick={() => setIndex(i)} className={`relative rounded-xl overflow-hidden aspect-square border-2 transition-all ${i === index ? 'border-[#2e2e2e]' : 'border-gray-200'}`}>
+                    <img src={img} alt={`${entrada.titulo} ${i + 1}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="max-w-3xl mx-auto">{contenido}</div>
         )}
+        <div className="max-w-3xl mx-auto">{contenido}</div>
       </div>
     </div>
   );
