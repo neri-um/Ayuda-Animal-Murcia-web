@@ -1,3 +1,8 @@
+// Prerrender de páginas dinámicas para redes sociales (WhatsApp, Facebook, Telegram, X…).
+// Se ejecuta en el edge ANTES de servir la SPA: si quien pide /animales/{slug} o /blog/{slug}
+// es un bot (scraper de redes), se devuelve el HTML con las metaetiquetas OG del contenido.
+// Los humanos siguen recibiendo la aplicación React sin redirección.
+
 const SITE_URL = 'https://www.ayudaanimalmurcia.org';
 const API_BASE = (process.env.VITE_API_URL || 'https://ayuda-animal-murcia-web.onrender.com/vidanimal').replace(/\/+$/, '');
 const DEFAULT_IMAGE = `${SITE_URL}/og-banner.png`;
@@ -9,6 +14,13 @@ interface AnimalPublico {
   nombre?: string;
   descripcion?: string;
   fotoUrl?: string;
+}
+
+interface EntradaBlogPublica {
+  titulo?: string;
+  contenido?: string;
+  imagenUrl?: string;
+  galeria?: string[];
 }
 
 function toSlug(name: string): string {
@@ -42,28 +54,57 @@ export default async function middleware(request: Request): Promise<Response | u
   if (!BOT_RE.test(ua)) return undefined;
 
   const { pathname } = new URL(request.url);
-  const slug = decodeURIComponent(pathname.split('/')[2] || '').toLowerCase();
+  const parts = pathname.split('/').filter(Boolean);
+  const seccion = parts[0];
+  const slug = decodeURIComponent(parts[1] || '').toLowerCase();
   if (!slug) return undefined;
 
-  let animal: AnimalPublico | null = null;
-  try {
-    const r = await fetch(`${API_BASE}/animales`);
-    if (r.ok) {
-      const list: AnimalPublico[] = await r.json();
-      animal = (list || []).find(a => a && a.nombre && toSlug(a.nombre) === slug) || null;
-    }
-  } catch {
-    animal = null;
-  }
+  let title = '';
+  let description = '';
+  let image = DEFAULT_IMAGE;
+  let realUrl = SITE_URL;
 
-  const realUrl = `${SITE_URL}/animales/${slug}`;
-  const title = animal
-    ? `${animal.nombre} en adopción | Ayuda Animal Murcia`
-    : 'Ayuda Animal Murcia | Adopta, no compres';
-  const description = animal?.descripcion
-    ? truncate(animal.descripcion, 180)
-    : 'Asociación sin ánimo de lucro dedicada a la adopción y el cuidado de animales en Murcia.';
-  const image = animal?.fotoUrl || DEFAULT_IMAGE;
+  if (seccion === 'animales') {
+    realUrl = `${SITE_URL}/animales/${slug}`;
+    let animal: AnimalPublico | null = null;
+    try {
+      const r = await fetch(`${API_BASE}/animales`);
+      if (r.ok) {
+        const list: AnimalPublico[] = await r.json();
+        animal = (list || []).find(a => a && a.nombre && toSlug(a.nombre) === slug) || null;
+      }
+    } catch {
+      animal = null;
+    }
+    title = animal
+      ? `${animal.nombre} en adopción | Ayuda Animal Murcia`
+      : 'Ayuda Animal Murcia | Adopta, no compres';
+    description = animal?.descripcion
+      ? truncate(animal.descripcion, 180)
+      : 'Asociación sin ánimo de lucro dedicada a la adopción y el cuidado de animales en Murcia.';
+    image = animal?.fotoUrl || DEFAULT_IMAGE;
+  } else if (seccion === 'blog') {
+    realUrl = `${SITE_URL}/blog/${slug}`;
+    let entrada: EntradaBlogPublica | null = null;
+    try {
+      const r = await fetch(`${API_BASE}/blog`);
+      if (r.ok) {
+        const list: EntradaBlogPublica[] = await r.json();
+        entrada = (list || []).find(e => e && e.titulo && toSlug(e.titulo) === slug) || null;
+      }
+    } catch {
+      entrada = null;
+    }
+    title = entrada
+      ? `${entrada.titulo} | Blog de Ayuda Animal Murcia`
+      : 'Blog de Ayuda Animal Murcia';
+    description = entrada?.contenido
+      ? truncate(entrada.contenido, 180)
+      : 'Historias y noticias de Ayuda Animal Murcia, la protectora de animales de la Región de Murcia.';
+    image = entrada?.imagenUrl || entrada?.galeria?.[0] || DEFAULT_IMAGE;
+  } else {
+    return undefined;
+  }
 
   const html = `<!DOCTYPE html>
 <html lang="es">
@@ -80,7 +121,7 @@ export default async function middleware(request: Request): Promise<Response | u
 <meta property="og:description" content="${escapeHtml(description)}" />
 <meta property="og:url" content="${realUrl}" />
 <meta property="og:image" content="${image}" />
-<meta property="og:image:alt" content="${escapeHtml(animal?.nombre ? `Foto de ${animal.nombre}` : 'Ayuda Animal Murcia')}" />
+<meta property="og:image:alt" content="${escapeHtml(title)}" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:domain" content="www.ayudaanimalmurcia.org" />
 <meta name="twitter:title" content="${escapeHtml(title)}" />
@@ -88,10 +129,10 @@ export default async function middleware(request: Request): Promise<Response | u
 <meta name="twitter:image" content="${image}" />
 </head>
 <body style="font-family:system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#fdf6e9;color:#2e2e2e;text-align:center;padding:24px">
-${animal?.fotoUrl ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(animal.nombre || '')}" style="max-width:280px;border-radius:16px;margin-bottom:16px" />` : ''}
+${image !== DEFAULT_IMAGE ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" style="max-width:280px;border-radius:16px;margin-bottom:16px" />` : ''}
 <h1 style="margin:0 0 8px;font-size:20px">${escapeHtml(title)}</h1>
 <p style="margin:0 0 16px;color:#666">Ayuda Animal Murcia · Protectora de animales en Murcia</p>
-<a href="${realUrl}" style="color:#547792">Ver la ficha</a>
+<a href="${realUrl}" style="color:#547792">Ver la página</a>
 </body>
 </html>`;
 
@@ -105,5 +146,5 @@ ${animal?.fotoUrl ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(animal.no
 }
 
 export const config = {
-  matcher: ['/animales/:path*'],
+  matcher: ['/animales/:path*', '/blog/:path*'],
 };
