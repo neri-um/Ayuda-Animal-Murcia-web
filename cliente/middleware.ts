@@ -1,8 +1,3 @@
-// Prerrender de fichas de animales para redes sociales (WhatsApp, Facebook, Telegram, X…).
-// Se ejecuta en el edge ANTES de servir la SPA: si quien pide /animales/{slug} es un bot
-// (scraper de redes), se devuelve el HTML con las metaetiquetas OG del animal. Los humanos
-// siguen recibiendo la aplicación React sin redirección.
-
 const SITE_URL = 'https://www.ayudaanimalmurcia.org';
 const API_BASE = (process.env.VITE_API_URL || 'https://ayuda-animal-murcia-web.onrender.com/vidanimal').replace(/\/+$/, '');
 const DEFAULT_IMAGE = `${SITE_URL}/og-banner.png`;
