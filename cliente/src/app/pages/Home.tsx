@@ -252,9 +252,9 @@ export default function Home() {
                   className="group rounded-2xl border p-5 flex flex-col gap-2 transition-shadow hover:shadow-md"
                   style={{ backgroundColor: '#f7f7f7', borderColor: '#d9d9d9' }}
                 >
-                  {novedad.imagenUrl && (
-                    <img src={novedad.imagenUrl} alt={novedad.titulo} className="rounded-xl w-full h-40 object-cover" loading="lazy" />
-                  )}
+                  {novedad.imagenUrl || novedad.galeria?.[0] ? (
+                    <img src={novedad.imagenUrl || novedad.galeria?.[0]} alt={novedad.titulo} className="rounded-xl w-full h-40 object-cover" loading="lazy" />
+                  ) : null}
                   <p className="text-xs" style={{ color: '#727272' }}>{formatFecha(novedad.fecha)}</p>
                   <h3 className="text-lg font-semibold" style={{ color: '#2e2e2e' }}>{novedad.titulo}</h3>
                   <p className="text-sm flex-1 line-clamp-3" style={{ color: '#727272' }}>{textoConEnlaces(novedad.contenido)}</p>

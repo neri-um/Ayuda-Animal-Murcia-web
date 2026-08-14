@@ -123,11 +123,11 @@ export default function Blog() {
                     className="rounded-2xl border p-5 flex flex-col gap-3 transition-shadow hover:shadow-md"
                     style={{ backgroundColor: '#f7f7f7', borderColor: '#d9d9d9' }}
                   >
-                    {e.imagenUrl && (
+                    {e.imagenUrl || e.galeria?.[0] ? (
                       <Link to={`/blog/${toSlug(e.titulo)}`} className="block overflow-hidden rounded-xl">
-                        <img src={e.imagenUrl} alt={e.titulo} className="w-full aspect-[4/3] object-cover transition-transform hover:scale-105" loading="lazy" />
+                        <img src={e.imagenUrl || e.galeria?.[0]} alt={e.titulo} className="w-full aspect-[4/3] object-cover transition-transform hover:scale-105" loading="lazy" />
                       </Link>
-                    )}
+                    ) : null}
                     <p className="text-xs flex items-center gap-1" style={{ color: '#727272' }}>
                       <Calendar className="w-3.5 h-3.5" />{formatFecha(e.fecha)}
                     </p>
