@@ -1,13 +1,15 @@
 import { useParams, Link, useNavigate } from 'react-router';
 import {
   ArrowLeft, Heart, Calendar, Ruler, User2,
-  CheckCircle, PawPrint, ChevronLeft, ChevronRight, ImageOff, Cat, Dog, Newspaper, ArrowRight, HeartHandshake
+  CheckCircle, PawPrint, ChevronLeft, ChevronRight, ImageOff, Cat, Dog, Newspaper, ArrowRight, HeartHandshake,
+  Share2, Facebook, Twitter, Send
 } from 'lucide-react';
 import { useMemo, useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { AnimalStatusBadge } from '../components/StatusBadge';
 import JsonLd from '../components/JsonLd';
 import { usePageMeta, SITE_URL } from '../hooks/usePageMeta';
+import WhatsAppIcon from '../components/WhatsAppIcon';
 import { formatEnum } from '../services/enums';
 import { toSlug } from '../utils/slug';
 import { getEntradasDeAnimal } from '../services/blog';
@@ -110,6 +112,8 @@ export default function AnimalDetail() {
     ...(animal.canLiveOutside ? [{ icon: <CheckCircle className="w-3.5 h-3.5" />, label: 'Puede vivir en exterior' }] : []),
   ];
   const currentImage = images[index] || cleanUrl(animal.imageUrl) || '';
+  const shareUrl = `${SITE_URL}/animales/${toSlug(animal.name)}`;
+  const shareText = `Adopta a ${animal.name} en Ayuda Animal Murcia`;
 
   const badge = (label: string) => (
     <div key={label} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm border" style={{ backgroundColor: '#f0e8d0', color: '#2e2e2e', borderColor: '#d9d0b8' }}>
@@ -151,7 +155,7 @@ export default function AnimalDetail() {
           {animal.status === 'EN_ADOPCION' && <div className="mt-2"><Link to={`/adopcion/${toSlug(animal.name)}`} className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl transition-all hover:opacity-80" style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e', fontWeight: 600 }}><Heart className="w-5 h-5" />Quiero adoptar a {animal.name}</Link><p className="text-center text-xs text-gray-400 mt-2">Te contactaremos lo antes posible</p></div>}
           {animal.status === 'PRE_ADOPCION' && <div className="rounded-xl p-4 text-sm border" style={{ backgroundColor: '#f0e8d0', borderColor: '#d9d0b8', color: '#2e2e2e' }}><p style={{ fontWeight: 500 }}>🏠 En pre-adopción</p><p className="mt-1" style={{ color: '#727272' }}>Este animal está reservado temporalmente. Si te interesa, puedes consultarnos por su disponibilidad.</p></div>}
           {animal.status === 'ADOPTADO' && <div className="rounded-xl p-4 text-sm border" style={{ backgroundColor: '#f7f7f7', borderColor: '#d9d9d9', color: '#2e2e2e' }}><p style={{ fontWeight: 500 }}>🎉 ¡Ya tiene hogar!</p><p className="mt-1" style={{ color: '#727272' }}>Este animal ya fue adoptado. ¡Explora nuestros otros animales disponibles!</p><Link to="/adoptar" className="underline mt-2 block" style={{ color: '#2e2e2e' }}>Ver otros animales</Link></div>}
-        </div>
+      </div>
       </div>
 
       {entradas.length > 0 && (
@@ -187,6 +191,18 @@ export default function AnimalDetail() {
         </section>
       )}
       {blogLoading && <p className="text-sm text-gray-400 text-center mt-12">Cargando historias...</p>}
+
+      <div className="mt-12 flex flex-col items-center gap-3">
+        <p className="text-sm font-semibold flex items-center gap-2" style={{ color: '#2e2e2e' }}>
+          <Share2 className="w-4 h-4" style={{ color: '#547792' }} /> Compartir a {animal.name}
+        </p>
+        <div className="flex items-center gap-2.5">
+          <a href={`https://wa.me/?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`} target="_blank" rel="noopener noreferrer" aria-label="Compartir por WhatsApp" className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm transition-all hover:scale-110 hover:opacity-80" style={{ backgroundColor: '#25D366', color: '#ffffff' }}><WhatsAppIcon className="w-5 h-5" /></a>
+          <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" aria-label="Compartir en Facebook" className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm transition-all hover:scale-110 hover:opacity-80" style={{ backgroundColor: '#1877F2', color: '#ffffff' }}><Facebook className="w-5 h-5" /></a>
+          <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" aria-label="Compartir en X" className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm transition-all hover:scale-110 hover:opacity-80" style={{ backgroundColor: '#000000', color: '#ffffff' }}><Twitter className="w-5 h-5" /></a>
+          <a href={`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`} target="_blank" rel="noopener noreferrer" aria-label="Compartir en Telegram" className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm transition-all hover:scale-110 hover:opacity-80" style={{ backgroundColor: '#229ED9', color: '#ffffff' }}><Send className="w-5 h-5" /></a>
+        </div>
+      </div>
     </div>
   );
 }
