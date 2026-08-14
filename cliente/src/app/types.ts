@@ -68,6 +68,7 @@ export interface EntradaBlog {
 }
 
 export interface EntradaBlogInput {
+  id?: number;
   titulo: string;
   contenido: string;
   fecha: string;

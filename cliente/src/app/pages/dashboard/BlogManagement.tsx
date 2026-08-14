@@ -17,6 +17,7 @@ const vacio: EntradaBlogInput = {
 
 function aInput(e: EntradaBlog): EntradaBlogInput {
   return {
+    id: e.id,
     titulo: e.titulo,
     contenido: e.contenido,
     fecha: e.fecha,
