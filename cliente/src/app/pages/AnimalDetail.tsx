@@ -2,7 +2,7 @@ import { useParams, Link, useNavigate } from 'react-router';
 import {
   ArrowLeft, Heart, Calendar, Ruler, User2,
   CheckCircle, PawPrint, ChevronLeft, ChevronRight, ImageOff, Cat, Dog, Newspaper, ArrowRight, HeartHandshake,
-  Share2, Facebook, Twitter, Send
+  Share2, Facebook, Twitter, Send, Copy, Check
 } from 'lucide-react';
 import { useMemo, useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
@@ -50,6 +50,7 @@ export default function AnimalDetail() {
   const { animals } = useApp();
   const navigate = useNavigate();
   const [index, setIndex] = useState(0);
+  const [copied, setCopied] = useState(false);
   const animal = animals.find(a => toSlug(a.name) === param || a.id === param);
   const [entradas, setEntradas] = useState<EntradaBlog[]>([]);
   const [blogLoading, setBlogLoading] = useState(false);
@@ -114,6 +115,20 @@ export default function AnimalDetail() {
   const currentImage = images[index] || cleanUrl(animal.imageUrl) || '';
   const shareUrl = `${SITE_URL}/animales/${toSlug(animal.name)}`;
   const shareText = `Adopta a ${animal.name} en Ayuda Animal Murcia`;
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = shareUrl;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const badge = (label: string) => (
     <div key={label} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm border" style={{ backgroundColor: '#f0e8d0', color: '#2e2e2e', borderColor: '#d9d0b8' }}>
@@ -201,6 +216,7 @@ export default function AnimalDetail() {
           <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" aria-label="Compartir en Facebook" className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm transition-all hover:scale-110 hover:opacity-80" style={{ backgroundColor: '#1877F2', color: '#ffffff' }}><Facebook className="w-5 h-5" /></a>
           <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" aria-label="Compartir en X" className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm transition-all hover:scale-110 hover:opacity-80" style={{ backgroundColor: '#000000', color: '#ffffff' }}><Twitter className="w-5 h-5" /></a>
           <a href={`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`} target="_blank" rel="noopener noreferrer" aria-label="Compartir en Telegram" className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm transition-all hover:scale-110 hover:opacity-80" style={{ backgroundColor: '#229ED9', color: '#ffffff' }}><Send className="w-5 h-5" /></a>
+          <button onClick={copyLink} aria-label={copied ? 'Enlace copiado' : 'Copiar enlace'} title={copied ? 'Enlace copiado' : 'Copiar enlace'} className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm transition-all hover:scale-110 hover:opacity-80" style={{ backgroundColor: '#fdf6e9', color: '#547792', border: '1px solid #d9d0b8' }}>{copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}</button>
         </div>
       </div>
     </div>
