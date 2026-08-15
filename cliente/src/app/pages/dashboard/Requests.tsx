@@ -21,6 +21,7 @@ export default function Requests() {
   const [statusFilter, setStatusFilter] = useState<RequestStatus | ''>('');
   const [managerNoteModal, setManagerNoteModal] = useState<{ id: string; action: 'ACEPTADA' | 'RECHAZADA' } | null>(null);
   const [managerNote, setManagerNote] = useState('');
+  const [detalleEntregado, setDetalleEntregado] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,9 +60,10 @@ export default function Requests() {
     setLoading(true);
     setError(null);
     try {
-      await updateRequestStatus(managerNoteModal.id, managerNoteModal.action, currentUser.id, managerNote);
+      await updateRequestStatus(managerNoteModal.id, managerNoteModal.action, currentUser.id, managerNote, detalleEntregado);
       setManagerNoteModal(null);
       setManagerNote('');
+      setDetalleEntregado('');
     } catch {
       setError('Error al actualizar la solicitud. Inténtalo de nuevo.');
     } finally {
@@ -194,13 +196,19 @@ export default function Requests() {
                         {req.managerNote}
                       </div>
                     )}
+                    {req.detalleEntregado && req.status === 'ACEPTADA' && (
+                      <div className="mt-2 rounded-xl p-3 text-sm" style={{ backgroundColor: '#f0fdf4', color: '#166534' }}>
+                        <span className="text-xs opacity-70 block mb-0.5">Producto entregado:</span>
+                        {req.detalleEntregado}
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex flex-col gap-2 min-w-fit">
                     {isManager && req.status === 'PENDIENTE' && (
                       <>
                         <button
-                          onClick={() => { setManagerNoteModal({ id: req.id, action: 'ACEPTADA' }); setManagerNote(''); }}
+                          onClick={() => { setManagerNoteModal({ id: req.id, action: 'ACEPTADA' }); setManagerNote(''); setDetalleEntregado(''); }}
                           className="flex items-center gap-2 text-white px-4 py-2 rounded-xl text-sm transition-colors"
                           style={{ backgroundColor: '#547792' }}
                           onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#3d6180')}
@@ -210,7 +218,7 @@ export default function Requests() {
                           Aceptar
                         </button>
                         <button
-                          onClick={() => { setManagerNoteModal({ id: req.id, action: 'RECHAZADA' }); setManagerNote(''); }}
+                          onClick={() => { setManagerNoteModal({ id: req.id, action: 'RECHAZADA' }); setManagerNote(''); setDetalleEntregado(''); }}
                           className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm transition-colors"
                         >
                           <XCircle className="w-4 h-4" />
@@ -265,13 +273,27 @@ export default function Requests() {
             <p className="text-gray-500 text-sm mb-4">
               Puedes añadir un comentario opcional para el voluntario.
             </p>
-            <textarea
-              value={managerNote}
-              onChange={e => setManagerNote(e.target.value)}
-              rows={3}
-              placeholder="Comentario opcional..."
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 resize-none mb-4"
-            />
+            <div className="mb-4">
+              <label className="block text-sm text-gray-700 mb-1">Nota para el voluntario</label>
+              <textarea
+                value={managerNote}
+                onChange={e => setManagerNote(e.target.value)}
+                rows={3}
+                placeholder="Ej: puedes recogerlo el jueves a partir de las 17:00 en la sede..."
+                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 resize-none"
+              />
+            </div>
+            {managerNoteModal.action === 'ACEPTADA' && (
+              <div className="mb-4">
+                <label className="block text-sm text-gray-700 mb-1">Detalle del producto entregado</label>
+                <input
+                  value={detalleEntregado}
+                  onChange={e => setDetalleEntregado(e.target.value)}
+                  placeholder="Ej: Transportín nº 5"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+                />
+              </div>
+            )}
             <div className="flex gap-3">
               <button
                 onClick={() => setManagerNoteModal(null)}

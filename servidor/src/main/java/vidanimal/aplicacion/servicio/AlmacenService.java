@@ -102,7 +102,7 @@ public class AlmacenService implements AlmacenUseCase {
     }
 
     @Override
-    public SolicitudProducto decidirSolicitud(Long solicitudId, String decision, Long encargadoId) {
+    public SolicitudProducto decidirSolicitud(Long solicitudId, String decision, Long encargadoId, String notaEncargado, String detalleEntregado) {
         SolicitudProducto solicitud = solicitudRepo.buscarPorId(solicitudId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Solicitud no encontrada"));
 
@@ -111,6 +111,8 @@ public class AlmacenService implements AlmacenUseCase {
 
         solicitud.setEncargado(encargado);
         solicitud.setFechaDecision(LocalDateTime.now());
+        solicitud.setNotaEncargado(notaEncargado);
+        solicitud.setDetalleEntregado(detalleEntregado);
 
         if ("ACEPTADA".equalsIgnoreCase(decision)) {
             solicitud.setEstado(EstadoSolicitudProducto.ACEPTADA);

@@ -86,7 +86,7 @@ public class AlmacenController {
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO')")
     public ResponseEntity<SolicitudProducto> decidirSolicitud(@PathVariable Long id,
             @RequestBody DecisionSolicitudDTO dto) {
-        return ResponseEntity.ok(servicio.decidirSolicitud(id, dto.getDecision(), dto.getEncargadoId()));
+        return ResponseEntity.ok(servicio.decidirSolicitud(id, dto.getDecision(), dto.getEncargadoId(), dto.getNotaEncargado(), dto.getDetalleEntregado()));
     }
 
     // Alias para compatibilidad con el frontend (PUT /solicitudes/{id}/decision)
@@ -94,7 +94,7 @@ public class AlmacenController {
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO')")
     public ResponseEntity<SolicitudProducto> decidirSolicitudAlias(@PathVariable Long id,
             @RequestBody DecisionSolicitudDTO dto) {
-        return ResponseEntity.ok(servicio.decidirSolicitud(id, dto.getDecision(), dto.getEncargadoId()));
+        return ResponseEntity.ok(servicio.decidirSolicitud(id, dto.getDecision(), dto.getEncargadoId(), dto.getNotaEncargado(), dto.getDetalleEntregado()));
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO', 'VOLUNTARIO')")

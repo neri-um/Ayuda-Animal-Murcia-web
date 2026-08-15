@@ -48,6 +48,10 @@ public class SolicitudProducto {
 	@JsonIgnore 
 	private Usuario encargado;
 
+	private String notaEncargado;
+
+	private String detalleEntregado;
+
 	// ---- Flujo de devolución (CU-16, CU-22) ----
 
 	private boolean devolucionNotificada = false;
@@ -129,6 +133,22 @@ public class SolicitudProducto {
 
 	public void setEncargado(Usuario encargado) {
 		this.encargado = encargado;
+	}
+
+	public String getNotaEncargado() {
+		return notaEncargado;
+	}
+
+	public void setNotaEncargado(String notaEncargado) {
+		this.notaEncargado = notaEncargado;
+	}
+
+	public String getDetalleEntregado() {
+		return detalleEntregado;
+	}
+
+	public void setDetalleEntregado(String detalleEntregado) {
+		this.detalleEntregado = detalleEntregado;
 	}
 
 	public boolean isDevolucionNotificada() {

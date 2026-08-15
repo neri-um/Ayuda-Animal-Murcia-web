@@ -112,4 +112,5 @@ export interface ProductRequest {
   returnConfirmed: boolean;
   managerId?: string;
   managerNote?: string;
+  detalleEntregado?: string;
 }

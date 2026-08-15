@@ -227,12 +227,17 @@ export default function Warehouse() {
                     {volunteers.map(r => (
                       <span
                         key={r.id}
-                        title={r.reason}
-                        className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-white border border-gray-200 text-gray-600"
+                        title={r.detalleEntregado}
+                        className="inline-flex flex-col items-start px-2.5 py-1.5 rounded-lg text-xs bg-white border border-gray-200"
                       >
-                        {getNombreVoluntario(r.volunteerId)}
-                        {r.quantity > 1 && (
-                          <span className="ml-1 text-gray-400">×{r.quantity}</span>
+                        <span className="text-gray-700">
+                          {getNombreVoluntario(r.volunteerId)}
+                          {r.quantity > 1 && (
+                            <span className="ml-1 text-gray-400">×{r.quantity}</span>
+                          )}
+                        </span>
+                        {r.detalleEntregado && (
+                          <span className="text-gray-500 mt-0.5">{r.detalleEntregado}</span>
                         )}
                       </span>
                     ))}
