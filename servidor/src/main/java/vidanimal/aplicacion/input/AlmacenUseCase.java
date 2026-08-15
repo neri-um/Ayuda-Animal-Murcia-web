@@ -23,7 +23,7 @@ public interface AlmacenUseCase {
 
 	List<SolicitudProducto> listarSolicitudesDeVoluntario(Long voluntarioId);
 
-	SolicitudProducto decidirSolicitud(Long solicitudId, String decision, Long encargadoId);
+	SolicitudProducto decidirSolicitud(Long solicitudId, String decision, Long encargadoId, String notaEncargado, String detalleEntregado);
 
 	List<AsignacionProducto> listarAsignaciones();
 

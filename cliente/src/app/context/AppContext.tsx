@@ -253,6 +253,7 @@ function mapRequestFromBackend(r: any): ProductRequest {
     requestDate: r.fechaSolicitud ?? new Date().toISOString().slice(0, 10),
     responseDate: r.fechaDecision ?? undefined,
     managerNote: r.notaEncargado ?? undefined,
+    detalleEntregado: r.detalleEntregado ?? undefined,
     returnNotified: Boolean(r.devolucionNotificada ?? false),
     returnConfirmed: Boolean(r.devolucionConfirmada ?? false),
   };
@@ -753,13 +754,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await fetchRequests();
   }, [token, fetchRequests]);
 
-  const updateRequestStatus = useCallback(async (id: string, status: RequestStatus, managerId: string, note?: string) => {
+  const updateRequestStatus = useCallback(async (id: string, status: RequestStatus, managerId: string, note?: string, detalle?: string) => {
     const res = await fetch(`${BASE}/almacen/solicitudes/${id}/decision`, {
       method: 'PUT', headers: jsonHeaders(token),
       body: JSON.stringify({
         decision: status,
         encargadoId: Number(managerId),
         notaEncargado: note ?? '',
+        detalleEntregado: detalle ?? '',
       }),
     });
     if (!res.ok) throw new Error('Error al actualizar solicitud');
