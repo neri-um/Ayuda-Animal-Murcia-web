@@ -1,7 +1,7 @@
 package vidanimal.infraestructura.rest;
 
 import java.util.List;
-
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -57,6 +57,7 @@ public class BlogController {
 		if (dto.getAnimalId() != null) {
 			animal = animales.obtenerPorId(dto.getAnimalId());
 		}
+		comprobarPermisoBlog(authentication, animal);
 		Long usuarioId = Long.parseLong((String) authentication.getPrincipal());
 		usuarioRepo.buscarPorId(usuarioId).ifPresent(entrada::setAutor);
 		return ResponseEntity.ok(EntradaBlogDTO.fromDominio(entradas.crear(entrada, animal)));
@@ -64,18 +65,35 @@ public class BlogController {
 
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO', 'ENCARGADO')")
 	@PutMapping("/{id}")
-	public ResponseEntity<EntradaBlogDTO> editar(@PathVariable Long id, @RequestBody EntradaBlogEditarDTO dto) {
+	public ResponseEntity<EntradaBlogDTO> editar(@PathVariable Long id, @RequestBody EntradaBlogEditarDTO dto, Authentication authentication) {
 		Animal animal = null;
 		if (dto.getAnimalId() != null) {
 			animal = animales.obtenerPorId(dto.getAnimalId());
 		}
+		comprobarPermisoBlog(authentication, entradas.obtenerPorId(id).getAnimal());
 		return ResponseEntity.ok(EntradaBlogDTO.fromDominio(entradas.editar(id, dto.toDominio(), animal)));
 	}
 
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO', 'ENCARGADO')")
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+	public ResponseEntity<Void> eliminar(@PathVariable Long id, Authentication authentication) {
+		comprobarPermisoBlog(authentication, entradas.obtenerPorId(id).getAnimal());
 		entradas.eliminar(id);
 		return ResponseEntity.noContent().build();
+	}
+
+	private void comprobarPermisoBlog(Authentication authentication, Animal animal){
+		Long usuarioId = Long.parseLong((String) authentication.getPrincipal());
+		boolean esAdmin = authentication.getAuthorities().stream()
+			.anyMatch(a -> a.getAuthority().equals("ADMIN"));
+		if(esAdmin)
+			return;
+		if (animal == null) {
+			throw new AccessDeniedException("Solo la administradora puede gestionar el blog general");
+		}
+		boolean esResponsable = animal.getResponsable() !=null && usuarioId.equals(animal.getResponsable().getId());
+		if (!esResponsable) {
+			throw new AccessDeniedException("Solo el responsable del animal puede gestionar esta entrada");
+		}
 	}
 }

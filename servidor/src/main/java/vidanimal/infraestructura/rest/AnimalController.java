@@ -2,7 +2,7 @@ package vidanimal.infraestructura.rest;
 
 import java.util.List;
 import org.springframework.security.core.Authentication;
-
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -74,50 +74,67 @@ public class AnimalController {
 				.map(EntradaBlogDTO::fromDominio).toList());
 	}
 
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO', 'VOLUNTARIO')")
 	@PostMapping
 	public ResponseEntity<Animal> crear(@RequestBody AnimalNuevoDTO dto, Authentication authentication) {
 		Animal animal = dto.toDominio();
 		Long usuarioId = Long.parseLong((String) authentication.getPrincipal());
 		usuarioRepo.buscarPorId(usuarioId).ifPresent(animal::setResponsable);
-
 		return ResponseEntity.ok(animales.crear(animal));
 	}
 
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO', 'VOLUNTARIO')")
 	@PutMapping("/{id}")
-	public ResponseEntity<Animal> editar(@PathVariable Long id, @RequestBody AnimalEditarDTO dto) {
+	public ResponseEntity<Animal> editar(@PathVariable Long id, @RequestBody AnimalEditarDTO dto, Authentication authentication) {
+		comprobarPermisoAnimal(authentication, animales.obtenerPorId(id));
 		return ResponseEntity.ok(animales.editar(id, dto.toDominio()));
 	}
 
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO', 'VOLUNTARIO')")
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+	public ResponseEntity<Void> eliminar(@PathVariable Long id, Authentication authentication) {
+		comprobarPermisoAnimal(authentication, animales.obtenerPorId(id));
 		animales.eliminar(id);
 		return ResponseEntity.noContent().build();
 	}
 
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO', 'VOLUNTARIO')")
 	@PatchMapping("/{id}/estado")
-	public ResponseEntity<Animal> cambiarEstado(@PathVariable Long id, @RequestBody CambioEstadoDTO dto) {
+	public ResponseEntity<Animal> cambiarEstado(@PathVariable Long id, @RequestBody CambioEstadoDTO dto, Authentication authentication) {
+		comprobarPermisoAnimal(authentication, animales.obtenerPorId(id));
 		return ResponseEntity.ok(animales.cambiarEstado(id, dto.getEstado()));
 	}
 
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO', 'VOLUNTARIO')")
 	@PostMapping("/{id}/citas")
-	public ResponseEntity<CitaResponseDTO> agregarCita(@PathVariable Long id, @RequestBody CitaNuevaDTO dto) {
+	public ResponseEntity<CitaResponseDTO> agregarCita(@PathVariable Long id, @RequestBody CitaNuevaDTO dto, Authentication authentication) {
+		comprobarPermisoAnimal(authentication, animales.obtenerPorId(id));
 		return ResponseEntity.ok(CitaResponseDTO.from(animales.agregarCita(id, dto.toDominio())));
 	}
 
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO', 'VOLUNTARIO')")
 	@GetMapping("/{id}/citas")
 	public ResponseEntity<List<CitaResponseDTO>> listarCitas(@PathVariable Long id) {
 		return ResponseEntity.ok(animales.listarCitas(id).stream().map(CitaResponseDTO::from).toList());
 	}
 
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'VOLUNTARIO','ENCARGADO')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO', 'VOLUNTARIO')")
 	@PatchMapping("/{id}/citas/{citaId}/completar")
-	public ResponseEntity<CitaResponseDTO> completarCita(@PathVariable Long id, @PathVariable Long citaId) {
+	public ResponseEntity<CitaResponseDTO> completarCita(@PathVariable Long id, @PathVariable Long citaId, Authentication authentication) {
+		comprobarPermisoAnimal(authentication, animales.obtenerPorId(id));
 		return ResponseEntity.ok(CitaResponseDTO.from(animales.completarCita(id, citaId)));
 	}
+
+	private void comprobarPermisoAnimal(Authentication authentication, Animal animal) {
+    Long usuarioId = Long.parseLong((String) authentication.getPrincipal());
+    boolean esAdmin = authentication.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equals("ADMIN"));
+    if (esAdmin) return;
+
+    boolean esResponsable = animal.getResponsable() != null
+            && usuarioId.equals(animal.getResponsable().getId());
+    if (!esResponsable) {
+        throw new AccessDeniedException("Solo el responsable del animal puede gestionarlo");
+    }
+}
 }

@@ -119,32 +119,30 @@ function AnimalRow({ animal, puedeEditar, puedeEliminar, esAdmin, responsable, s
       </td>
       <td style={{ ...CELL_PAD, paddingRight: '1.5rem' }}>
         <div className="flex items-center gap-1.5 whitespace-nowrap">
-          {/* Botón Animal del mes — solo ADMIN o ENCARGADO */}
-          {esAdmin && (
-            <button
-              onClick={() => onSetAnimalDelMes(esMes ? null : animal.id)}
-              title={esMes ? 'Quitar como animal del mes' : 'Marcar como animal del mes'}
-              className="p-2 rounded-lg transition-colors"
-              style={esMes
-                ? { backgroundColor: '#f7e3b0', color: '#2e2e2e' }
-                : { color: '#9ca3af' }
+          {/* Botón Animal del mes — visible para todos; el servidor valida el permiso */}
+          <button
+            onClick={() => onSetAnimalDelMes(esMes ? null : animal.id)}
+            title={esMes ? 'Quitar como animal del mes' : 'Marcar como animal del mes'}
+            className="p-2 rounded-lg transition-colors"
+            style={esMes
+              ? { backgroundColor: '#f7e3b0', color: '#2e2e2e' }
+              : { color: '#9ca3af' }
+            }
+            onMouseEnter={e => {
+              if (!esMes) {
+                e.currentTarget.style.backgroundColor = '#fef9ec';
+                e.currentTarget.style.color = '#2e2e2e';
               }
-              onMouseEnter={e => {
-                if (!esMes) {
-                  e.currentTarget.style.backgroundColor = '#fef9ec';
-                  e.currentTarget.style.color = '#2e2e2e';
-                }
-              }}
-              onMouseLeave={e => {
-                if (!esMes) {
-                  e.currentTarget.style.backgroundColor = '';
-                  e.currentTarget.style.color = '#9ca3af';
-                }
-              }}
-            >
-              <Star className="w-4 h-4" fill={esMes ? '#2e2e2e' : 'none'} />
-            </button>
-          )}
+            }}
+            onMouseLeave={e => {
+              if (!esMes) {
+                e.currentTarget.style.backgroundColor = '';
+                e.currentTarget.style.color = '#9ca3af';
+              }
+            }}
+          >
+            <Star className="w-4 h-4" fill={esMes ? '#2e2e2e' : 'none'} />
+          </button>
           <Link to={`/dashboard/animales/${animal.id}`}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap border border-gray-200 text-gray-600 hover:bg-gray-50"
           >
@@ -243,19 +241,17 @@ function AnimalCard({ animal, puedeEditar, puedeEliminar, esAdmin, responsable, 
         >
           <Stethoscope className="w-3.5 h-3.5" /> Protocolo
         </Link>
-        {esAdmin && (
-          <button
-            onClick={() => onSetAnimalDelMes(esMes ? null : animal.id)}
-            title={esMes ? 'Quitar como animal del mes' : 'Marcar como animal del mes'}
-            className="p-2.5 rounded-lg transition-colors"
-            style={esMes
-              ? { backgroundColor: '#f7e3b0', color: '#2e2e2e' }
-              : { color: '#9ca3af' }
-            }
-          >
-            <Star className="w-4 h-4" fill={esMes ? '#2e2e2e' : 'none'} />
-          </button>
-        )}
+        <button
+          onClick={() => onSetAnimalDelMes(esMes ? null : animal.id)}
+          title={esMes ? 'Quitar como animal del mes' : 'Marcar como animal del mes'}
+          className="p-2.5 rounded-lg transition-colors"
+          style={esMes
+            ? { backgroundColor: '#f7e3b0', color: '#2e2e2e' }
+            : { color: '#9ca3af' }
+          }
+        >
+          <Star className="w-4 h-4" fill={esMes ? '#2e2e2e' : 'none'} />
+        </button>
         {puedeEditar && (
           <Link to={`/dashboard/animales/${animal.id}/edit`}
             className="p-2.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors" title="Editar">
@@ -286,6 +282,7 @@ export default function AnimalsManagement() {
   const [statusFilter, setStatusFilter]   = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [showOtros, setShowOtros]         = useState(false);
+  const [errorMes, setErrorMes]           = useState<string | null>(null);
 
   const rol = (currentUser?.role ?? '').toUpperCase();
   const esAdmin      = rol === 'ADMIN';
@@ -308,7 +305,16 @@ export default function AnimalsManagement() {
   };
 
   const puedeEditarAnimal = (a: Animal) =>
-    esAdmin || (esVoluntario && !!currentUser && String(a.volunteerId) === String(currentUser.id));
+    esAdmin || (!!currentUser && String(a.volunteerId) === String(currentUser.id));
+
+  const manejarAnimalDelMes = async (id: string | null) => {
+    try {
+      await setAnimalDelMesId(id);
+      setErrorMes(null);
+    } catch (e: any) {
+      setErrorMes(e?.message ?? 'No se pudo cambiar el animal del mes.');
+    }
+  };
 
   const myAnimals    = animalsTodos.filter(a => String(a.volunteerId) === String(currentUser?.id) && matchFilter(a));
   const otherAnimals = animalsTodos.filter(a => String(a.volunteerId) !== String(currentUser?.id) && matchFilter(a));
@@ -332,7 +338,7 @@ export default function AnimalsManagement() {
           <h1 className="text-gray-900">Gestión de animales</h1>
           <p className="text-gray-500 text-sm mt-1">{animalsTodos.length} animales en total</p>
         </div>
-        {(esAdmin || esVoluntario) && (
+        {(esAdmin || esVoluntario || esEncargado) && (
           <Link to="/dashboard/animales/nuevo"
             className="self-start sm:self-auto inline-flex items-center gap-2 text-white px-4 py-2 rounded-xl transition-colors text-sm"
             style={{ backgroundColor: '#547792' }}
@@ -343,6 +349,12 @@ export default function AnimalsManagement() {
           </Link>
         )}
       </div>
+
+      {errorMes && (
+        <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl">
+          {errorMes}
+        </div>
+      )}
 
       {animalDelMesId && (() => {
         const adm = animalsTodos.find(a => a.id === animalDelMesId);
@@ -355,9 +367,9 @@ export default function AnimalsManagement() {
               <Star className="w-4 h-4" fill="#2e2e2e" />
               <strong>Animal del mes:</strong> {adm.name}
             </span>
-            {(esAdmin || esEncargado) && (
+            {(esAdmin) && (
               <button
-                onClick={() => setAnimalDelMesId(null)}
+                onClick={() => manejarAnimalDelMes(null)}
                 className="text-xs underline opacity-60 hover:opacity-100 transition-opacity"
               >
                 Quitar
@@ -425,12 +437,12 @@ export default function AnimalsManagement() {
                       <AnimalRow key={animal.id} animal={animal}
                         puedeEditar={puedeEditarAnimal(animal)}
                         puedeEliminar={esAdmin}
-                        esAdmin={esAdmin || esEncargado}
+                        esAdmin={(esAdmin)}
                         statusOptions={statusOptions}
                         onStatusChange={s => changeAnimalStatus(animal.id, s)}
                         onDelete={() => setDeleteConfirm(animal.id)}
                         animalDelMesId={animalDelMesId}
-                        onSetAnimalDelMes={setAnimalDelMesId}
+                        onSetAnimalDelMes={manejarAnimalDelMes}
                       />
                     ))}
                   </tbody>
@@ -448,12 +460,12 @@ export default function AnimalsManagement() {
                   <AnimalCard key={animal.id} animal={animal}
                     puedeEditar={puedeEditarAnimal(animal)}
                     puedeEliminar={esAdmin}
-                    esAdmin={esAdmin || esEncargado}
+                    esAdmin={esAdmin}
                     statusOptions={statusOptions}
                     onStatusChange={s => changeAnimalStatus(animal.id, s)}
                     onDelete={() => setDeleteConfirm(animal.id)}
                     animalDelMesId={animalDelMesId}
-                    onSetAnimalDelMes={setAnimalDelMesId}
+                    onSetAnimalDelMes={manejarAnimalDelMes}
                   />
                 ))
               )}
@@ -490,13 +502,13 @@ export default function AnimalsManagement() {
                           <AnimalRow key={animal.id} animal={animal}
                             puedeEditar={puedeEditarAnimal(animal)}
                             puedeEliminar={esAdmin}
-                            esAdmin={esAdmin || esEncargado}
+                            esAdmin={esAdmin}
                             responsable={getNombreResponsable(animal.volunteerId)}
                             statusOptions={statusOptions}
                             onStatusChange={s => changeAnimalStatus(animal.id, s)}
                             onDelete={() => setDeleteConfirm(animal.id)}
                             animalDelMesId={animalDelMesId}
-                            onSetAnimalDelMes={setAnimalDelMesId}
+                            onSetAnimalDelMes={manejarAnimalDelMes}
                           />
                         ))}
                       </tbody>
@@ -513,13 +525,13 @@ export default function AnimalsManagement() {
                       <AnimalCard key={animal.id} animal={animal}
                         puedeEditar={puedeEditarAnimal(animal)}
                         puedeEliminar={esAdmin}
-                        esAdmin={esAdmin || esEncargado}
+                        esAdmin={esAdmin}
                         responsable={getNombreResponsable(animal.volunteerId)}
                         statusOptions={statusOptions}
                         onStatusChange={s => changeAnimalStatus(animal.id, s)}
                         onDelete={() => setDeleteConfirm(animal.id)}
                         animalDelMesId={animalDelMesId}
-                        onSetAnimalDelMes={setAnimalDelMesId}
+                        onSetAnimalDelMes={manejarAnimalDelMes}
                       />
                     ))
                   )}

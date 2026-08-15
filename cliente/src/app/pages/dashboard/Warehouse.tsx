@@ -65,8 +65,8 @@ export default function Warehouse() {
         await addProduct(productForm);
       }
       setShowForm(false);
-    } catch {
-      setError('Error al guardar el producto. Inténtalo de nuevo.');
+    } catch (e: any) {
+      setError(e?.message ?? 'Error al guardar el producto. Inténtalo de nuevo.');
     } finally {
       setLoading(false);
     }
@@ -78,8 +78,8 @@ export default function Warehouse() {
     try {
       await deleteProduct(id);
       setDeleteConfirm(null);
-    } catch {
-      setError('Error al eliminar el producto.');
+    } catch (e: any) {
+      setError(e?.message ?? 'Error al eliminar el producto.');
     } finally {
       setLoading(false);
     }
@@ -94,8 +94,8 @@ export default function Warehouse() {
       await addRequest({ productId: requestModal.id, volunteerId: currentUser.id, quantity: reqForm.quantity, reason: reqForm.reason });
       setRequestModal(null);
       setReqForm({ quantity: 1, reason: '' });
-    } catch {
-      setError('Error al enviar la solicitud.');
+    } catch (e: any) {
+      setError(e?.message ?? 'Error al enviar la solicitud.');
     } finally {
       setLoading(false);
     }
@@ -110,18 +110,16 @@ export default function Warehouse() {
             {isManager ? 'Gestión completa del inventario' : 'Consulta y solicita productos del almacén'}
           </p>
         </div>
-        {isManager && (
-          <button
-            onClick={openAddProduct}
-            className="inline-flex items-center gap-2 text-white px-5 py-2.5 rounded-xl text-sm transition-colors"
-            style={{ backgroundColor: '#547792' }}
-            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#3d6180')}
-            onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#547792')}
-          >
-            <Plus className="w-4 h-4" />
-            Añadir producto
-          </button>
-        )}
+        <button
+          onClick={openAddProduct}
+          className="inline-flex items-center gap-2 text-white px-5 py-2.5 rounded-xl text-sm transition-colors"
+          style={{ backgroundColor: '#547792' }}
+          onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#3d6180')}
+          onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#547792')}
+        >
+          <Plus className="w-4 h-4" />
+          Añadir producto
+        </button>
       </div>
 
       {error && (
@@ -193,16 +191,14 @@ export default function Warehouse() {
                   </div>
                   <span className="text-xs text-gray-400 mt-0.5 block">{formatEnum(p.categoria)}</span>
                 </div>
-                {isManager && (
-                  <div className="flex items-center gap-1 flex-shrink-0">
-                    <button onClick={() => openEditProduct(p)} className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors" title="Editar">
-                      <Edit2 className="w-3.5 h-3.5" />
-                    </button>
-                    <button onClick={() => setDeleteConfirm(p.id)} className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors" title="Eliminar">
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                )}
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <button onClick={() => openEditProduct(p)} className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors" title="Editar">
+                    <Edit2 className="w-3.5 h-3.5" />
+                  </button>
+                  <button onClick={() => setDeleteConfirm(p.id)} className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors" title="Eliminar">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
 
               <div className="grid grid-cols-3 gap-2 text-center">
