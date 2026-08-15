@@ -78,8 +78,9 @@ export default function Requests() {
   };
 
   const handleConfirmReturn = async (id: string) => {
+    if (!currentUser) return;
     setError(null);
-    try { await confirmReturn(id); }
+    try { await confirmReturn(id, currentUser.id); }
     catch { setError('Error al confirmar la devolución.'); }
   };
 
