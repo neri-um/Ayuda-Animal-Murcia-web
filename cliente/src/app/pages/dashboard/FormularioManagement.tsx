@@ -3,7 +3,7 @@ import { Plus, FileText, Trash2, Loader2, ChevronDown, ChevronUp, AlertCircle } 
 import { useAuth } from '../../context/AppContext';
 import type { FormularioAdopcionAdmin } from '../../types/adoption';
 
-import { API_BASE as BASE } from '../../services/api';
+import { API_BASE as BASE, leerMensajeError } from '../../services/api';
 
 const ESPECIES = ['PERRO', 'GATO', 'CONEJO', 'AVE', 'REPTIL', 'OTRO'];
 
@@ -41,7 +41,7 @@ export default function FormularioManagement() {
       const res = await fetch(`${BASE}/formularios`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw await leerMensajeError(res);
       const data = await res.json();
       setFormularios(
         (Array.isArray(data) ? data : []).map((f: any) => ({
@@ -50,9 +50,9 @@ export default function FormularioManagement() {
             ?? (f.preguntas != null ? JSON.stringify(f.preguntas, null, 2) : ''),
         }))
       );
-    } catch {
-      setError('No se pudieron cargar los formularios.');
-    } finally {
+      } catch (e: any) {
+        setError(e?.message ?? 'No se pudieron cargar los formularios.');
+      } finally {
       setLoading(false);
     }
   }, [token]);
@@ -87,13 +87,13 @@ export default function FormularioManagement() {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw await leerMensajeError(res);
       setForm({ nombre: '', especie: '', cachorro: '', preguntasRaw: PLANTILLA_PREGUNTAS });
       setMostrarFormulario(false);
       await fetchFormularios();
-    } catch {
-      setError('No se pudo guardar el formulario.');
-    } finally {
+      } catch (e: any) {
+        setError(e?.message ?? 'No se pudieron cargar los formularios.');
+      } finally {
       setGuardando(false);
     }
   };
@@ -106,10 +106,10 @@ export default function FormularioManagement() {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw await leerMensajeError(res);
       await fetchFormularios();
-    } catch {
-      setError('No se pudo eliminar el formulario.');
+    } catch (e: any) {
+      setError(e?.message ?? 'No se pudieron cargar los formularios.');
     } finally {
       setEliminando(null);
     }

@@ -11,7 +11,7 @@ const empty = { tratamiento: '', descripcion: '', fecha: '', veterinario: '' };
 export default function AnimalAppointments() {
   const { id } = useParams<{ id: string }>();
   const { animalsTodos, addTratamiento, completarCita } = useApp();
-  const { token, currentUser, canAccess } = useAuth();
+  const { token } = useAuth();
   const navigate = useNavigate();
 
   const [showModal, setShowModal] = useState(false);
@@ -23,12 +23,6 @@ export default function AnimalAppointments() {
   const [completarError, setCompletarError] = useState('');
 
   const animal = animalsTodos.find(a => a.id === id);
-
-  const puedeEditar = useMemo(() => {
-    if (!currentUser || !animal) return false;
-    if (canAccess('ENCARGADO')) return true;
-    return String(animal.volunteerId) === String(currentUser.id);
-  }, [currentUser, animal, canAccess]);
 
   const authHeaders = useCallback((): HeadersInit => {
     return token ? { Authorization: `Bearer ${token}` } : {};
@@ -81,8 +75,8 @@ export default function AnimalAppointments() {
       await recargar();
       setShowModal(false);
       setForm({ ...empty });
-    } catch {
-      setError('No se pudo guardar. Inténtalo de nuevo.');
+    } catch (e: any) {
+      setError(e?.message ?? 'No se pudo guardar. Inténtalo de nuevo.');
     } finally {
       setSaving(false);
     }
@@ -93,9 +87,8 @@ export default function AnimalAppointments() {
     try {
       await completarCita(id!, citaId);
       await recargar();
-    } catch (err) {
-      console.error('Error al completar cita:', err);
-      setCompletarError('No se pudo marcar la cita como realizada.');
+    } catch (e: any) {
+      setCompletarError(e?.message ?? 'No se pudo marcar la cita como realizada.');
       setTimeout(() => setCompletarError(''), 4000);
     }
   };
@@ -127,13 +120,6 @@ export default function AnimalAppointments() {
         </div>
       </div>
 
-      {!puedeEditar && (
-        <div className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm" style={{ backgroundColor: '#dce8ed', color: '#213448' }}>
-          <span>🔒</span>
-          <span>Estás viendo el protocolo en modo lectura. Solo el responsable del animal puede modificarlo.</span>
-        </div>
-      )}
-
       {completarError && (
         <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm">
           {completarError}
@@ -150,12 +136,12 @@ export default function AnimalAppointments() {
           especie={animal.species}
           birthDate={animal.birthDate}
           protocolo={protocolo}
-          onAdd={puedeEditar ? () => setShowModal(true) : undefined}
-          onCompletar={puedeEditar ? handleCompletar : undefined}
+          onAdd={() => setShowModal(true)}
+          onCompletar={handleCompletar}
         />
       )}
 
-      {showModal && puedeEditar && (
+      {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => !saving && setShowModal(false)} />
           <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6">

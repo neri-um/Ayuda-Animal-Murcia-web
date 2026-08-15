@@ -31,7 +31,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Map<String, Object>> accesoDenegado(AccessDeniedException e) {
-        throw e; // Deja que Spring Security lo maneje con 403
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                Map.of("codigo", 403, "mensaje", e.getMessage()));
     }
 
     @ExceptionHandler(RuntimeException.class)

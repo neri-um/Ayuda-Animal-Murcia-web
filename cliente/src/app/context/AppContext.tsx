@@ -10,7 +10,7 @@ import {
 } from '../types';
 import { TratamientoItem } from '../components/ProtocoloVeterinarioCard';
 
-import { API_BASE as BASE } from '../services/api';
+import { API_BASE as BASE, leerMensajeError } from '../services/api';
 
 const VALID_REQUEST_STATUSES: RequestStatus[] = [
   'PENDIENTE', 'ACEPTADA', 'RECHAZADA', 'DEVOLUCION_NOTIFICADA', 'DEVUELTA',
@@ -71,7 +71,7 @@ interface AppContextType {
   notifyReturn: (id: string) => Promise<void>;
   confirmReturn: (id: string, managerId: string) => Promise<void>;
   animalDelMesId: string | null;
-  setAnimalDelMesId: (id: string | null) => void;
+  setAnimalDelMesId: (id: string | null) => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -361,18 +361,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return () => { cancelRetry.current = true; };
   }, []);
 
-  const setAnimalDelMesId = useCallback((id: string | null) => {
+  const setAnimalDelMesId = useCallback(async (id: string | null) => {
     const normalized = normalizeId(id);
-    setAnimalDelMesIdState(normalized);
-    saveAnimalDelMesCache(normalized);
-
-    fetch(`${BASE}/configuracion/animal-del-mes`, {
+    const res = await fetch(`${BASE}/configuracion/animal-del-mes`, {
       method: 'PUT',
       headers: jsonHeaders(token),
       body: JSON.stringify({ animalId: normalized ?? '' }),
-    }).catch(() => {
-      console.warn('[animal-del-mes] No se pudo persistir en el servidor');
     });
+    if (!res.ok) throw await leerMensajeError(res);
+    setAnimalDelMesIdState(normalized);
+    saveAnimalDelMesCache(normalized);
   }, [token]);
 
   const fetchAnimals = useCallback(async (tkn?: string | null) => {
@@ -588,7 +586,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         fecha: item.fecha, veterinario: item.veterinario ?? '',
       }),
     });
-    if (!res.ok) throw new Error('Error al guardar la cita');
+    if (!res.ok) throw await leerMensajeError(res);
     await recargarCitas(animalId, token, setAnimals);
   }, [token]);
 
@@ -597,7 +595,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       method: 'PATCH',
       headers: authHeaders(token),
     });
-    if (!res.ok) throw new Error('Error al completar la cita');
+    if (!res.ok) throw await leerMensajeError(res);
     await recargarCitas(animalId, token, setAnimals);
   }, [token]);
 
@@ -704,7 +702,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const res = await fetch(`${BASE}/almacen/productos`, {
       method: 'POST', headers: jsonHeaders(token), body: JSON.stringify(data),
     });
-    if (!res.ok) throw new Error('Error al crear producto');
+    if (!res.ok) throw await leerMensajeError(res);
     await fetchProducts();
   }, [token, fetchProducts]);
 
@@ -712,13 +710,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const res = await fetch(`${BASE}/almacen/productos/${id}`, {
       method: 'PUT', headers: jsonHeaders(token), body: JSON.stringify(data),
     });
-    if (!res.ok) throw new Error('Error al actualizar producto');
+    if (!res.ok) throw await leerMensajeError(res);
     await fetchProducts();
   }, [token, fetchProducts]);
 
   const deleteProduct = useCallback(async (id: string) => {
     const res = await fetch(`${BASE}/almacen/productos/${id}`, { method: 'DELETE', headers: authHeaders(token) });
-    if (!res.ok) throw new Error('Error al eliminar producto');
+    if (!res.ok) throw await leerMensajeError(res);
     await fetchProducts();
   }, [token, fetchProducts]);
 
@@ -749,7 +747,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         motivo: req.reason,
       }),
     });
-    if (!res.ok) throw new Error('Error al crear solicitud');
+    if (!res.ok) throw await leerMensajeError(res);
     await fetchRequests();
   }, [token, fetchRequests]);
 

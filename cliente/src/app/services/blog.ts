@@ -1,17 +1,17 @@
 import type { EntradaBlog, EntradaBlogInput } from '../types';
 
-import { API_BASE as API_URL } from './api';
+import { API_BASE as API_URL, leerMensajeError } from './api';
 
 export async function getEntradasGenerales(etiqueta?: string): Promise<EntradaBlog[]> {
   const params = etiqueta ? `?etiqueta=${encodeURIComponent(etiqueta)}` : '';
   const res = await fetch(`${API_URL}/blog${params}`);
-  if (!res.ok) throw new Error('Error al cargar las entradas del blog');
+  if (!res.ok) throw await leerMensajeError(res);
   return res.json();
 }
 
 export async function getEntradaBlog(id: number | string): Promise<EntradaBlog> {
   const res = await fetch(`${API_URL}/blog/${id}`);
-  if (!res.ok) throw new Error('Entrada no encontrada');
+  if (!res.ok) throw await leerMensajeError(res);
   return res.json();
 }
 
@@ -27,7 +27,7 @@ export async function crearEntradaBlog(datos: EntradaBlogInput, token: string | 
     headers: jsonHeaders(token),
     body: JSON.stringify(datos),
   });
-  if (!res.ok) throw new Error('Error al crear la entrada de blog');
+  if (!res.ok) throw await leerMensajeError(res);
   return res.json();
 }
 
@@ -37,7 +37,7 @@ export async function editarEntradaBlog(id: number, datos: EntradaBlogInput, tok
     headers: jsonHeaders(token),
     body: JSON.stringify(datos),
   });
-  if (!res.ok) throw new Error('Error al guardar la entrada de blog');
+  if (!res.ok) throw await leerMensajeError(res);
   return res.json();
 }
 
@@ -46,7 +46,7 @@ export async function eliminarEntradaBlog(id: number, token: string | null): Pro
     method: 'DELETE',
     headers: authHeaders(token),
   });
-  if (!res.ok) throw new Error('Error al eliminar la entrada de blog');
+  if (!res.ok) throw await leerMensajeError(res);
 }
 
 function authHeaders(token: string | null): HeadersInit {

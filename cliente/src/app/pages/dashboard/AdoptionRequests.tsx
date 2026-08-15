@@ -4,7 +4,7 @@ import { useApp, useAuth } from '../../context/AppContext';
 import { useEnums, formatEnum } from '../../hooks/useEnums';
 import type { SolicitudAdopcion, EstadoSolicitudAdopcion } from '../../types/adoption';
 
-import { API_BASE as BASE } from '../../services/api';
+import { API_BASE as BASE, leerMensajeError } from '../../services/api';
 
 const ESTADO_COLORS: Record<EstadoSolicitudAdopcion, string> = {
   PENDIENTE: 'bg-amber-100 text-amber-700',
@@ -47,11 +47,11 @@ export default function AdoptionRequests() {
       const res = await fetch(`${BASE}/adopciones`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw await leerMensajeError(res);
       const data = await res.json();
       setSolicitudes(Array.isArray(data) ? data : []);
-    } catch {
-      setError('No se pudieron cargar las solicitudes.');
+    } catch (e: any) {
+      setError(e?.message ?? 'No se pudieron cargar las solicitudes.');
     } finally {
       setLoading(false);
     }
@@ -128,11 +128,11 @@ export default function AdoptionRequests() {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ estado: nuevoEstado }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw await leerMensajeError(res);
       await fetchSolicitudes();
-    } catch {
-      setError('No se pudo actualizar el estado.');
-    } finally {
+      } catch (e: any) {
+        setError(e?.message ?? 'No se pudo actualizar el estado.');
+      } finally {
       setActualizando(null);
     }
   };
@@ -153,11 +153,11 @@ export default function AdoptionRequests() {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ animalId: Number(reubicarAnimalId) }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw await leerMensajeError(res);
       setReubicarId(null);
       await fetchSolicitudes();
-    } catch {
-      setErrorReubicar('No se pudo reubicar la solicitud.');
+    } catch (e: any) {
+      setError(e?.message ?? 'No se pudo reubicar la solicitud.');
     } finally {
       setReubicando(false);
     }
@@ -172,12 +172,12 @@ export default function AdoptionRequests() {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw await leerMensajeError(res);
       setBorrarId(null);
       await fetchSolicitudes();
-    } catch {
-      setErrorBorrar('No se pudo eliminar la solicitud.');
-    } finally {
+      } catch (e: any) {
+        setError(e?.message ?? 'No se pudo eliminar la solicitud.');
+      } finally {
       setBorrando(false);
     }
   };

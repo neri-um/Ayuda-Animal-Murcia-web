@@ -39,7 +39,7 @@ public class ConfiguracionController {
      * Solo ADMIN o ENCARGADO.
      * Body: { "animalId": "42" }  — enviar "" o null para quitar.
      */
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/animal-del-mes")
     public ResponseEntity<Map<String, String>> fijarAnimalDelMes(@RequestBody Map<String, String> body) {
         String id = body.get("animalId");
@@ -55,7 +55,7 @@ public class ConfiguracionController {
      * DELETE /vidanimal/configuracion/animal-del-mes
      * Alternativa REST semántica para quitar el animal del mes.
      */
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/animal-del-mes")
     public ResponseEntity<Void> quitarAnimalDelMes() {
         configuracion.eliminarClave(CLAVE_ANIMAL_MES);

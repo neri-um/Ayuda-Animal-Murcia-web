@@ -17,6 +17,7 @@ interface AnimalPublico {
 }
 
 interface EntradaBlogPublica {
+  id?: number;
   titulo?: string;
   contenido?: string;
   imagenUrl?: string;
@@ -86,14 +87,20 @@ export default async function middleware(request: Request): Promise<Response | u
   } else if (seccion === 'blog') {
     realUrl = `${SITE_URL}/blog/${slug}`;
     let entrada: EntradaBlogPublica | null = null;
-    try {
-      const r = await fetch(`${API_BASE}/blog`);
-      if (r.ok) {
-        const list: EntradaBlogPublica[] = await r.json();
-        entrada = (list || []).find(e => e && e.titulo && toSlug(e.titulo) === slug) || null;
+      try {
+        const r = await fetch(`${API_BASE}/blog`);
+        if (r.ok) {
+          const list: EntradaBlogPublica[] = await r.json();
+          entrada =
+            (list || []).find(e => e && e.titulo && toSlug(e.titulo) === slug) ||
+            (list || []).find(e => e && e.id != null && String(e.id) === slug) ||
+            null;
+        }
+      } catch {
+        entrada = null;
       }
-    } catch {
-      entrada = null;
+    if (entrada && entrada.titulo) {
+      realUrl = `${SITE_URL}/blog/${toSlug(entrada.titulo)}`;
     }
     title = entrada
       ? `${entrada.titulo} | Blog de Ayuda Animal Murcia`

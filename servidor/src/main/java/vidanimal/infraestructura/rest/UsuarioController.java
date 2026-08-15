@@ -52,22 +52,25 @@ public class UsuarioController {
         return ResponseEntity.ok(usuariosAdmin.obtenerPorId(id));
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO') or authentication.name == #id.toString()")
+    @PreAuthorize("hasAnyAuthority('ADMIN') or authentication.name == #id.toString()")
     @GetMapping("/{id}/animales")
     public ResponseEntity<List<Animal>> listarAnimalesDeUsuario(@PathVariable Long id) {
         return ResponseEntity.ok(animales.listarPorResponsable(id));
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
     public ResponseEntity<Usuario> crear(@RequestBody UsuarioNuevoDTO dto) {
         return ResponseEntity.ok(usuariosAdmin.crearUsuario(dto.toDominio()));
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<Usuario> editar(@PathVariable Long id, @RequestBody UsuarioEditarDTO dto) {
         return ResponseEntity.ok(usuariosAdmin.editarUsuario(id, dto.toDominio()));
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PatchMapping("/{id}/activo")
     public ResponseEntity<Usuario> cambiarActivo(
             @PathVariable Long id,
@@ -76,6 +79,7 @@ public class UsuarioController {
         return ResponseEntity.ok(usuariosAdmin.cambiarActivo(id, activo));
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         usuariosAdmin.eliminarUsuario(id);

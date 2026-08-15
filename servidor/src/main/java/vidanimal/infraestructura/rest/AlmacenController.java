@@ -63,7 +63,7 @@ public class AlmacenController {
     }
 
     @DeleteMapping("/productos/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ENCARGADO')")
     public ResponseEntity<Void> eliminarProducto(@PathVariable Long id) {
         servicio.eliminarProducto(id);
         return ResponseEntity.noContent().build();

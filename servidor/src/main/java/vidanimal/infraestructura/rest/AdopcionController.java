@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -90,6 +91,7 @@ public class AdopcionController {
                 toResponseDTO(adopcionUseCase.reubicarSolicitud(id, dto.getAnimalId())));
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarSolicitud(@PathVariable Long id) {
         adopcionUseCase.eliminarSolicitud(id);
