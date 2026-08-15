@@ -1,7 +1,8 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import {
   CheckCircle2, Circle, Calendar, FileText, Shield, Syringe,
-  Stethoscope, ChevronDown, ChevronUp, Plus, PawPrint, FlaskConical
+  Stethoscope, ChevronDown, ChevronUp, Plus, PawPrint, FlaskConical,
+  AlertTriangle
 } from 'lucide-react';
 import { getProtocoloEspecie, type ProtocoloItem } from '../services/enums';
 
@@ -170,7 +171,10 @@ export default function ProtocoloVeterinarioCard({ especie, birthDate, protocolo
 
           {faltantes.length > 0 && (
             <div className="mb-5 px-4 py-3 rounded-xl bg-orange-50 border border-orange-200">
-              <p className="text-xs font-semibold text-orange-700 mb-1">⚠️ Faltan en el protocolo base</p>
+              <p className="flex items-center gap-1.5 text-xs font-semibold text-orange-700 mb-1">
+                <AlertTriangle className="w-4 h-4" />
+                Faltan en el protocolo base
+              </p>
               <p className="text-xs text-orange-600">{faltantes.map(t => formatTratamientoName(t)).join(', ')}</p>
             </div>
           )}

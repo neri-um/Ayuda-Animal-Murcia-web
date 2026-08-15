@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router';
-import { Plus, Search, Edit2, Trash2, Stethoscope, ChevronDown, ChevronUp, Star, Eye } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Stethoscope, ChevronDown, ChevronUp, Star, Eye, User, PawPrint } from 'lucide-react';
 import { useApp, useAuth } from '../../context/AppContext';
-import { Animal } from '../../types';
+import { Animal, AnimalStatus } from '../../types';
 import { AnimalStatusBadge } from '../../components/StatusBadge';
 import { useEnums, formatEnum } from '../../hooks/useEnums';
 
@@ -62,11 +62,8 @@ function StatusDropdown({ animal, statusOptions, onChange }: {
   );
 }
 
-function AnimalRow({ animal, puedeEditar, puedeEliminar, esAdmin, responsable, statusOptions, onStatusChange, onDelete, animalDelMesId, onSetAnimalDelMes }: {
+function AnimalRow({ animal, responsable, statusOptions, onStatusChange, onDelete, animalDelMesId, onSetAnimalDelMes }: {
   animal: Animal;
-  puedeEditar: boolean;
-  puedeEliminar: boolean;
-  esAdmin: boolean;
   responsable?: string;
   statusOptions: string[];
   onStatusChange: (s: string) => void;
@@ -82,7 +79,7 @@ function AnimalRow({ animal, puedeEditar, puedeEliminar, esAdmin, responsable, s
         <div className="flex items-center gap-3 min-w-0">
           {animal.imageUrl
             ? <img src={animal.imageUrl} alt={animal.name} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
-            : <div className="w-10 h-10 rounded-lg bg-gray-100 flex-shrink-0 flex items-center justify-center text-gray-400">🐾</div>
+            : <div className="w-10 h-10 rounded-lg bg-gray-100 flex-shrink-0 flex items-center justify-center text-gray-400"><PawPrint className="w-5 h-5" /></div>
           }
           <div className="min-w-0">
             <p className="text-sm font-medium text-gray-800 truncate flex items-center gap-1.5">
@@ -100,7 +97,7 @@ function AnimalRow({ animal, puedeEditar, puedeEliminar, esAdmin, responsable, s
             </p>
             <div className="flex items-center gap-2 flex-wrap">
               <p className="text-xs text-gray-400">{formatEnum(animal.species)}</p>
-              {responsable && <span className="text-xs" style={{ color: '#547792' }}>· 👤 {responsable}</span>}
+              {responsable && <span className="inline-flex items-center gap-1 text-xs" style={{ color: '#547792' }}>· <User className="w-3 h-3" /> {responsable}</span>}
             </div>
           </div>
         </div>
@@ -108,14 +105,10 @@ function AnimalRow({ animal, puedeEditar, puedeEliminar, esAdmin, responsable, s
       <td style={CELL_PAD} className="text-sm text-gray-600 whitespace-nowrap">{calcEdad(animal.birthDate)}</td>
       <td style={CELL_PAD} className="text-sm text-gray-600 whitespace-nowrap">{formatEnum(animal.gender)}</td>
       <td style={CELL_PAD}>
-        {puedeEditar ? (
-          <>
-            <StatusDropdown animal={animal} statusOptions={statusOptions} onChange={onStatusChange} />
-            <p className="text-xs text-gray-400 mt-1">Clic para cambiar</p>
-          </>
-        ) : (
-          <AnimalStatusBadge status={animal.status} />
-        )}
+        <>
+          <StatusDropdown animal={animal} statusOptions={statusOptions} onChange={onStatusChange} />
+          <p className="text-xs text-gray-400 mt-1">Clic para cambiar</p>
+        </>
       </td>
       <td style={{ ...CELL_PAD, paddingRight: '1.5rem' }}>
         <div className="flex items-center gap-1.5 whitespace-nowrap">
@@ -156,29 +149,22 @@ function AnimalRow({ animal, puedeEditar, puedeEliminar, esAdmin, responsable, s
           >
             <Stethoscope className="w-3.5 h-3.5" /> Protocolo
           </Link>
-          {puedeEditar && (
-            <Link to={`/dashboard/animales/${animal.id}/edit`}
-              className="p-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors" title="Editar">
-              <Edit2 className="w-4 h-4" />
-            </Link>
-          )}
-          {puedeEliminar && (
-            <button onClick={onDelete}
-              className="p-2 rounded-lg text-red-300 hover:bg-red-50 hover:text-red-500 transition-colors" title="Eliminar">
-              <Trash2 className="w-4 h-4" />
-            </button>
-          )}
+          <Link to={`/dashboard/animales/${animal.id}/edit`}
+            className="p-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors" title="Editar">
+            <Edit2 className="w-4 h-4" />
+          </Link>
+          <button onClick={onDelete}
+            className="p-2 rounded-lg text-red-300 hover:bg-red-50 hover:text-red-500 transition-colors" title="Eliminar">
+            <Trash2 className="w-4 h-4" />
+          </button>
         </div>
       </td>
     </tr>
   );
 }
 
-function AnimalCard({ animal, puedeEditar, puedeEliminar, esAdmin, responsable, statusOptions, onStatusChange, onDelete, animalDelMesId, onSetAnimalDelMes }: {
+function AnimalCard({ animal, responsable, statusOptions, onStatusChange, onDelete, animalDelMesId, onSetAnimalDelMes }: {
   animal: Animal;
-  puedeEditar: boolean;
-  puedeEliminar: boolean;
-  esAdmin: boolean;
   responsable?: string;
   statusOptions: string[];
   onStatusChange: (s: string) => void;
@@ -193,7 +179,7 @@ function AnimalCard({ animal, puedeEditar, puedeEliminar, esAdmin, responsable, 
       <div className="flex items-center gap-3">
         {animal.imageUrl
           ? <img src={animal.imageUrl} alt={animal.name} className="w-12 h-12 rounded-xl object-cover flex-shrink-0" />
-          : <div className="w-12 h-12 rounded-xl bg-gray-100 flex-shrink-0 flex items-center justify-center text-lg text-gray-400">🐾</div>
+          : <div className="w-12 h-12 rounded-xl bg-gray-100 flex-shrink-0 flex items-center justify-center text-gray-400"><PawPrint className="w-5 h-5" /></div>
         }
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
@@ -210,11 +196,7 @@ function AnimalCard({ animal, puedeEditar, puedeEliminar, esAdmin, responsable, 
                 </span>
               )}
             </p>
-            {puedeEditar ? (
-              <StatusDropdown animal={animal} statusOptions={statusOptions} onChange={onStatusChange} />
-            ) : (
-              <AnimalStatusBadge status={animal.status} />
-            )}
+            <StatusDropdown animal={animal} statusOptions={statusOptions} onChange={onStatusChange} />
           </div>
           <div className="flex items-center gap-2 flex-wrap mt-1 text-xs">
             <span className="text-gray-400">{formatEnum(animal.species)}</span>
@@ -222,7 +204,7 @@ function AnimalCard({ animal, puedeEditar, puedeEliminar, esAdmin, responsable, 
             <span className="text-gray-600">{calcEdad(animal.birthDate)}</span>
             <span className="text-gray-300">·</span>
             <span className="text-gray-600">{formatEnum(animal.gender)}</span>
-            {responsable && <span className="text-xs" style={{ color: '#547792' }}>👤 {responsable}</span>}
+            {responsable && <span className="inline-flex items-center gap-1 text-xs" style={{ color: '#547792' }}><User className="w-3 h-3" /> {responsable}</span>}
           </div>
         </div>
       </div>
@@ -252,18 +234,14 @@ function AnimalCard({ animal, puedeEditar, puedeEliminar, esAdmin, responsable, 
         >
           <Star className="w-4 h-4" fill={esMes ? '#2e2e2e' : 'none'} />
         </button>
-        {puedeEditar && (
-          <Link to={`/dashboard/animales/${animal.id}/edit`}
-            className="p-2.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors" title="Editar">
-            <Edit2 className="w-4 h-4" />
-          </Link>
-        )}
-        {puedeEliminar && (
-          <button onClick={onDelete}
-            className="p-2.5 rounded-lg text-red-300 hover:bg-red-50 hover:text-red-500 transition-colors" title="Eliminar">
-            <Trash2 className="w-4 h-4" />
-          </button>
-        )}
+        <Link to={`/dashboard/animales/${animal.id}/edit`}
+          className="p-2.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors" title="Editar">
+          <Edit2 className="w-4 h-4" />
+        </Link>
+        <button onClick={onDelete}
+          className="p-2.5 rounded-lg text-red-300 hover:bg-red-50 hover:text-red-500 transition-colors" title="Eliminar">
+          <Trash2 className="w-4 h-4" />
+        </button>
       </div>
     </div>
   );
@@ -283,6 +261,7 @@ export default function AnimalsManagement() {
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [showOtros, setShowOtros]         = useState(false);
   const [errorMes, setErrorMes]           = useState<string | null>(null);
+  const [eliminando, setEliminando]       = useState(false);
 
   const rol = (currentUser?.role ?? '').toUpperCase();
   const esAdmin      = rol === 'ADMIN';
@@ -304,8 +283,27 @@ export default function AnimalsManagement() {
     return true;
   };
 
-  const puedeEditarAnimal = (a: Animal) =>
-    esAdmin || (!!currentUser && String(a.volunteerId) === String(currentUser.id));
+  const manejarCambioEstado = async (id: string, estado: string) => {
+    setErrorMes(null);
+    try {
+      await changeAnimalStatus(id, estado as AnimalStatus);
+    } catch (e: any) {
+      setErrorMes(e?.message ?? 'No se pudo cambiar el estado del animal.');
+    }
+  };
+
+  const handleEliminar = async (id: string) => {
+    setEliminando(true);
+    setErrorMes(null);
+    try {
+      await deleteAnimal(id);
+      setDeleteConfirm(null);
+    } catch (e: any) {
+      setErrorMes(e?.message ?? 'No se pudo eliminar el animal.');
+    } finally {
+      setEliminando(false);
+    }
+  };
 
   const manejarAnimalDelMes = async (id: string | null) => {
     try {
@@ -426,7 +424,7 @@ export default function AnimalsManagement() {
                   <tbody>
                     <tr>
                       <td colSpan={5} className="text-center py-10 text-gray-400">
-                        <span className="text-4xl block mb-2">🐾</span>
+                        <PawPrint className="w-10 h-10 text-gray-300 block mx-auto mb-2" />
                         <p className="text-sm">No tienes animales asignados</p>
                       </td>
                     </tr>
@@ -434,16 +432,13 @@ export default function AnimalsManagement() {
                 ) : (
                   <tbody className="divide-y divide-gray-50">
                     {myAnimals.map(animal => (
-                      <AnimalRow key={animal.id} animal={animal}
-                        puedeEditar={puedeEditarAnimal(animal)}
-                        puedeEliminar={esAdmin}
-                        esAdmin={(esAdmin)}
-                        statusOptions={statusOptions}
-                        onStatusChange={s => changeAnimalStatus(animal.id, s)}
-                        onDelete={() => setDeleteConfirm(animal.id)}
-                        animalDelMesId={animalDelMesId}
-                        onSetAnimalDelMes={manejarAnimalDelMes}
-                      />
+                    <AnimalRow key={animal.id} animal={animal}
+                      statusOptions={statusOptions}
+                      onStatusChange={s => manejarCambioEstado(animal.id, s)}
+                      onDelete={() => setDeleteConfirm(animal.id)}
+                      animalDelMesId={animalDelMesId}
+                      onSetAnimalDelMes={manejarAnimalDelMes}
+                    />
                     ))}
                   </tbody>
                 )}
@@ -452,17 +447,14 @@ export default function AnimalsManagement() {
             <div className="md:hidden divide-y divide-gray-50">
               {myAnimals.length === 0 ? (
                 <div className="text-center py-10 text-gray-400">
-                  <span className="text-4xl block mb-2">🐾</span>
+                  <PawPrint className="w-10 h-10 text-gray-300 block mx-auto mb-2" />
                   <p className="text-sm">No tienes animales asignados</p>
                 </div>
               ) : (
                 myAnimals.map(animal => (
                   <AnimalCard key={animal.id} animal={animal}
-                    puedeEditar={puedeEditarAnimal(animal)}
-                    puedeEliminar={esAdmin}
-                    esAdmin={esAdmin}
                     statusOptions={statusOptions}
-                    onStatusChange={s => changeAnimalStatus(animal.id, s)}
+                    onStatusChange={s => manejarCambioEstado(animal.id, s)}
                     onDelete={() => setDeleteConfirm(animal.id)}
                     animalDelMesId={animalDelMesId}
                     onSetAnimalDelMes={manejarAnimalDelMes}
@@ -500,12 +492,9 @@ export default function AnimalsManagement() {
                       <tbody className="divide-y divide-gray-50">
                         {otherAnimals.map(animal => (
                           <AnimalRow key={animal.id} animal={animal}
-                            puedeEditar={puedeEditarAnimal(animal)}
-                            puedeEliminar={esAdmin}
-                            esAdmin={esAdmin}
                             responsable={getNombreResponsable(animal.volunteerId)}
                             statusOptions={statusOptions}
-                            onStatusChange={s => changeAnimalStatus(animal.id, s)}
+                            onStatusChange={s => manejarCambioEstado(animal.id, s)}
                             onDelete={() => setDeleteConfirm(animal.id)}
                             animalDelMesId={animalDelMesId}
                             onSetAnimalDelMes={manejarAnimalDelMes}
@@ -523,12 +512,9 @@ export default function AnimalsManagement() {
                   ) : (
                     otherAnimals.map(animal => (
                       <AnimalCard key={animal.id} animal={animal}
-                        puedeEditar={puedeEditarAnimal(animal)}
-                        puedeEliminar={esAdmin}
-                        esAdmin={esAdmin}
                         responsable={getNombreResponsable(animal.volunteerId)}
                         statusOptions={statusOptions}
-                        onStatusChange={s => changeAnimalStatus(animal.id, s)}
+                        onStatusChange={s => manejarCambioEstado(animal.id, s)}
                         onDelete={() => setDeleteConfirm(animal.id)}
                         animalDelMesId={animalDelMesId}
                         onSetAnimalDelMes={manejarAnimalDelMes}
@@ -556,8 +542,10 @@ export default function AnimalsManagement() {
             <div className="flex gap-3">
               <button onClick={() => setDeleteConfirm(null)}
                 className="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-xl text-sm hover:bg-gray-50 transition-colors">Cancelar</button>
-              <button onClick={() => { deleteAnimal(deleteConfirm); setDeleteConfirm(null); }}
-                className="flex-1 bg-red-500 text-white py-2.5 rounded-xl text-sm hover:bg-red-600 transition-colors">Sí, eliminar</button>
+              <button onClick={() => handleEliminar(deleteConfirm)} disabled={eliminando}
+                className="flex-1 bg-red-500 text-white py-2.5 rounded-xl text-sm hover:bg-red-600 transition-colors disabled:opacity-60">
+                {eliminando ? 'Eliminando...' : 'Sí, eliminar'}
+              </button>
             </div>
           </div>
         </div>

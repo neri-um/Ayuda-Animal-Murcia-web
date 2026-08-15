@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ClipboardList, CheckCircle, XCircle, RotateCcw, Package } from 'lucide-react';
+import { ClipboardList, CheckCircle, XCircle, RotateCcw, Package, RefreshCw, Calendar } from 'lucide-react';
 import { useApp, useAuth } from '../../context/AppContext';
 import { ProductRequest, RequestStatus } from '../../types';
 import { RequestStatusBadge } from '../../components/StatusBadge';
@@ -151,13 +151,15 @@ export default function Requests() {
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
                       <RequestStatusBadge status={req.status} />
                       {req.returnNotified && !req.returnConfirmed && (
-                        <span className="text-xs px-2 py-0.5 rounded-full border" style={{ backgroundColor: '#dce8ed', color: '#213448', borderColor: '#b5cdd8' }}>
-                          🔄 Devolución notificada
+                        <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border" style={{ backgroundColor: '#dce8ed', color: '#213448', borderColor: '#b5cdd8' }}>
+                          <RefreshCw className="w-3 h-3" />
+                          Devolución notificada
                         </span>
                       )}
                       {req.returnConfirmed && (
-                        <span className="text-xs px-2 py-0.5 rounded-full border" style={{ backgroundColor: '#dce8ed', color: '#213448', borderColor: '#b5cdd8' }}>
-                          ✅ Devuelto
+                        <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border" style={{ backgroundColor: '#dce8ed', color: '#213448', borderColor: '#b5cdd8' }}>
+                          <CheckCircle className="w-3 h-3" />
+                          Devuelto
                         </span>
                       )}
                     </div>
@@ -175,8 +177,9 @@ export default function Requests() {
                       </p>
                     )}
 
-                    <p className="text-xs text-gray-500 mb-2">
-                      📅 {new Date(req.requestDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    <p className="flex items-center gap-1.5 text-xs text-gray-500 mb-2">
+                      <Calendar className="w-3.5 h-3.5" />
+                      {new Date(req.requestDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
                       {req.responseDate && ` · Respuesta: ${new Date(req.responseDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}`}
                     </p>
 
@@ -253,8 +256,11 @@ export default function Requests() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setManagerNoteModal(null)} />
           <div className="relative bg-white rounded-2xl p-6 max-w-md w-full shadow-xl z-10">
-            <h3 className="text-gray-800 mb-2">
-              {managerNoteModal.action === 'ACEPTADA' ? '✅ Aceptar solicitud' : '❌ Rechazar solicitud'}
+            <h3 className="text-gray-800 mb-2 flex items-center gap-2">
+              {managerNoteModal.action === 'ACEPTADA'
+                ? <CheckCircle className="w-5 h-5 text-green-600" />
+                : <XCircle className="w-5 h-5 text-red-600" />}
+              {managerNoteModal.action === 'ACEPTADA' ? 'Aceptar solicitud' : 'Rechazar solicitud'}
             </h3>
             <p className="text-gray-500 text-sm mb-4">
               Puedes añadir un comentario opcional para el voluntario.
