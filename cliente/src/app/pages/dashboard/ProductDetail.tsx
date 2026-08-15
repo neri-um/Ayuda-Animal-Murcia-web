@@ -103,6 +103,9 @@ export default function ProductDetail() {
                     <p className="text-xs text-gray-400">
                       Solicitado el {new Date(r.requestDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </p>
+                    {r.reason && (
+                      <p className="text-xs text-gray-600 mt-0.5 leading-snug">{r.reason}</p>
+                    )}
                   </div>
                   <span className="text-sm px-3 py-1 rounded-full" style={{ backgroundColor: '#dce8ed', color: '#213448', fontWeight: 600 }}>
                     ×{r.quantity}
@@ -139,6 +142,9 @@ export default function ProductDetail() {
                     <p className="text-xs text-gray-400">
                       {new Date(r.requestDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </p>
+                    {r.reason && (
+                      <p className="text-xs text-gray-600 mt-0.5 leading-snug">{r.reason}</p>
+                    )}
                   </div>
                   <span className="text-xs px-2.5 py-1 rounded-full" style={{ backgroundColor: sc.bg, color: sc.text, fontWeight: 600 }}>
                     {r.status.replace('_', ' ')}
