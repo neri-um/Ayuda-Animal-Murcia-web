@@ -227,6 +227,7 @@ export default function Warehouse() {
                     {volunteers.map(r => (
                       <span
                         key={r.id}
+                        title={r.reason}
                         className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-white border border-gray-200 text-gray-600"
                       >
                         {getNombreVoluntario(r.volunteerId)}
