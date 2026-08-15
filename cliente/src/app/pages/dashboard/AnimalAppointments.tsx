@@ -1,5 +1,5 @@
 import { useParams, Link, useNavigate } from 'react-router';
-import { ArrowLeft, X } from 'lucide-react';
+import { ArrowLeft, X, PawPrint } from 'lucide-react';
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useApp, useAuth } from '../../context/AppContext';
 import ProtocoloVeterinarioCard from '../../components/ProtocoloVeterinarioCard';

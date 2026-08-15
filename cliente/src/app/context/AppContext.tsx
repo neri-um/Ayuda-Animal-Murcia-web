@@ -562,17 +562,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [token, fetchAnimals, fetchAllAnimals]);
 
   const deleteAnimal = useCallback(async (id: string) => {
-    await fetch(`${BASE}/animales/${id}`, { method: 'DELETE', headers: authHeaders(token) });
+    const res = await fetch(`${BASE}/animales/${id}`, { method: 'DELETE', headers: authHeaders(token) });
+    if (!res.ok) throw await leerMensajeError(res);
     await fetchAnimals();
     await fetchAllAnimals();
   }, [token, fetchAnimals, fetchAllAnimals]);
 
   const changeAnimalStatus = useCallback(async (id: string, status: AnimalStatus) => {
-    await fetch(`${BASE}/animales/${id}/estado`, {
+    const res = await fetch(`${BASE}/animales/${id}/estado`, {
       method: 'PATCH',
       headers: jsonHeaders(token),
       body: JSON.stringify({ estado: status }),
     });
+    if (!res.ok) throw await leerMensajeError(res);
     await fetchAnimals();
     await fetchAllAnimals();
   }, [token, fetchAnimals, fetchAllAnimals]);

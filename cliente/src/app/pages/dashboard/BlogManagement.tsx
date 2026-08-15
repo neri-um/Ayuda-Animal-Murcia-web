@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { Plus, Pencil, Trash2, X, Newspaper, Save, Upload, ImagePlus } from 'lucide-react';
-import { useAuth } from '../../context/AppContext';
+import { useApp, useAuth } from '../../context/AppContext';
 import { getEntradasGenerales, crearEntradaBlog, editarEntradaBlog, eliminarEntradaBlog } from '../../services/blog';
 import { uploadToImgBB } from '../../services/imgbb';
 import type { EntradaBlog, EntradaBlogInput } from '../../types';
@@ -29,7 +29,8 @@ function aInput(e: EntradaBlog): EntradaBlogInput {
 }
 
 export default function BlogManagement() {
-  const { token } = useAuth();
+  const { token, currentUser } = useAuth();
+  const { animalsTodos } = useApp();
   const [entradas, setEntradas] = useState<EntradaBlog[]>([]);
   const [loading, setLoading] = useState(true);
   const [editando, setEditando] = useState<EntradaBlogInput | null>(null);
@@ -38,6 +39,11 @@ export default function BlogManagement() {
   const [subiendoGaleria, setSubiendoGaleria] = useState(false);
   const imgInputRef = useRef<HTMLInputElement>(null);
   const galeriaInputRef = useRef<HTMLInputElement>(null);
+
+  const esAdmin = (currentUser?.role ?? '').toUpperCase() === 'ADMIN';
+  const misAnimales = esAdmin
+    ? animalsTodos
+    : (animalsTodos ?? []).filter(a => String(a.volunteerId) === String(currentUser?.id));
 
   const subirGaleria = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -71,6 +77,10 @@ export default function BlogManagement() {
     if (!editando) return;
     if (!editando.titulo.trim()) { setError('El título es obligatorio'); return; }
     if (!editando.fecha) { setError('La fecha es obligatoria'); return; }
+    if (!esAdmin && !editando.animalId) {
+      setError('Elige el animal de esta entrada. Solo la administradora puede crear entradas generales.');
+      return;
+    }
     setError('');
     try {
       if (editando.id) {
@@ -129,7 +139,7 @@ export default function BlogManagement() {
         <p className="text-sm text-gray-400 py-10 text-center">Cargando...</p>
       ) : entradas.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
-          <p className="text-4xl mb-3">📰</p>
+          <Newspaper className="w-12 h-12 text-gray-300 mx-auto mb-3" />
           <p>Aún no hay entradas de blog.</p>
         </div>
       ) : (
@@ -139,7 +149,9 @@ export default function BlogManagement() {
               {e.imagenUrl ? (
                 <img src={e.imagenUrl} alt="" className="w-20 h-20 rounded-xl object-cover flex-shrink-0" />
               ) : (
-                <div className="w-20 h-20 rounded-xl bg-gray-100 flex items-center justify-center text-2xl flex-shrink-0">📰</div>
+                <div className="w-20 h-20 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
+                  <Newspaper className="w-8 h-8 text-gray-400" />
+                </div>
               )}
               <div className="flex-1 min-w-0">
                 <p className="text-xs text-gray-400">{e.fecha ? new Date(e.fecha).toLocaleDateString('es-ES') : '—'}</p>
@@ -195,6 +207,22 @@ export default function BlogManagement() {
                   onChange={e => setEditando({ ...editando, fecha: e.target.value })}
                   className={inputCls}
                 />
+              </div>
+              <div>
+                <label className={labelCls}>Animal{esAdmin ? '' : ' *'}</label>
+                <select
+                  value={editando.animalId ?? ''}
+                  onChange={e => setEditando({ ...editando, animalId: e.target.value ? Number(e.target.value) : null })}
+                  className={inputCls}
+                >
+                  {esAdmin && <option value="">Entrada general (sin animal)</option>}
+                  {!esAdmin && misAnimales.length === 0 && (
+                    <option value="">No tienes animales asignados</option>
+                  )}
+                  {misAnimales.map(a => (
+                    <option key={a.id} value={a.id}>{a.name}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className={labelCls}>Imagen (opcional)</label>

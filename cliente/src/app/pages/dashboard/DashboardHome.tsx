@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
-import { PawPrint, ClipboardList, FileText, AlertTriangle, ChevronRight } from 'lucide-react';
+import { PawPrint, ClipboardList, FileText, AlertTriangle, ChevronRight, User } from 'lucide-react';
 import { useApp, useAuth } from '../../context/AppContext';
 import { AnimalStatusBadge } from '../../components/StatusBadge';
 
@@ -45,14 +45,14 @@ function AnimalItem({ a, responsable }: {
     >
       {a.imageUrl
         ? <img src={a.imageUrl} alt={a.name} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" loading="lazy" width={40} height={40} />
-        : <div className="w-10 h-10 rounded-lg bg-gray-100 flex-shrink-0 flex items-center justify-center text-gray-400">🐾</div>
+        : <div className="w-10 h-10 rounded-lg bg-gray-100 flex-shrink-0 flex items-center justify-center text-gray-400"><PawPrint className="w-5 h-5" /></div>
       }
       <div className="flex-1 min-w-0">
         <p className="text-sm text-gray-800 font-medium truncate">{a.name}</p>
         <div className="flex items-center gap-2 flex-wrap">
           <p className="text-xs text-gray-400 truncate">{a.breed}</p>
           {responsable && (
-            <span className="text-xs" style={{ color: '#547792' }}>· 👤 {responsable}</span>
+            <span className="inline-flex items-center gap-1 text-xs" style={{ color: '#547792' }}>· <User className="w-3 h-3" /> {responsable}</span>
           )}
         </div>
       </div>

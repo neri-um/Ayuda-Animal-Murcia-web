@@ -338,7 +338,10 @@ export default function Warehouse() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setDeleteConfirm(null)} />
           <div className="relative bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
-            <h3 className="text-gray-800 mb-2">⚠️ Eliminar producto</h3>
+            <h3 className="text-gray-800 mb-2 flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-red-500" />
+              Eliminar producto
+            </h3>
             <p className="text-gray-500 text-sm mb-5">Esta acción no se puede deshacer.</p>
             <div className="flex gap-3">
               <button onClick={() => setDeleteConfirm(null)} disabled={loading} className="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-xl text-sm hover:bg-gray-50 disabled:opacity-60">Cancelar</button>

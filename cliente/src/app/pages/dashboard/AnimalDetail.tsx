@@ -1,6 +1,6 @@
 import { useParams, Link, useNavigate } from 'react-router';
 import { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Edit2, Stethoscope, Newspaper, Plus, X, Save, Calendar, ImagePlus } from 'lucide-react';
+import { ArrowLeft, Edit2, Stethoscope, Newspaper, Plus, X, Save, Calendar, ImagePlus, PawPrint } from 'lucide-react';
 import { useApp, useAuth } from '../../context/AppContext';
 import { AnimalStatusBadge } from '../../components/StatusBadge';
 import { formatEnum } from '../../services/enums';
@@ -52,7 +52,7 @@ export default function AnimalDetailDashboard() {
   if (!animal) {
     return (
       <div className="text-center py-20 text-gray-400">
-        <div className="text-5xl mb-3">🐾</div>
+        <PawPrint className="w-12 h-12 text-gray-300 mx-auto mb-3" />
         <p>Animal no encontrado</p>
         <Link to="/dashboard/animales" className="text-sm underline mt-4 block" style={{ color: '#547792' }}>Volver a animales</Link>
       </div>
@@ -143,7 +143,7 @@ export default function AnimalDetailDashboard() {
         {animal.imageUrl ? (
           <img src={animal.imageUrl} alt={animal.name} className="w-full h-64 object-cover" />
         ) : (
-          <div className="w-full h-48 bg-gray-100 flex items-center justify-center text-6xl">🐾</div>
+          <div className="w-full h-48 bg-gray-100 flex items-center justify-center"><PawPrint className="w-16 h-16 text-gray-300" /></div>
         )}
         <div className="p-5 flex items-center justify-between">
           <AnimalStatusBadge status={animal.status} />
