@@ -68,6 +68,13 @@ public class AlmacenService implements AlmacenUseCase {
     public void eliminarProducto(Long id) {
         Producto producto = productoRepo.buscarPorId(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Producto con id " + id + " no encontrado"));
+
+        List<SolicitudProducto> solicitudes = solicitudRepo.buscarPorProductoId(id);
+        for (SolicitudProducto solicitud : solicitudes) {
+            solicitud.setProducto(null);
+            solicitudRepo.guardar(solicitud);
+        }
+
         productoRepo.eliminar(producto);
     }
 

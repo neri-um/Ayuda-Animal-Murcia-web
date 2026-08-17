@@ -27,7 +27,7 @@ public class SolicitudProducto {
 	private Usuario voluntario;
 
 	@ManyToOne
-	@JoinColumn(name = "producto_id", nullable = false)
+	@JoinColumn(name = "producto_id")
 	private Producto producto;
 
 	@Column(nullable = false)
