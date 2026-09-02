@@ -5,8 +5,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import java.time.LocalDate;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,41 +12,26 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import vidanimal.dominio.modelo.Animal;
-import vidanimal.dominio.modelo.SolicitudAdopcion;
+import vidanimal.dominio.modelo.TipoCuestionario;
 
 @ExtendWith(MockitoExtension.class)
-class NotificacionSolicitudAdopcionServiceTest {
+class NotificacionServiceTest {
 
     @Mock
     private ResendEmailService resendEmailService;
 
-    private NotificacionSolicitudAdopcionService service;
-    private SolicitudAdopcion solicitud;
+    private NotificacionService service;
 
     @BeforeEach
     void setUp() {
-        service = new NotificacionSolicitudAdopcionService(
+        service = new NotificacionService(
                 resendEmailService, "destino@example.com", "https://www.ayudaanimalmurcia.org/dashboard/adopciones");
-
-        Animal animal = new Animal();
-        animal.setId(5L);
-        animal.setNombre("Nala");
-
-        solicitud = new SolicitudAdopcion();
-        solicitud.setId(11L);
-        solicitud.setAnimal(animal);
-        solicitud.setNombreAdoptante("Ana");
-        solicitud.setEmail("ana@example.com");
-        solicitud.setTelefono("600123123");
-        solicitud.setDni("12345678A");
-        solicitud.setFechaSolicitud(LocalDate.of(2026, 8, 8));
-        solicitud.setRespuestas("{\"vivienda\":\"piso\"}");
     }
 
     @Test
     void enviarNuevaSolicitud_enviaCorreoSinIdNiRespuestasNiFecha() {
-        service.enviarNuevaSolicitud(solicitud);
+        service.enviarNuevaSolicitud(TipoCuestionario.ADOPCION, "Nala",
+                "Ana", "ana@example.com", "600123123", "12345678A");
 
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         verify(resendEmailService).enviar(eq("destino@example.com"),
@@ -62,28 +45,36 @@ class NotificacionSolicitudAdopcionServiceTest {
                 .contains("Teléfono: 600123123")
                 .contains("DNI/NIE: 12345678A")
                 .contains("https://www.ayudaanimalmurcia.org/dashboard/adopciones")
-                .doesNotContain("(ID 5)")
                 .doesNotContain("Respuestas")
                 .doesNotContain("Fecha")
                 .doesNotContain("2026-08-08");
     }
 
     @Test
-    void enviarNuevaSolicitud_sinAnimal_usaLosDatosBasicos() {
-        solicitud.setAnimal(null);
-
-        service.enviarNuevaSolicitud(solicitud);
+    void enviarNuevaSolicitud_sinNombreAnimal_usaLosDatosBasicos() {
+        service.enviarNuevaSolicitud(TipoCuestionario.ADOPCION, null,
+                "Ana", "ana@example.com", "600123123", "12345678A");
 
         verify(resendEmailService).enviar(eq("destino@example.com"),
                 eq("Nueva solicitud de adopción: Animal"), anyString());
     }
 
     @Test
-    void enviarNuevaSolicitud_sinDashboardUrl_noIncluyeEnlace() {
-        NotificacionSolicitudAdopcionService sinEnlace =
-                new NotificacionSolicitudAdopcionService(resendEmailService, "destino@example.com", " ");
+    void enviarNuevaSolicitud_acogida_usaLaEtiquetaDeAcogida() {
+        service.enviarNuevaSolicitud(TipoCuestionario.ACOGIDA, "Luna",
+                "María", "maria@example.com", "600999999", "87654321B");
 
-        sinEnlace.enviarNuevaSolicitud(solicitud);
+        verify(resendEmailService).enviar(eq("destino@example.com"),
+                eq("Nueva solicitud de acogida: Luna"), anyString());
+    }
+
+    @Test
+    void enviarNuevaSolicitud_sinDashboardUrl_noIncluyeEnlace() {
+        NotificacionService sinEnlace =
+                new NotificacionService(resendEmailService, "destino@example.com", " ");
+
+        sinEnlace.enviarNuevaSolicitud(TipoCuestionario.ADOPCION, "Nala",
+                "Ana", "ana@example.com", "600123123", "12345678A");
 
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
         verify(resendEmailService).enviar(eq("destino@example.com"),
@@ -97,10 +88,11 @@ class NotificacionSolicitudAdopcionServiceTest {
 
     @Test
     void enviarNuevaSolicitud_sinDestinoNoEnvia() {
-        NotificacionSolicitudAdopcionService sinDestino =
-                new NotificacionSolicitudAdopcionService(resendEmailService, " ", "https://www.ayudaanimalmurcia.org/dashboard/adopciones");
+        NotificacionService sinDestino =
+                new NotificacionService(resendEmailService, " ", "https://www.ayudaanimalmurcia.org/dashboard/adopciones");
 
-        sinDestino.enviarNuevaSolicitud(solicitud);
+        sinDestino.enviarNuevaSolicitud(TipoCuestionario.ADOPCION, "Nala",
+                "Ana", "ana@example.com", "600123123", "12345678A");
 
         verify(resendEmailService, never()).enviar(anyString(), anyString(), anyString());
     }
