@@ -28,6 +28,7 @@ const defaultForm: FormData = {
   gallery: [],
   needsMedication: false,
   needsSpecialCare: false,
+  needsAcogida: false,
   positivoLeucemia: false,
   positivoInmunodeficiencia: false,
   entryDate: new Date().toISOString().slice(0, 10),
@@ -197,6 +198,7 @@ export default function AnimalForm() {
       compatiblePerrosPequenos: form.goodWithDogsSmall,
       necesitaMedicacion: form.needsMedication,
       necesitaCuidadosEspeciales: form.needsSpecialCare,
+      necesitaAcogida: form.needsAcogida,
       positivoLeucemia: form.positivoLeucemia,
       positivoInmunodeficiencia: form.positivoInmunodeficiencia,
       compatibleNinos: form.goodWithKids,
@@ -437,6 +439,7 @@ export default function AnimalForm() {
             {([
               { key: 'needsMedication', label: 'Necesita medicación' },
               { key: 'needsSpecialCare', label: 'Necesita cuidados especiales' },
+              { key: 'needsAcogida', label: 'Necesita acogida' },
               { key: 'positivoLeucemia', label: 'Positivo/a a leucemia' },
               { key: 'positivoInmunodeficiencia', label: 'Positivo/a a inmunodeficiencia' },
             ] as { key: keyof FormData; label: string }[]).map(({ key, label }) => (

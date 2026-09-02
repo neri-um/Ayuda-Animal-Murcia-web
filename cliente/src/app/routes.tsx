@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Adoptar from './pages/Adoptar';
 import AnimalDetail from './pages/AnimalDetail';
 import AdoptionForm from './pages/AdoptionForm';
+import AcogidaAnimalForm from './pages/AcogidaAnimalForm';
 import Login from './pages/Login';
 import Contacto from './pages/Contacto';
 import Colaborar from './pages/Colaborar';
@@ -43,6 +44,7 @@ export const router = createBrowserRouter([
       { path: 'animales', element: <Navigate to="/adoptar" replace /> },
       { path: 'animales/:id', element: <AnimalDetail /> },
       { path: 'adopcion/:id', element: <AdoptionForm /> },
+      { path: 'acogida/:id', element: <AcogidaAnimalForm /> },
       { path: 'novedades/:id', element: <NovedadDetail /> },
       // Blog
       { path: 'blog', element: <Blog /> },

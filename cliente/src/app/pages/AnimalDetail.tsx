@@ -2,7 +2,7 @@ import { useParams, Link, useNavigate } from 'react-router';
 import {
   ArrowLeft, Heart, Calendar, Ruler, User2,
   CheckCircle, PawPrint, ChevronLeft, ChevronRight, ImageOff, Cat, Dog, Newspaper, ArrowRight, HeartHandshake,
-  Share2, Facebook, Twitter, Send, Copy, Check
+  Share2, Facebook, Twitter, Send, Copy, Check, Home
 } from 'lucide-react';
 import { useMemo, useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
@@ -167,7 +167,7 @@ export default function AnimalDetail() {
           {convivencia.length > 0 && <div><h3 className="text-gray-800 mb-3">Convivencia</h3><div className="flex flex-wrap gap-2">{convivencia.map(c => badge(c.label))}</div></div>}
           {Array.isArray(animal.personality) && animal.personality.length > 0 && <div><h3 className="text-gray-800 mb-3">Carácter</h3><div className="flex flex-wrap gap-2">{animal.personality.map(c => badge(formatEnum(c)))}</div></div>}
           {animal.entryDate && <p className="text-xs text-gray-400 flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />En la protectora desde {new Date(animal.entryDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</p>}
-          {animal.status === 'EN_ADOPCION' && <div className="mt-2"><Link to={`/adopcion/${toSlug(animal.name)}`} className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl transition-all hover:opacity-80" style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e', fontWeight: 600 }}><Heart className="w-5 h-5" />Quiero adoptar a {animal.name}</Link><p className="text-center text-xs text-gray-400 mt-2">Te contactaremos lo antes posible</p></div>}
+          {animal.status === 'EN_ADOPCION' && <div className="mt-2 flex flex-col gap-2"><Link to={`/adopcion/${toSlug(animal.name)}`} className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl transition-all hover:opacity-80" style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e', fontWeight: 600 }}><Heart className="w-5 h-5" />Quiero adoptar a {animal.name}</Link>{animal.needsAcogida && <Link to={`/acogida/${toSlug(animal.name)}`} className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl transition-all hover:opacity-80 border" style={{ backgroundColor: '#f4f8fa', color: '#2e2e2e', fontWeight: 600, borderColor: '#547792' }}><Home className="w-5 h-5" style={{ color: '#547792' }} />Quiero acoger a {animal.name}</Link>}<p className="text-center text-xs text-gray-400 mt-2">Te contactaremos lo antes posible</p></div>}
           {animal.status === 'PRE_ADOPCION' && <div className="rounded-xl p-4 text-sm border" style={{ backgroundColor: '#f0e8d0', borderColor: '#d9d0b8', color: '#2e2e2e' }}><p style={{ fontWeight: 500 }}>🏠 En pre-adopción</p><p className="mt-1" style={{ color: '#727272' }}>Este animal está reservado temporalmente. Si te interesa, puedes consultarnos por su disponibilidad.</p></div>}
           {animal.status === 'ADOPTADO' && <div className="rounded-xl p-4 text-sm border" style={{ backgroundColor: '#f7f7f7', borderColor: '#d9d9d9', color: '#2e2e2e' }}><p style={{ fontWeight: 500 }}>🎉 ¡Ya tiene hogar!</p><p className="mt-1" style={{ color: '#727272' }}>Este animal ya fue adoptado. ¡Explora nuestros otros animales disponibles!</p><Link to="/adoptar" className="underline mt-2 block" style={{ color: '#2e2e2e' }}>Ver otros animales</Link></div>}
       </div>
