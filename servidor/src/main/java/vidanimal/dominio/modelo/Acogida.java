@@ -1,10 +1,5 @@
 package vidanimal.dominio.modelo;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,7 +8,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 
 @Entity
@@ -44,10 +38,6 @@ public class Acogida {
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private EstadoAcogida estado = EstadoAcogida.PENDIENTE;
-
-	@OneToMany(mappedBy = "acogida")
-	@JsonIgnore
-	private List<Animal> animalesEnAcogida = new LinkedList<>();
 
     @OneToOne(mappedBy = "acogida", cascade = CascadeType.ALL)
     private SolicitudAcogida solicitud;
@@ -92,10 +82,6 @@ public class Acogida {
         return estado;
     }
 
-    public List<Animal> getAnimalesEnAcogida() {
-        return animalesEnAcogida;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -130,10 +116,6 @@ public class Acogida {
 
     public void setEstado(EstadoAcogida estado) {
         this.estado = estado;
-    }
-
-    public void setAnimalesEnAcogida(List<Animal> animalesEnAcogida) {
-        this.animalesEnAcogida = animalesEnAcogida;
     }
 
     public void setSolicitud(SolicitudAcogida solicitud) {
