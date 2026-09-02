@@ -25,6 +25,7 @@ import ProductDetail from './pages/dashboard/ProductDetail';
 import Requests from './pages/dashboard/Requests';
 import UserManagement from './pages/dashboard/UserManagement';
 import AdoptionRequests from './pages/dashboard/AdoptionRequests';
+import AcogidaManagement from './pages/dashboard/AcogidaManagement';
 import FormularioManagement from './pages/dashboard/FormularioManagement';
 import Blog from './pages/Blog';
 import EntradaBlogDetail from './pages/EntradaBlogDetail';
@@ -74,6 +75,7 @@ export const router = createBrowserRouter([
       { path: 'almacen/:id', element: <ProductDetail /> },
       { path: 'solicitudes', element: <Requests /> },
       { path: 'adopciones', element: <AdoptionRequests /> },
+      { path: 'acogidas', element: <AcogidaManagement /> },
       { path: 'blog', element: <BlogManagement /> },
       { path: 'usuarios', element: <UserManagement /> },
       { path: 'formularios', element: <FormularioManagement /> },

@@ -2,10 +2,10 @@ package vidanimal.infraestructura.rest.dto;
 
 import vidanimal.dominio.modelo.EstadoSolicitudCuestionario;
 
-public class CambioEstadoAdopcionDTO {
+public class CambioEstadoAcogidaDTO {
 	private EstadoSolicitudCuestionario estado;
 
-	public CambioEstadoAdopcionDTO() {
+	public CambioEstadoAcogidaDTO() {
 	}
 
 	public EstadoSolicitudCuestionario getEstado() {

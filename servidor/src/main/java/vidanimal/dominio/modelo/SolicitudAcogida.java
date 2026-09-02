@@ -1,21 +1,35 @@
 package vidanimal.dominio.modelo;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "solicitudes_adopcion")
-public class SolicitudAdopcion {
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 
+@Entity
+@Table(name = "solicitudes_acogida")
+public class SolicitudAcogida {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @OneToOne
+    @JoinColumn(name = "acogida_id")
+    private Acogida acogida;
 
     @ManyToOne
     @JoinColumn(name = "animal_id")
     private Animal animal;
 
-    private String nombreAdoptante;
+    private String nombreAcogida;
     private String email;
     private String telefono;
     private String dni;
@@ -27,7 +41,7 @@ public class SolicitudAdopcion {
     @Column(columnDefinition = "TEXT")
     private String respuestas;
 
-    public SolicitudAdopcion() {}
+    public SolicitudAcogida() {}
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -37,8 +51,11 @@ public class SolicitudAdopcion {
 
     public Long getAnimalId() { return animal != null ? animal.getId() : null; }
 
-    public String getNombreAdoptante() { return nombreAdoptante; }
-    public void setNombreAdoptante(String nombreAdoptante) { this.nombreAdoptante = nombreAdoptante; }
+    public Acogida getAcogida() { return acogida; }
+    public void setAcogida(Acogida acogida) { this.acogida = acogida; }
+
+    public String getNombreAcogida() { return nombreAcogida; }
+    public void setNombreAcogida(String nombreAcogida) { this.nombreAcogida = nombreAcogida; }
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }

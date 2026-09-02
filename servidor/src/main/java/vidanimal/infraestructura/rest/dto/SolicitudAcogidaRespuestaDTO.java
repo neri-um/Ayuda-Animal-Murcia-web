@@ -4,11 +4,11 @@ import vidanimal.dominio.modelo.EstadoSolicitudCuestionario;
 import java.time.LocalDate;
 import java.util.Map;
 
-public class SolicitudAdopcionRespuestaDTO {
+public class SolicitudAcogidaRespuestaDTO {
 	private Long id;
 	private Long animalId;
 	private String animalNombre;
-	private String nombreAdoptante;
+	private String nombreAcogida;
 	private String email;
 	private String telefono;
 	private String dni;
@@ -16,7 +16,7 @@ public class SolicitudAdopcionRespuestaDTO {
 	private EstadoSolicitudCuestionario estado;
 	private Map<String, String> respuestas;
 
-	public SolicitudAdopcionRespuestaDTO() {
+	public SolicitudAcogidaRespuestaDTO() {
 	}
 
 	public Long getId() {
@@ -43,12 +43,12 @@ public class SolicitudAdopcionRespuestaDTO {
 		this.animalNombre = animalNombre;
 	}
 
-	public String getNombreAdoptante() {
-		return nombreAdoptante;
+	public String getNombreAcogida() {
+		return nombreAcogida;
 	}
 
-	public void setNombreAdoptante(String nombreAdoptante) {
-		this.nombreAdoptante = nombreAdoptante;
+	public void setNombreAcogida(String nombreAcogida) {
+		this.nombreAcogida = nombreAcogida;
 	}
 
 	public String getEmail() {
