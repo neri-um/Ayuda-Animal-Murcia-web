@@ -17,7 +17,7 @@ import vidanimal.aplicacion.output.AnimalRepositorioPort;
 import vidanimal.aplicacion.output.FormularioAdopcionRepositorioPort;
 import vidanimal.aplicacion.output.SolicitudAdopcionRepositorioPort;
 import vidanimal.dominio.modelo.Animal;
-import vidanimal.dominio.modelo.EstadoSolicitudAdopcion;
+import vidanimal.dominio.modelo.EstadoSolicitudCuestionario;
 import vidanimal.dominio.modelo.SolicitudAdopcion;
 
 class AdopcionServiceTest {
@@ -25,7 +25,7 @@ class AdopcionServiceTest {
     private AnimalRepositorioPort animalRepo;
     private FormularioAdopcionRepositorioPort formularioRepo;
     private SolicitudAdopcionRepositorioPort solicitudRepo;
-    private NotificacionSolicitudAdopcionService notificacionService;
+    private NotificacionService notificacionService;
     private AdopcionService service;
 
     @BeforeEach
@@ -33,7 +33,7 @@ class AdopcionServiceTest {
         animalRepo = Mockito.mock(AnimalRepositorioPort.class);
         formularioRepo = Mockito.mock(FormularioAdopcionRepositorioPort.class);
         solicitudRepo = Mockito.mock(SolicitudAdopcionRepositorioPort.class);
-        notificacionService = Mockito.mock(NotificacionSolicitudAdopcionService.class);
+        notificacionService = Mockito.mock(NotificacionService.class);
         service = new AdopcionService(
                 animalRepo,
                 formularioRepo,
@@ -58,9 +58,11 @@ class AdopcionServiceTest {
         SolicitudAdopcion result = service.crearSolicitud(solicitud, 10L, "{\"vivienda\":\"piso\"}");
 
         assertNotNull(result.getFechaSolicitud());
-        assertEquals(EstadoSolicitudAdopcion.PENDIENTE, result.getEstado());
+        assertEquals(EstadoSolicitudCuestionario.PENDIENTE, result.getEstado());
         assertEquals(animal, result.getAnimal());
-        verify(notificacionService).enviarNuevaSolicitud(result);
+        verify(notificacionService).enviarNuevaSolicitud(
+                vidanimal.dominio.modelo.TipoCuestionario.ADOPCION, "Luna",
+                "Ana", "ana@example.com", "600123123", "12345678A");
         assertEquals(LocalDate.now(), result.getFechaSolicitud());
     }
 

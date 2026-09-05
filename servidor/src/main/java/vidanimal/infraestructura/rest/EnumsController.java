@@ -9,7 +9,7 @@ import vidanimal.dominio.modelo.Rol;
 import vidanimal.dominio.modelo.Sexo;
 import vidanimal.dominio.modelo.Tamanyo;
 import vidanimal.dominio.modelo.CategoriaProducto;
-import vidanimal.dominio.modelo.EstadoSolicitudAdopcion;
+import vidanimal.dominio.modelo.EstadoSolicitudCuestionario;
 import vidanimal.dominio.modelo.EstadoSolicitudProducto;
 import vidanimal.dominio.protocolo.*;
 
@@ -33,7 +33,7 @@ public class EnumsController {
         data.put("sexos",                    Arrays.stream(Sexo.values()).map(Enum::name).collect(Collectors.toList()));
         data.put("tamanyes",                 Arrays.stream(Tamanyo.values()).map(Enum::name).collect(Collectors.toList()));
         data.put("categoriasProducto",       Arrays.stream(CategoriaProducto.values()).map(Enum::name).collect(Collectors.toList()));
-        data.put("estadosSolicitudAdopcion", Arrays.stream(EstadoSolicitudAdopcion.values()).map(Enum::name).collect(Collectors.toList()));
+        data.put("estadosSolicitudAdopcion", Arrays.stream(EstadoSolicitudCuestionario.values()).map(Enum::name).collect(Collectors.toList()));
         data.put("estadosSolicitudProducto", Arrays.stream(EstadoSolicitudProducto.values()).map(Enum::name).collect(Collectors.toList()));
         data.put("roles",                    Arrays.stream(Rol.values()).map(Enum::name).collect(Collectors.toList()));
         return ResponseEntity.ok(data);

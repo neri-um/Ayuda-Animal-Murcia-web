@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Adoptar from './pages/Adoptar';
 import AnimalDetail from './pages/AnimalDetail';
 import AdoptionForm from './pages/AdoptionForm';
+import AcogidaAnimalForm from './pages/AcogidaAnimalForm';
 import Login from './pages/Login';
 import Contacto from './pages/Contacto';
 import Colaborar from './pages/Colaborar';
@@ -25,6 +26,7 @@ import ProductDetail from './pages/dashboard/ProductDetail';
 import Requests from './pages/dashboard/Requests';
 import UserManagement from './pages/dashboard/UserManagement';
 import AdoptionRequests from './pages/dashboard/AdoptionRequests';
+import AcogidaManagement from './pages/dashboard/AcogidaManagement';
 import FormularioManagement from './pages/dashboard/FormularioManagement';
 import Blog from './pages/Blog';
 import EntradaBlogDetail from './pages/EntradaBlogDetail';
@@ -42,6 +44,7 @@ export const router = createBrowserRouter([
       { path: 'animales', element: <Navigate to="/adoptar" replace /> },
       { path: 'animales/:id', element: <AnimalDetail /> },
       { path: 'adopcion/:id', element: <AdoptionForm /> },
+      { path: 'acogida/:id', element: <AcogidaAnimalForm /> },
       { path: 'novedades/:id', element: <NovedadDetail /> },
       // Blog
       { path: 'blog', element: <Blog /> },
@@ -74,6 +77,7 @@ export const router = createBrowserRouter([
       { path: 'almacen/:id', element: <ProductDetail /> },
       { path: 'solicitudes', element: <Requests /> },
       { path: 'adopciones', element: <AdoptionRequests /> },
+      { path: 'acogidas', element: <AcogidaManagement /> },
       { path: 'blog', element: <BlogManagement /> },
       { path: 'usuarios', element: <UserManagement /> },
       { path: 'formularios', element: <FormularioManagement /> },

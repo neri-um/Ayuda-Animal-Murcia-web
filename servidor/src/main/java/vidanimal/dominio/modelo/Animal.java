@@ -69,6 +69,8 @@ public class Animal {
 
 	private boolean necesitaCuidadosEspeciales;
 
+	private boolean necesitaAcogida;
+
 	private boolean positivoLeucemia;
 
 	private boolean positivoInmunodeficiencia;
@@ -263,6 +265,14 @@ public class Animal {
 
 	public void setNecesitaCuidadosEspeciales(boolean necesitaCuidadosEspeciales) {
 		this.necesitaCuidadosEspeciales = necesitaCuidadosEspeciales;
+	}
+
+	public boolean isNecesitaAcogida() {
+		return necesitaAcogida;
+	}
+
+	public void setNecesitaAcogida(boolean necesitaAcogida) {
+		this.necesitaAcogida = necesitaAcogida;
 	}
 
 	public boolean isPositivoLeucemia() {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
-import { PawPrint, ClipboardList, FileText, AlertTriangle, ChevronRight, User } from 'lucide-react';
+import { PawPrint, ClipboardList, FileText, AlertTriangle, ChevronRight, User, Home } from 'lucide-react';
 import { useApp, useAuth } from '../../context/AppContext';
 import { AnimalStatusBadge } from '../../components/StatusBadge';
 
@@ -66,6 +66,7 @@ export default function DashboardHome() {
   const { currentUser, token, canAccess } = useAuth();
 
   const [adopcionesPendientes, setAdopcionesPendientes] = useState(0);
+  const [acogidasPendientes, setAcogidasPendientes] = useState(0);
 
   useEffect(() => {
     if (!token) return;
@@ -74,6 +75,18 @@ export default function DashboardHome() {
       .then((data: any[]) => {
         if (Array.isArray(data)) {
           setAdopcionesPendientes(data.filter(s => s.estado === 'PENDIENTE').length);
+        }
+      })
+      .catch(() => {});
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
+    fetch(`${BASE}/acogidas/solicitudes`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(res => (res.ok ? res.json() : []))
+      .then((data: any[]) => {
+        if (Array.isArray(data)) {
+          setAcogidasPendientes(data.filter(s => s.estado === 'PENDIENTE').length);
         }
       })
       .catch(() => {});
@@ -99,7 +112,7 @@ export default function DashboardHome() {
         <p className="text-gray-500 text-sm mt-1">Aquí tienes un resumen del estado de la protectora.</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <StatCard
           to="/dashboard/animales"
           icon={<PawPrint className="w-5 h-5" style={{ color: '#547792' }} />}
@@ -113,6 +126,14 @@ export default function DashboardHome() {
           icon={<FileText className="w-5 h-5" style={{ color: '#547792' }} />}
           label="Formularios de adopción"
           value={adopcionesPendientes}
+          sub="sin gestionar"
+          color="bg-[#dce8ed]"
+        />
+        <StatCard
+          to="/dashboard/acogidas"
+          icon={<Home className="w-5 h-5" style={{ color: '#547792' }} />}
+          label="Solicitudes de acogida"
+          value={acogidasPendientes}
           sub="sin gestionar"
           color="bg-[#dce8ed]"
         />

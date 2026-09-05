@@ -17,17 +17,18 @@ type FormData = Omit<Animal, 'id' | 'volunteerId' | 'protocolo'>;
 
 const defaultForm: FormData = {
   name: '',
-  species: '',
   breed: '',
   birthDate: '',
-  size: '',
-  gender: '',
-  status: '',
+  species: '' as Species,
+  size: '' as AnimalSize,
+  gender: '' as AnimalGender,
+  status: '' as AnimalStatus,
   description: '',
   imageUrl: '',
   gallery: [],
   needsMedication: false,
   needsSpecialCare: false,
+  needsAcogida: false,
   positivoLeucemia: false,
   positivoInmunodeficiencia: false,
   entryDate: new Date().toISOString().slice(0, 10),
@@ -69,7 +70,7 @@ export default function AnimalForm() {
   const coverInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
 
-  const rol = (currentUser?.role ?? '').toUpperCase();
+  const rol = (currentUser?.rol ?? '').toUpperCase();
   const esAdmin = rol === 'ADMIN';
   const puedeCrear = rol === 'VOLUNTARIO' || rol === 'ENCARGADO' || esAdmin;
 
@@ -80,10 +81,10 @@ export default function AnimalForm() {
         if (!isEdit) {
           setForm(prev => ({
             ...prev,
-            species: data.especies?.[0] ?? '',
-            size: data.tamanyes?.[0] ?? '',
-            gender: data.sexos?.[0] ?? '',
-            status: data.estados?.[0] ?? '',
+            species: (data.especies?.[0] ?? '') as Species,
+            size: (data.tamanyes?.[0] ?? '') as AnimalSize,
+            gender: (data.sexos?.[0] ?? '') as AnimalGender,
+            status: (data.estados?.[0] ?? '') as AnimalStatus,
           }));
         }
       })
@@ -94,7 +95,7 @@ export default function AnimalForm() {
     if (isEdit && id && !animalLoadedRef.current) {
       const animal = animalsTodos.find(a => a.id === id);
       if (animal) {
-        const puedeEditar = esAdmin || animal.volunteerId === currentUser?.id;
+        const puedeEditar = esAdmin || animal.volunteerId === String(currentUser?.id);
         if (!puedeEditar) {
           alert('No puedes editar este animal');
           navigate('/dashboard/animales', { replace: true });
@@ -197,6 +198,7 @@ export default function AnimalForm() {
       compatiblePerrosPequenos: form.goodWithDogsSmall,
       necesitaMedicacion: form.needsMedication,
       necesitaCuidadosEspeciales: form.needsSpecialCare,
+      necesitaAcogida: form.needsAcogida,
       positivoLeucemia: form.positivoLeucemia,
       positivoInmunodeficiencia: form.positivoInmunodeficiencia,
       compatibleNinos: form.goodWithKids,
@@ -429,6 +431,16 @@ export default function AnimalForm() {
               onBlur={e => !errors.description && (e.currentTarget.style.borderColor = '#e5e7eb')} />
             {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
           </div>
+          <label className="flex items-center gap-2 text-sm text-gray-700">
+            <input
+              type="checkbox"
+              checked={form.needsAcogida}
+              onChange={e => setForm({ ...form, needsAcogida: e.target.checked })}
+              className="w-4 h-4"
+              style={{ accentColor: '#547792' }}
+            />
+            Necesita casa de acogida
+        </label>
         </section>
 
         <section className="bg-white rounded-2xl border border-gray-100 p-6">
