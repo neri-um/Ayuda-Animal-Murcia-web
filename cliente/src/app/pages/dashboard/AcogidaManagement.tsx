@@ -342,6 +342,24 @@ export default function AcogidaManagement() {
                         </>
                       )}
 
+                      {a.estado === 'DISPONIBLE' && (
+                        <button
+                          onClick={() => cambiarEstado(a.id, 'NO_DISPONIBLE')}
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors"
+                        >
+                          <Ban className="w-3.5 h-3.5" /> No disponible
+                        </button>
+                      )}
+
+                      {a.estado === 'NO_DISPONIBLE' && (
+                        <button
+                          onClick={() => cambiarEstado(a.id, 'DISPONIBLE')}
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-green-700 bg-green-50 hover:bg-green-100 transition-colors"
+                        >
+                          <Home className="w-3.5 h-3.5" /> Disponible
+                        </button>
+                      )}
+
                       <a
                         href={waLink(a.telefono)}
                         target="_blank"
