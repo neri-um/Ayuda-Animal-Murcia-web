@@ -7,6 +7,7 @@ import { toSlug } from '../utils/slug';
 import type { SolicitudAcogidaRequest } from '../types/acogida';
 import { crearSolicitudAcogida } from '../services/acogidas';
 import { API_BASE as BASE } from '../services/api';
+import { AceptacionClausula } from '../components/colaborar/comun';
 
 interface PreguntaRaw {
   id: string;
@@ -29,7 +30,7 @@ function mapTipo(tipo: string, tieneOpciones: boolean): string {
   switch (tipo) {
     case 'paragraph': return 'textarea';
     case 'selection': return 'select';
-    case 'multiple_choice': return 'radio';
+    case 'multiple_choice': return 'checkbox';
     default: return tipo;
   }
 }
@@ -217,6 +218,24 @@ export default function AcogidaAnimalForm() {
             {(p.opciones ?? []).map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
         );
+      case 'checkbox':
+        return (
+          <div className="flex flex-col gap-2">
+            {(p.opciones ?? []).map(o => {
+              const vals = val ? val.split(',').map(s => s.trim()).filter(Boolean) : [];
+              const marcada = vals.includes(o.value);
+              return (
+                <label key={o.value} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                  <input type="checkbox"
+                    checked={marcada}
+                    onChange={() => onChange(marcada ? vals.filter(x => x !== o.value).join(', ') : [...vals, o.value].join(', '))}
+                    style={{ accentColor: '#2e2e2e' }} />
+                  {o.label}
+                </label>
+              );
+            })}
+          </div>
+        );
       case 'radio':
         return (
           <div className="flex flex-col gap-2">
@@ -328,14 +347,13 @@ export default function AcogidaAnimalForm() {
         )}
 
         <section className="bg-white rounded-2xl border border-gray-100 p-6">
-          <p className="text-sm font-semibold uppercase tracking-wide text-gray-400 mb-3 pb-3 border-b border-gray-100">Protección de datos</p>
-          <label className="flex items-start gap-3 cursor-pointer">
-            <input type="checkbox" checked={acepta} onChange={e => setAcepta(e.target.checked)}
-              className="mt-0.5 w-4 h-4" style={{ accentColor: '#2e2e2e' }} />
-            <span className="text-sm text-gray-700">
-              He leído y acepto la cláusula de protección de datos y el tratamiento de mi información para gestionar esta solicitud de acogida.
+          <div className="flex items-center gap-2 mb-5 pb-3 border-b border-gray-100">
+            <span className="text-xs font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full"
+              style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e' }}>
+              Protección de datos
             </span>
-          </label>
+          </div>
+          <AceptacionClausula acepta={acepta} onChange={setAcepta} />
         </section>
 
         {error && <p className="text-sm text-red-600 bg-red-50 rounded-xl px-4 py-3 border border-red-200">{error}</p>}
