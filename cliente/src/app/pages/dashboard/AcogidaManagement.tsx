@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import { Home, PawPrint, Loader2, Search, ChevronDown, ChevronUp, MessageCircle,
   Trash2, CheckCircle, XCircle, ClipboardList, RefreshCw, FileDown, ArrowLeftRight, X,
-  Clock, Ban } from 'lucide-react';
+  Clock, Ban, Pause } from 'lucide-react';
 import { useApp, useAuth } from '../../context/AppContext';
 import { formatEnum } from '../../services/enums';
 import type { Acogida, EstadoAcogida } from '../../types/acogida';
@@ -366,6 +366,13 @@ export default function AcogidaManagement() {
                         title="Exportar PDF"
                       >
                         <FileDown className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => cambiarEstado(a.id, a.estado === 'DISPONIBLE' ? 'NO_DISPONIBLE' : 'DISPONIBLE')}
+                        className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition-colors"
+                        title={a.estado === 'DISPONIBLE' ? 'No disponible' : 'Disponible'}
+                      >
+                        <Pause className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => borrarAcogida(a.id)}
