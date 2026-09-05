@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import { Home, PawPrint, Loader2, Search, ChevronDown, ChevronUp, MessageCircle,
   Trash2, CheckCircle, XCircle, ClipboardList, RefreshCw, FileDown, ArrowLeftRight, X,
-  Clock, Ban } from 'lucide-react';
+  Clock, Ban, Pause } from 'lucide-react';
 import { useApp, useAuth } from '../../context/AppContext';
 import { formatEnum } from '../../services/enums';
 import type { Acogida, EstadoAcogida } from '../../types/acogida';
@@ -342,24 +342,6 @@ export default function AcogidaManagement() {
                         </>
                       )}
 
-                      {a.estado === 'DISPONIBLE' && (
-                        <button
-                          onClick={() => cambiarEstado(a.id, 'NO_DISPONIBLE')}
-                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors"
-                        >
-                          <Ban className="w-3.5 h-3.5" /> No disponible
-                        </button>
-                      )}
-
-                      {a.estado === 'NO_DISPONIBLE' && (
-                        <button
-                          onClick={() => cambiarEstado(a.id, 'DISPONIBLE')}
-                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-green-700 bg-green-50 hover:bg-green-100 transition-colors"
-                        >
-                          <Home className="w-3.5 h-3.5" /> Disponible
-                        </button>
-                      )}
-
                       <a
                         href={waLink(a.telefono)}
                         target="_blank"
@@ -384,6 +366,13 @@ export default function AcogidaManagement() {
                         title="Exportar PDF"
                       >
                         <FileDown className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => cambiarEstado(a.id, a.estado === 'DISPONIBLE' ? 'NO_DISPONIBLE' : 'DISPONIBLE')}
+                        className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition-colors"
+                        title={a.estado === 'DISPONIBLE' ? 'No disponible' : 'Disponible'}
+                      >
+                        <Pause className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => borrarAcogida(a.id)}
