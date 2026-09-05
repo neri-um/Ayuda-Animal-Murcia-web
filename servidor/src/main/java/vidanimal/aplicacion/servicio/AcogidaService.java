@@ -76,13 +76,14 @@ public class AcogidaService implements AcogidaUseCase {
         solicitud.setAcogida(acogida);
         acogida.setSolicitud(solicitud);
 
-        SolicitudAcogida solicitudGuardada = solicitudRepo.guardar(solicitud);
+        // Guardar la casa de acogida (cascade ALL persiste tambien la solicitud y su FK acogida_id)
+        acogidaRepo.guardar(acogida);
 
         String nombreAnimal = solicitud.getAnimal() != null ? solicitud.getAnimal().getNombre() : "casa de acogida";
         notificacionService.enviarNuevaSolicitud(TipoCuestionario.ACOGIDA, nombreAnimal,
                 solicitud.getNombreAcogida(), solicitud.getEmail(), solicitud.getTelefono(), solicitud.getDni());
 
-        return solicitudGuardada;
+        return acogida.getSolicitud();
     }
 
     @Override
