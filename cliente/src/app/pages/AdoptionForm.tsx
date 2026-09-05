@@ -35,7 +35,7 @@ function mapTipo(tipo: string, tieneOpciones: boolean): string {
   switch (tipo) {
     case 'paragraph': return 'textarea';
     case 'selection': return 'select';
-    case 'multiple_choice': return 'radio';
+    case 'multiple_choice': return 'checkbox';
     default: return tipo;
   }
 }
@@ -313,6 +313,24 @@ useEffect(() => {
             <option value="">Selecciona una opción</option>
             {(p.opciones ?? []).map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
+        );
+      case 'checkbox':
+        return (
+          <div className="flex flex-col gap-2">
+            {(p.opciones ?? []).map(o => {
+              const vals = val ? val.split(',').map(s => s.trim()).filter(Boolean) : [];
+              const marcada = vals.includes(o.value);
+              return (
+                <label key={o.value} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                  <input type="checkbox"
+                    checked={marcada}
+                    onChange={() => onChange(marcada ? vals.filter(x => x !== o.value).join(', ') : [...vals, o.value].join(', '))}
+                    style={{ accentColor: '#2e2e2e' }} />
+                  {o.label}
+                </label>
+              );
+            })}
+          </div>
         );
       case 'radio':
         return (
