@@ -198,7 +198,7 @@ export default function AcogidaAnimalForm() {
   }
 
   const focusStyle = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-    (e.currentTarget.style.borderColor = '#547792');
+    (e.currentTarget.style.borderColor = '#2e2e2e');
   const blurStyle = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     (e.currentTarget.style.borderColor = '#e5e7eb');
 
@@ -224,7 +224,7 @@ export default function AcogidaAnimalForm() {
               <label key={o.value} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
                 <input type="radio" name={p.id} value={o.value} checked={val === o.value}
                   onChange={() => onChange(o.value)} required={p.obligatoria}
-                  style={{ accentColor: '#547792' }} />
+                  style={{ accentColor: '#2e2e2e' }} />
                 {o.label}
               </label>
             ))}
@@ -247,7 +247,12 @@ export default function AcogidaAnimalForm() {
 
   const datosPersonalesSection = (
     <section className="bg-white rounded-2xl border border-gray-100 p-6">
-      <p className="text-sm font-semibold uppercase tracking-wide text-gray-400 mb-5 pb-3 border-b border-gray-100">Datos personales</p>
+      <div className="flex items-center gap-2 mb-5 pb-3 border-b border-gray-100">
+        <span className="text-xs font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full"
+          style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e' }}>
+          Datos personales
+        </span>
+      </div>
       <div className="flex flex-col gap-4">
         {[
           { label: 'Nombre completo *', field: 'name', type: 'text', placeholder: 'María García López' },
@@ -279,7 +284,7 @@ export default function AcogidaAnimalForm() {
         <img src={animal.imageUrl} alt={animal.name} className="w-20 h-20 rounded-xl object-cover flex-shrink-0" />
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Home className="w-4 h-4" style={{ color: '#547792' }} />
+            <Home className="w-4 h-4" style={{ color: '#e8a020' }} />
             <span className="text-sm" style={{ color: '#2e2e2e' }}>Formulario de acogida</span>
           </div>
           <h2 className="text-gray-900">Acoger a {animal.name}</h2>
@@ -326,7 +331,7 @@ export default function AcogidaAnimalForm() {
           <p className="text-sm font-semibold uppercase tracking-wide text-gray-400 mb-3 pb-3 border-b border-gray-100">Protección de datos</p>
           <label className="flex items-start gap-3 cursor-pointer">
             <input type="checkbox" checked={acepta} onChange={e => setAcepta(e.target.checked)}
-              className="mt-0.5 w-4 h-4" style={{ accentColor: '#547792' }} />
+              className="mt-0.5 w-4 h-4" style={{ accentColor: '#2e2e2e' }} />
             <span className="text-sm text-gray-700">
               He leído y acepto la cláusula de protección de datos y el tratamiento de mi información para gestionar esta solicitud de acogida.
             </span>

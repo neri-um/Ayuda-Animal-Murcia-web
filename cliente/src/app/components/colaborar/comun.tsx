@@ -7,11 +7,30 @@ export function Seccion({
   titulo,
   descripcion,
   children,
+  formato = 'titulo',
 }: {
   titulo: string;
   descripcion?: string;
   children: React.ReactNode;
+  formato?: 'titulo' | 'card';
 }) {
+  const cabecera = (
+    <div className="flex items-center gap-2 mb-5 pb-3 border-b border-gray-100">
+      <span className="text-xs font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full"
+        style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e' }}>
+        {titulo}
+      </span>
+    </div>
+  );
+  if (formato === 'card') {
+    return (
+      <section className="bg-white rounded-2xl border border-gray-100 p-6 mb-6">
+        {cabecera}
+        {descripcion && <p className="text-sm text-gray-500 mb-4">{descripcion}</p>}
+        <div className="flex flex-col gap-4">{children}</div>
+      </section>
+    );
+  }
   return (
     <div className="mb-8">
       <h3 className="text-lg font-bold mb-1" style={{ color: '#2e2e2e' }}>
