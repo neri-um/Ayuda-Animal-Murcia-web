@@ -25,6 +25,7 @@ public class AnimalNuevoDTO {
 	private boolean compatiblePerrosPequenos;
 	private boolean necesitaMedicacion;
 	private boolean necesitaCuidadosEspeciales;
+	private boolean necesitaAcogida;
 	private boolean positivoLeucemia;
 	private boolean positivoInmunodeficiencia;
 	private boolean compatibleNinos;
@@ -55,6 +56,7 @@ public class AnimalNuevoDTO {
 		animal.setCompatiblePerrosPequenos(compatiblePerrosPequenos);
 		animal.setNecesitaMedicacion(necesitaMedicacion);
 		animal.setNecesitaCuidadosEspeciales(necesitaCuidadosEspeciales);
+		animal.setNecesitaAcogida(necesitaAcogida);
 		animal.setPositivoLeucemia(positivoLeucemia);
 		animal.setPositivoInmunodeficiencia(positivoInmunodeficiencia);
 		animal.setCompatibleNinos(compatibleNinos);
@@ -208,6 +210,14 @@ public class AnimalNuevoDTO {
 
 	public void setNecesitaCuidadosEspeciales(boolean necesitaCuidadosEspeciales) {
 		this.necesitaCuidadosEspeciales = necesitaCuidadosEspeciales;
+	}
+
+	public boolean isNecesitaAcogida() {
+		return necesitaAcogida;
+	}
+
+	public void setNecesitaAcogida(boolean necesitaAcogida) {
+		this.necesitaAcogida = necesitaAcogida;
 	}
 
 	public boolean isPositivoLeucemia() {

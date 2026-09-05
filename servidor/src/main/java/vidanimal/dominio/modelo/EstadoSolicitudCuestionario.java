@@ -1,5 +1,5 @@
 package vidanimal.dominio.modelo;
 
-public enum EstadoSolicitudAdopcion {
+public enum EstadoSolicitudCuestionario {
     PENDIENTE, ACEPTADA, RECHAZADA
 }

@@ -13,9 +13,10 @@ import vidanimal.aplicacion.output.SolicitudAdopcionRepositorioPort;
 import vidanimal.dominio.excepcion.RecursoNoEncontradoException;
 import vidanimal.dominio.modelo.Animal;
 import vidanimal.dominio.modelo.Especie;
-import vidanimal.dominio.modelo.EstadoSolicitudAdopcion;
+import vidanimal.dominio.modelo.EstadoSolicitudCuestionario;
 import vidanimal.dominio.modelo.FormularioAdopcion;
 import vidanimal.dominio.modelo.SolicitudAdopcion;
+import vidanimal.dominio.modelo.TipoCuestionario;
 
 @Service
 public class AdopcionService implements AdopcionUseCase {
@@ -23,12 +24,12 @@ public class AdopcionService implements AdopcionUseCase {
     private final AnimalRepositorioPort animalRepo;
     private final FormularioAdopcionRepositorioPort formularioRepo;
     private final SolicitudAdopcionRepositorioPort solicitudRepo;
-    private final NotificacionSolicitudAdopcionService notificacionService;
+    private final NotificacionService notificacionService;
 
     public AdopcionService(AnimalRepositorioPort animalRepo,
                            FormularioAdopcionRepositorioPort formularioRepo,
                            SolicitudAdopcionRepositorioPort solicitudRepo,
-                           NotificacionSolicitudAdopcionService notificacionService) {
+                           NotificacionService notificacionService) {
         this.animalRepo = animalRepo;
         this.formularioRepo = formularioRepo;
         this.solicitudRepo = solicitudRepo;
@@ -56,10 +57,12 @@ public class AdopcionService implements AdopcionUseCase {
             .orElseThrow(() -> new RecursoNoEncontradoException("Animal no encontrado: " + animalId));
         solicitud.setAnimal(animal);
         solicitud.setFechaSolicitud(LocalDate.now());
-        solicitud.setEstado(EstadoSolicitudAdopcion.PENDIENTE);
+        solicitud.setEstado(EstadoSolicitudCuestionario.PENDIENTE);
         solicitud.setRespuestas(respuestasJson);
         SolicitudAdopcion solicitudGuardada = solicitudRepo.guardar(solicitud);
-        notificacionService.enviarNuevaSolicitud(solicitudGuardada);
+        String nombreAnimal = animal.getNombre();
+        notificacionService.enviarNuevaSolicitud(TipoCuestionario.ADOPCION, nombreAnimal,
+                solicitud.getNombreAdoptante(), solicitud.getEmail(), solicitud.getTelefono(), solicitud.getDni());
 
         return solicitudGuardada;
     }
@@ -70,7 +73,7 @@ public class AdopcionService implements AdopcionUseCase {
     }
 
     @Override
-    public SolicitudAdopcion cambiarEstado(Long id, EstadoSolicitudAdopcion nuevoEstado) {
+    public SolicitudAdopcion cambiarEstado(Long id, EstadoSolicitudCuestionario nuevoEstado) {
         SolicitudAdopcion s = solicitudRepo.buscarPorId(id)
             .orElseThrow(() -> new RecursoNoEncontradoException("Solicitud no encontrada: " + id));
         s.setEstado(nuevoEstado);

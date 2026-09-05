@@ -30,6 +30,7 @@ public class AnimalPublicoDTO {
 	private boolean compatiblePerrosPequenos;
 	private boolean necesitaMedicacion;
 	private boolean necesitaCuidadosEspeciales;
+	private boolean necesitaAcogida;
 	private boolean positivoLeucemia;
 	private boolean positivoInmunodeficiencia;
 	private boolean compatibleNinos;
@@ -62,6 +63,7 @@ public class AnimalPublicoDTO {
 		dto.compatiblePerrosPequenos = a.isCompatiblePerrosPequenos();
 		dto.necesitaMedicacion = a.isNecesitaMedicacion();
 		dto.necesitaCuidadosEspeciales = a.isNecesitaCuidadosEspeciales();
+		dto.necesitaAcogida = a.isNecesitaAcogida();
 		dto.positivoLeucemia = a.isPositivoLeucemia();
 		dto.positivoInmunodeficiencia = a.isPositivoInmunodeficiencia();
 		dto.compatibleNinos = a.isCompatibleNinos();
@@ -148,6 +150,10 @@ public class AnimalPublicoDTO {
 
 	public boolean isNecesitaCuidadosEspeciales() {
 		return necesitaCuidadosEspeciales;
+	}
+
+	public boolean isNecesitaAcogida() {
+		return necesitaAcogida;
 	}
 
 	public boolean isPositivoLeucemia() {

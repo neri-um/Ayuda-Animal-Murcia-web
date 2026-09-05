@@ -30,7 +30,7 @@ export interface FormularioAdopcionAdmin {
   preguntasRaw: string; // JSON crudo como string
 }
 
-export type EstadoSolicitudAdopcion = 'PENDIENTE' | 'ACEPTADA' | 'RECHAZADA';
+export type EstadoSolicitudCuestionario = 'PENDIENTE' | 'ACEPTADA' | 'RECHAZADA';
 
 export interface SolicitudAdopcion {
   id: number;
@@ -41,7 +41,7 @@ export interface SolicitudAdopcion {
   telefono: string;
   dni: string;
   fechaSolicitud: string;
-  estado: EstadoSolicitudAdopcion;
+  estado: EstadoSolicitudCuestionario;
   respuestas: Record<string, string>; // { preguntaId: valorRespuesta }
 }
 
