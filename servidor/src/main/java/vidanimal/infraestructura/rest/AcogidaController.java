@@ -68,19 +68,15 @@ public class AcogidaController {
                 // se ignora y se intenta derivar de las respuestas
             }
         }
-        if (dto.getRespuestas() != null) {
-            String tipo = dto.getRespuestas().getOrDefault("tipoAnimal", "");
-            String t = tipo.trim().toLowerCase();
-            if (t.contains("gato")) return Especie.GATO;
-            if (t.contains("perro") || t.contains("perr")) return Especie.PERRO;
-        }
+        Especie derivada = derivarDeRespuestas(dto.getRespuestas());
+        if (derivada != null) return derivada;
         return Especie.PERRO;
     }
 
     // Deriva la especie de la casa de acogida a partir de la respuesta "qué tipo de animal quiere acoger".
-    private Especie derivarEspecieDeRespuestas(Map<String, String> respuestas) {
-        if (respuestas == null) return Especie.PERRO;
-        // Busca en cualquier clave que hable de "tipo de animal"
+    private Especie derivarDeRespuestas(Map<String, String> respuestas) {
+        if (respuestas == null) return null;
+        // Busca en cualquier clave que hable de "tipo de animal" o "tipo de acogida"
         for (Map.Entry<String, String> e : respuestas.entrySet()) {
             String k = e.getKey().toLowerCase();
             if (k.contains("tipo") && (k.contains("animal") || k.contains("acog")) && e.getValue() != null) {
@@ -91,7 +87,12 @@ public class AcogidaController {
                 if (v.contains("roedor")) return Especie.ROEDOR;
             }
         }
-        return Especie.PERRO;
+        return null;
+    }
+
+    private Especie derivarEspecieDeRespuestas(Map<String, String> respuestas) {
+        Especie derivada = derivarDeRespuestas(respuestas);
+        return derivada != null ? derivada : Especie.PERRO;
     }
 
     // Extrae la dirección de las respuestas si existe (clave "domicilio").
