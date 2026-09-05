@@ -25,7 +25,8 @@ class NotificacionServiceTest {
     @BeforeEach
     void setUp() {
         service = new NotificacionService(
-                resendEmailService, "destino@example.com", "https://www.ayudaanimalmurcia.org/dashboard/adopciones");
+                resendEmailService, "destino@example.com", "https://www.ayudaanimalmurcia.org/dashboard/adopciones",
+                "https://www.ayudaanimalmurcia.org/dashboard/acogidas");
     }
 
     @Test
@@ -71,7 +72,7 @@ class NotificacionServiceTest {
     @Test
     void enviarNuevaSolicitud_sinDashboardUrl_noIncluyeEnlace() {
         NotificacionService sinEnlace =
-                new NotificacionService(resendEmailService, "destino@example.com", " ");
+                new NotificacionService(resendEmailService, "destino@example.com", " ", " ");
 
         sinEnlace.enviarNuevaSolicitud(TipoCuestionario.ADOPCION, "Nala",
                 "Ana", "ana@example.com", "600123123", "12345678A");
@@ -89,7 +90,8 @@ class NotificacionServiceTest {
     @Test
     void enviarNuevaSolicitud_sinDestinoNoEnvia() {
         NotificacionService sinDestino =
-                new NotificacionService(resendEmailService, " ", "https://www.ayudaanimalmurcia.org/dashboard/adopciones");
+                new NotificacionService(resendEmailService, " ", "https://www.ayudaanimalmurcia.org/dashboard/adopciones",
+                        "https://www.ayudaanimalmurcia.org/dashboard/acogidas");
 
         sinDestino.enviarNuevaSolicitud(TipoCuestionario.ADOPCION, "Nala",
                 "Ana", "ana@example.com", "600123123", "12345678A");
