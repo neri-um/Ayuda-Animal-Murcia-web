@@ -15,14 +15,17 @@ public class NotificacionService {
 
     private final ResendEmailService resendEmailService;
     private final String mailDestination;
-    private final String dashboardUrl;
+    private final String dashboardAdopcionUrl;
+    private final String dashboardAcogidaUrl;
 
     public NotificacionService(ResendEmailService resendEmailService,
                                                 @Value("${adopcion.mail.destination:}") String mailDestination,
-                                                @Value("${adopcion.mail.dashboard-url:}") String dashboardUrl) {
+                                                @Value("${adopcion.mail.dashboard-url:https://www.ayudaanimalmurcia.org/dashboard/adopciones}") String dashboardAdopcionUrl,
+                                                @Value("${acogida.mail.dashboard-url:https://www.ayudaanimalmurcia.org/dashboard/acogidas}") String dashboardAcogidaUrl) {
         this.resendEmailService = resendEmailService;
         this.mailDestination = mailDestination;
-        this.dashboardUrl = dashboardUrl;
+        this.dashboardAdopcionUrl = dashboardAdopcionUrl;
+        this.dashboardAcogidaUrl = dashboardAcogidaUrl;
     }
 
     @Async("emailExecutor")
@@ -34,12 +37,20 @@ public class NotificacionService {
             return;
         }
 
-        if (nombreAnimal == null || nombreAnimal.isBlank()) {
-            nombreAnimal = "Animal";
+        boolean esAcogida = tipo == TipoCuestionario.ACOGIDA;
+        boolean conAnimal = nombreAnimal != null && !nombreAnimal.isBlank();
+
+        String asunto;
+        if (esAcogida) {
+            asunto = conAnimal
+                    ? "Nueva solicitud de acogida: " + nombreAnimal
+                    : "Nueva solicitud de casa de acogida";
+        } else {
+            asunto = "Nueva solicitud de adopción: " + (conAnimal ? nombreAnimal : "Animal");
         }
 
-        String asunto = "Nueva solicitud de " + etiqueta(tipo) + ": " + nombreAnimal;
-        String texto = construirContenidoCorreo(tipo, nombreAnimal, nombreSolicitante, email, telefono, dni);
+        String texto = construirContenidoCorreo(esAcogida, conAnimal ? nombreAnimal : null,
+                nombreSolicitante, email, telefono, dni);
 
         resendEmailService.enviar(mailDestination, asunto, texto);
     }
@@ -48,16 +59,21 @@ public class NotificacionService {
         return tipo == TipoCuestionario.ACOGIDA ? "acogida" : "adopción";
     }
 
-    private String construirContenidoCorreo(TipoCuestionario tipo, String nombreAnimal,
+    private String construirContenidoCorreo(boolean esAcogida, String nombreAnimal,
             String nombreSolicitante, String email, String telefono, String dni) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Se ha recibido una nueva solicitud de ").append(etiqueta(tipo)).append(".\n\n");
-        sb.append("Animal: ").append(nombreAnimal).append("\n");
+        sb.append("Se ha recibido una nueva solicitud de ").append(esAcogida ? "acogida" : "adopción").append(".\n\n");
+        if (nombreAnimal != null && !nombreAnimal.isBlank()) {
+            sb.append("Animal: ").append(nombreAnimal).append("\n");
+        }
         sb.append("Nombre: ").append(nombreSolicitante != null ? nombreSolicitante : "").append("\n");
         sb.append("Email: ").append(email != null ? email : "").append("\n");
         sb.append("Teléfono: ").append(telefono != null ? telefono : "").append("\n");
-        sb.append("DNI/NIE: ").append(dni != null ? dni : "").append("\n");
+        if (dni != null && !dni.isBlank()) {
+            sb.append("DNI/NIE: ").append(dni).append("\n");
+        }
 
+        String dashboardUrl = esAcogida ? dashboardAcogidaUrl : dashboardAdopcionUrl;
         if (dashboardUrl != null && !dashboardUrl.isBlank()) {
             sb.append("\nEntra al Dashboard para leer el formulario completo y descargarlo:\n");
             sb.append(dashboardUrl).append("\n");
