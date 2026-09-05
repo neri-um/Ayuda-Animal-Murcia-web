@@ -127,7 +127,7 @@ export default function AcogidaForm() {
   return (
     <>
       <h2 className="text-xl font-bold mb-1 flex items-center gap-2" style={{ color: '#2e2e2e' }}>
-        <Home className="w-5 h-5" style={{ color: '#547792' }} />
+        <Home className="w-5 h-5" style={{ color: '#e8a020' }} />
         Solicitud para casa de acogida temporal
       </h2>
       <p className="text-sm mb-6" style={{ color: '#727272' }}>
@@ -135,14 +135,14 @@ export default function AcogidaForm() {
       </p>
 
       <form onSubmit={handleSubmit}>
-        <Seccion titulo="Datos personales" descripcion="Así podremos ponernos en contacto contigo.">
+        <Seccion formato="card" titulo="Datos personales" descripcion="Así podremos ponernos en contacto contigo.">
           <CampoTexto label="Correo" required type="email" placeholder="tucorreo@ejemplo.com" value={datos.correo} onChange={set('correo')} />
           <CampoTexto label="Nombre completo" required placeholder="Tu nombre completo" value={datos.nombre} onChange={set('nombre')} />
           <CampoTexto label="DNI" required placeholder="12345678A" value={datos.dni} onChange={set('dni')} />
           <CampoTexto label="Número de teléfono de contacto" required type="tel" placeholder="600 000 000" value={datos.telefono} onChange={set('telefono')} />
         </Seccion>
 
-        <Seccion titulo="Hogar" descripcion="Cuéntanos cómo es tu vivienda para encontrar el animal adecuado.">
+        <Seccion formato="card" titulo="Hogar" descripcion="Cuéntanos cómo es tu vivienda para encontrar el animal adecuado.">
           <CampoTexto label="Domicilio" required placeholder="Calle, número, ciudad..." value={datos.domicilio} onChange={set('domicilio')} />
           <CampoTexto label="Tipo de vivienda" required placeholder="Piso, casa adosada, chalé..." value={datos.tipoVivienda} onChange={set('tipoVivienda')} />
           <PreguntaOpciones label="¿La vivienda es propia o de alquiler?" required opciones={['Propia', 'Alquiler']} value={datos.propiedad} onChange={set('propiedad')} />
@@ -153,7 +153,7 @@ export default function AcogidaForm() {
           <PreguntaOpciones label="¿Tiene vehículo propio y disponibilidad para transportar al animal en caso de urgencia o visita veterinaria?" required conOtro opciones={['Sí', 'No']} value={datos.vehiculo} onChange={set('vehiculo')} />
         </Seccion>
 
-        <Seccion titulo="El exterior y las ventanas" descripcion="¿Cómo es el acceso al exterior y la seguridad del hogar?">
+        <Seccion formato="card" titulo="El exterior y las ventanas" descripcion="¿Cómo es el acceso al exterior y la seguridad del hogar?">
           <PreguntaOpciones label="Jardín" multiple opciones={ESTADO_EXTERIOR} value={datos.jardin} onChange={set('jardin')} />
           <PreguntaOpciones label="Patio" multiple opciones={ESTADO_EXTERIOR} value={datos.patio} onChange={set('patio')} />
           <PreguntaOpciones label="Balcón" multiple opciones={ESTADO_EXTERIOR} value={datos.balcon} onChange={set('balcon')} />
@@ -164,7 +164,7 @@ export default function AcogidaForm() {
           <PreguntaOpciones label="En caso de no disponer de protecciones, ¿estaría dispuesto a ponerlas?" required conOtro opciones={['Sí', 'No']} value={datos.dispuestoProteger} onChange={set('dispuestoProteger')} />
         </Seccion>
 
-        <Seccion titulo="Convivencia con otros animales" descripcion="Para cuidar la salud de todos.">
+        <Seccion formato="card" titulo="Convivencia con otros animales" descripcion="Para cuidar la salud de todos.">
           <CampoTexto label="¿Cuántas horas al día pasaría el animal solo en casa aproximadamente?" required type="number" placeholder="8" value={datos.horasSolo} onChange={set('horasSolo')} />
           <div>
             <CampoTexto label="¿Hay más animales en casa? Cuéntanos sobre ellos" required multiline placeholder="Especie, edad, carácter..." value={datos.otrosAnimales} onChange={set('otrosAnimales')} />
@@ -174,7 +174,7 @@ export default function AcogidaForm() {
           <PreguntaOpciones label="¿Están vacunados anualmente los animales que habitan en su casa de la rabia y de la polivalente?" required conOtro opciones={['Sí', 'No']} value={datos.vacunados} onChange={set('vacunados')} />
         </Seccion>
 
-        <Seccion titulo="Sobre la acogida" descripcion="Cuéntanos qué tipo de animal y durante cuánto tiempo podrías acoger.">
+        <Seccion formato="card" titulo="Sobre la acogida" descripcion="Cuéntanos qué tipo de animal y durante cuánto tiempo podrías acoger.">
           <PreguntaOpciones label="¿Cuánto tiempo podría ofrecerse como casa de acogida para un animal? (El tiempo puede variar según la necesidad del animal)" conOtro opciones={['Tiempo indefinido (hasta la adopción)']} value={datos.tiempoAcogida} onChange={set('tiempoAcogida')} />
           <PreguntaOpciones label="¿Qué tipo de animal le gustaría acoger?" required conOtro opciones={['Perro', 'Gato']} value={datos.tipoAnimal} onChange={set('tipoAnimal')} />
           <PreguntaOpciones label="¿Estaría dispuesto a trabajar algún comportamiento inadecuado?" required conOtro opciones={['Sí', 'No']} value={datos.comportamiento} onChange={set('comportamiento')} />
@@ -184,7 +184,7 @@ export default function AcogidaForm() {
           </div>
         </Seccion>
 
-        <Seccion titulo="Protección de datos">
+        <Seccion formato="card" titulo="Protección de datos">
           <div>
             <AceptacionClausula acepta={acepta} onChange={setAcepta} />
           </div>
@@ -204,11 +204,11 @@ export default function AcogidaForm() {
           type="submit"
           disabled={enviando || !acepta}
           className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{ backgroundColor: '#547792', color: '#ffffff' }}
+          style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e' }}
         >
           {enviando ? (
             <>
-              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <span className="w-4 h-4 border-2 border-[#2e2e2e] border-t-transparent rounded-full animate-spin" />
               Enviando...
             </>
           ) : (
