@@ -72,6 +72,11 @@ export function formatEnum(val: string): string {
     DEVOLUCION_NOTIFICADA: 'Devolución notificada',
     DEVUELTA: 'Devuelta',
 
+    // Estados de acogida
+    ACTIVA: 'En acogida activa',
+    DISPONIBLE: 'Disponible',
+    NO_DISPONIBLE: 'No disponible',
+
     VOLUNTARIO: 'Voluntario/a',
     ENCARGADO: 'Encargado/a',
     ADMIN: 'Administrador/a',

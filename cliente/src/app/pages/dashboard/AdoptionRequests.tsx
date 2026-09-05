@@ -2,11 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { ClipboardList, CheckCircle, XCircle, Clock, Search, ChevronDown, ChevronUp, Loader2, FileDown, ArrowLeftRight, X, Trash2 } from 'lucide-react';
 import { useApp, useAuth } from '../../context/AppContext';
 import { useEnums, formatEnum } from '../../hooks/useEnums';
-import type { SolicitudAdopcion, EstadoSolicitudAdopcion } from '../../types/adoption';
+import type { SolicitudAdopcion, EstadoSolicitudCuestionario } from '../../types/adoption';
 
 import { API_BASE as BASE, leerMensajeError } from '../../services/api';
 
-const ESTADO_COLORS: Record<EstadoSolicitudAdopcion, string> = {
+const ESTADO_COLORS: Record<EstadoSolicitudCuestionario, string> = {
   PENDIENTE: 'bg-amber-100 text-amber-700',
   ACEPTADA:  'bg-green-100 text-green-700',
   RECHAZADA: 'bg-red-100 text-red-600',
@@ -25,7 +25,7 @@ export default function AdoptionRequests() {
     secciones: { titulo: string; ids: string[] }[];
   }[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filtroEstado, setFiltroEstado] = useState<EstadoSolicitudAdopcion | 'TODAS'>('TODAS');
+  const [filtroEstado, setFiltroEstado] = useState<EstadoSolicitudCuestionario | 'TODAS'>('TODAS');
   const [busqueda, setBusqueda] = useState('');
   const [expandida, setExpandida] = useState<number | null>(null);
   const [actualizando, setActualizando] = useState<number | null>(null);
@@ -120,7 +120,7 @@ export default function AdoptionRequests() {
   useEffect(() => { fetchSolicitudes(); }, [fetchSolicitudes]);
   useEffect(() => { fetchPreguntas(); }, [fetchPreguntas]);
 
-  const cambiarEstado = async (id: number, nuevoEstado: EstadoSolicitudAdopcion) => {
+  const cambiarEstado = async (id: number, nuevoEstado: EstadoSolicitudCuestionario) => {
     setActualizando(id);
     try {
       const res = await fetch(`${BASE}/adopciones/${id}/estado`, {
@@ -321,7 +321,7 @@ export default function AdoptionRequests() {
           {estadosFiltro.map(estado => (
             <button
               key={estado}
-              onClick={() => setFiltroEstado(estado as EstadoSolicitudAdopcion | 'TODAS')}
+              onClick={() => setFiltroEstado(estado as EstadoSolicitudCuestionario | 'TODAS')}
               className={`px-3 py-2 rounded-xl text-xs font-medium transition-colors border ${
                 filtroEstado === estado
                   ? 'text-white border-transparent'
@@ -540,7 +540,7 @@ export default function AdoptionRequests() {
                 .filter(a => String(a.id) !== String(solicitudes.find(x => x.id === reubicarId)?.animalId))
                 .map(a => (
                   <option key={a.id} value={a.id}>
-                    {a.name} — {formatEnum(a.species)}
+                    {a.name} 
                   </option>
                 ))}
             </select>
@@ -581,7 +581,7 @@ export default function AdoptionRequests() {
             </div>
             <p className="text-sm text-gray-500 mb-4">
               ¿Seguro que quieres eliminar la solicitud de{' '}
-              <strong>{solicitudes.find(x => x.id === borrarId)?.nombre ?? 'este solicitante'}</strong> para{' '}
+              <strong>{solicitudes.find(x => x.id === borrarId)?.nombreAdoptante ?? 'este solicitante'}</strong> para{' '}
               <strong>{solicitudes.find(x => x.id === borrarId)?.animalNombre ?? 'este animal'}</strong>?
               Esta acción no se puede deshacer.
             </p>

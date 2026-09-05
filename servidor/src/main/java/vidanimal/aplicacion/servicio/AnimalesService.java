@@ -67,6 +67,7 @@ public class AnimalesService implements AnimalesUseCase {
         animalConProtocolo.setCompatiblePerrosPequenos(animal.isCompatiblePerrosPequenos());
         animalConProtocolo.setNecesitaMedicacion(animal.isNecesitaMedicacion());
         animalConProtocolo.setNecesitaCuidadosEspeciales(animal.isNecesitaCuidadosEspeciales());
+        animalConProtocolo.setNecesitaAcogida(animal.isNecesitaAcogida());
         animalConProtocolo.setPositivoLeucemia(animal.isPositivoLeucemia());
         animalConProtocolo.setPositivoInmunodeficiencia(animal.isPositivoInmunodeficiencia());
         animalConProtocolo.setCompatibleNinos(animal.isCompatibleNinos());
@@ -103,6 +104,7 @@ public class AnimalesService implements AnimalesUseCase {
         animal.setCompatiblePerrosPequenos(datosNuevos.isCompatiblePerrosPequenos());
         animal.setNecesitaMedicacion(datosNuevos.isNecesitaMedicacion());
         animal.setNecesitaCuidadosEspeciales(datosNuevos.isNecesitaCuidadosEspeciales());
+        animal.setNecesitaAcogida(datosNuevos.isNecesitaAcogida());
         animal.setPositivoLeucemia(datosNuevos.isPositivoLeucemia());
         animal.setPositivoInmunodeficiencia(datosNuevos.isPositivoInmunodeficiencia());
         animal.setCompatibleNinos(datosNuevos.isCompatibleNinos());

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Send, AlertCircle, Home } from 'lucide-react';
 import { CampoTexto, PreguntaOpciones } from './campos';
 import { Seccion, AceptacionClausula, ExitoFormulario } from './comun';
-import { enviarColaboracion } from '../../services/colaboracion';
+import { crearAcogida } from '../../services/acogidas';
 
 const ESTADO_EXTERIOR = ['Sí, completamente protegido/cercado', 'Sí, pero no está protegido/cercado', 'No tengo'];
 const PROTECCIONES = ['Mosquiteras (deben estar en buen estado)', 'Malla', 'Red'];
@@ -97,7 +97,15 @@ export default function AcogidaForm() {
         'Animal en concreto': datos.animalConcreto || '—',
         'Comentario adicional': datos.comentario || '—',
       };
-      await enviarColaboracion('ACOGIDA', datos.correo, respuestas);
+      await crearAcogida({
+        nombre: datos.nombre,
+        apellidos: '',
+        telefono: datos.telefono,
+        email: datos.correo,
+        direccion: datos.domicilio,
+        especie: null,
+        respuestas,
+      });
       setEnviado(true);
     } catch (err: any) {
       setError(err?.message ?? 'No se pudo enviar la solicitud. Inténtalo de nuevo.');

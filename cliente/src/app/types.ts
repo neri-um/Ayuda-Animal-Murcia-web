@@ -36,6 +36,7 @@ export interface Animal {
   gallery?: string[];
   needsMedication: boolean;
   needsSpecialCare: boolean;
+  needsAcogida: boolean;
   positivoLeucemia: boolean;
   positivoInmunodeficiencia: boolean;
   entryDate: string;
