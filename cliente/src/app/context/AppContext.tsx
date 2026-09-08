@@ -350,6 +350,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const cancelRetry = useRef(false);
   // Evita cierres de sesión duplicados (p.ej. interceptor 401 + temporizador)
   const logoutEnProgreso = useRef(false);
+  // Animal del mes que no está en la lista pública (ADOPTADO/FALLECIDO/PRE_ADOPCION)
+  // para que la tarjeta del Home y su ficha sigan funcionando tras "salir" de adopción.
+  const animalDelMesExtraRef = useRef<Animal | null>(null);
 
   useEffect(() => {
     cancelRetry.current = false;
@@ -358,6 +361,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       if (cancelRetry.current) return;
       setAnimalDelMesIdState(id);
       saveAnimalDelMesCache(id);
+      if (!id) return;
+      fetch(`${BASE}/animales/${id}`)
+        .then(r => (r.ok ? r.json() : null))
+        .then(data => {
+          if (cancelRetry.current || !data) return;
+          const animal = mapAnimalFromBackend(data);
+          animalDelMesExtraRef.current = animal;
+          setAnimals(prev =>
+            prev.some(a => a.id === animal.id)
+              ? prev
+              : [...prev, animal]
+          );
+        })
+        .catch(() => { /* si falla, simplemente no se muestra la tarjeta */ });
     });
 
     return () => { cancelRetry.current = true; };
@@ -384,7 +401,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const contentType = res.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
         const data = await res.json();
-        setAnimals(Array.isArray(data) ? data.map(mapAnimalFromBackend) : []);
+        const mapeados = Array.isArray(data) ? data.map(mapAnimalFromBackend) : [];
+        if (animalDelMesExtraRef.current
+            && !mapeados.some(a => a.id === animalDelMesExtraRef.current!.id)) {
+          mapeados.push(animalDelMesExtraRef.current);
+        }
+        setAnimals(mapeados);
       } else {
         setAnimals([]);
       }

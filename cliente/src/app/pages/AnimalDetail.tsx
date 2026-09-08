@@ -73,7 +73,7 @@ export default function AnimalDetail() {
   const species = speciesLabel[animal?.species ?? ''] ?? 'Animal';
   usePageMeta({
     title: animal
-      ? `${animal.name} – ${species} en adopción en Murcia | Ayuda Animal Murcia`
+      ? `${animal.name} – ${species}${animal.status === 'EN_ADOPCION' ? ' en adopción' : ''} | Ayuda Animal Murcia`
       : 'Animal no encontrado | Ayuda Animal Murcia',
     description: animal
       ? recortarTexto(animal.description || '', 25)
@@ -114,7 +114,9 @@ export default function AnimalDetail() {
   ];
   const currentImage = images[index] || cleanUrl(animal.imageUrl) || '';
   const shareUrl = `${SITE_URL}/animales/${toSlug(animal.name)}`;
-  const shareText = `Adopta a ${animal.name} en Ayuda Animal Murcia`;
+  const shareText = animal.status === 'EN_ADOPCION'
+    ? `Adopta a ${animal.name} en Ayuda Animal Murcia`
+    : `Conoce a ${animal.name} en Ayuda Animal Murcia`;
   const copyLink = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
@@ -170,6 +172,7 @@ export default function AnimalDetail() {
           {animal.status === 'EN_ADOPCION' && <div className="mt-2 flex flex-col gap-2"><div className="flex flex-col gap-2 sm:flex-row sm:gap-2"><Link to={`/adopcion/${toSlug(animal.name)}`} className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl transition-all hover:opacity-80" style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e', fontWeight: 600 }}><Heart className="w-5 h-5" />Quiero adoptar a {animal.name}</Link>{animal.needsAcogida && <Link to={`/acogida/${toSlug(animal.name)}`} className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl transition-all hover:opacity-80 border" style={{ backgroundColor: '#d9d9d9', color: '#2e2e2e', fontWeight: 600, borderColor: '#d9d9d9' }}><Home className="w-5 h-5" />Quiero acoger a {animal.name}</Link>}</div><p className="text-center text-xs text-gray-400 mt-2">Te contactaremos lo antes posible</p></div>}
           {animal.status === 'PRE_ADOPCION' && <div className="rounded-xl p-4 text-sm border" style={{ backgroundColor: '#f0e8d0', borderColor: '#d9d0b8', color: '#2e2e2e' }}><p style={{ fontWeight: 500 }}>En pre-adopción</p><p className="mt-1" style={{ color: '#727272' }}>Este animal está de prueba con una familia. Si te interesa su adopción, puedes consultarnos por mensaje.</p></div>}
           {animal.status === 'ADOPTADO' && <div className="rounded-xl p-4 text-sm border" style={{ backgroundColor: '#f7f7f7', borderColor: '#d9d9d9', color: '#2e2e2e' }}><p style={{ fontWeight: 500 }}>¡Ya tiene hogar!</p><p className="mt-1" style={{ color: '#727272' }}>Este animal ya fue adoptado. ¡Explora nuestros otros animales disponibles!</p><Link to="/adoptar" className="underline mt-2 block" style={{ color: '#2e2e2e' }}>Ver otros animales</Link></div>}
+          {animal.status === 'FALLECIDO' && <div className="rounded-xl p-4 text-sm border" style={{ backgroundColor: '#f3f4f6', borderColor: '#e5e7eb', color: '#2e2e2e' }}><p style={{ fontWeight: 500 }}>En el recuerdo</p><p className="mt-1" style={{ color: '#727272' }}>Tristemente, este animal falleció. Guardamos su memoria con cariño. Si quieres dar un hogar a otro animal, mira los que siguen esperando.</p><Link to="/adoptar" className="underline mt-2 block" style={{ color: '#2e2e2e' }}>Ver otros animales</Link></div>}
       </div>
       </div>
 
