@@ -70,7 +70,7 @@ export default function AnimalForm() {
   const coverInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
 
-  const rol = (currentUser?.rol ?? '').toUpperCase();
+  const rol = (currentUser?.role ?? '').toUpperCase();
   const esAdmin = rol === 'ADMIN';
   const puedeCrear = rol === 'VOLUNTARIO' || rol === 'ENCARGADO' || esAdmin;
 
