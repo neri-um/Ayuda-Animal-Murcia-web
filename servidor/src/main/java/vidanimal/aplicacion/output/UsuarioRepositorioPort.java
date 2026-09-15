@@ -11,7 +11,7 @@ public interface UsuarioRepositorioPort {
 
 	Optional<Usuario> buscarPorId(Long id);
 
-	Optional<Usuario> buscarPorEmail(String email);
+	Optional<Usuario> buscarPorUsuario(String usuario);
 
 	List<Usuario> buscarTodosOrdenados();
 
@@ -19,7 +19,7 @@ public interface UsuarioRepositorioPort {
 
 	List<Usuario> buscarPorNombre(String nombre);
 
-	boolean existePorEmail(String email);
+	boolean existePorUsuario(String usuario);
 
 	void eliminar(Usuario usuario);
 }

@@ -98,7 +98,7 @@ export default function ProductDetail() {
                 <div key={r.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
                   <div>
                     <p className="text-sm text-gray-800" style={{ fontWeight: 500 }}>
-                      {volunteer?.name ?? r.volunteerId}
+                      {volunteer?.nombre ?? r.volunteerId}
                     </p>
                     <p className="text-xs text-gray-400">
                       Solicitado el {new Date(r.requestDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
@@ -137,7 +137,7 @@ export default function ProductDetail() {
                 <div key={r.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
                   <div>
                     <p className="text-sm text-gray-800" style={{ fontWeight: 500 }}>
-                      {volunteer?.name ?? r.volunteerId} · ×{r.quantity}
+                      {volunteer?.nombre ?? r.volunteerId} · ×{r.quantity}
                     </p>
                     <p className="text-xs text-gray-400">
                       {new Date(r.requestDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}

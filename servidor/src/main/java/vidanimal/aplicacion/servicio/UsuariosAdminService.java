@@ -24,11 +24,11 @@ public class UsuariosAdminService implements UsuariosAdminUseCase {
 
     @Override
     public Usuario crearUsuario(Usuario usuario) {
-        if (usuario.getEmail() == null || usuario.getEmail().isBlank()) {
-            throw new RuntimeException("Email obligatorio");
+        if (usuario.getUsuario() == null || usuario.getUsuario().isBlank()) {
+            throw new RuntimeException("Usuario obligatorio");
         }
-        if (usuarioRepo.existePorEmail(usuario.getEmail())) {
-            throw new RuntimeException("Ya existe un usuario con ese email");
+        if (usuarioRepo.existePorUsuario(usuario.getUsuario())) {
+            throw new RuntimeException("Ese usuario ya está en uso");
         }
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
         return usuarioRepo.guardar(usuario);
@@ -40,7 +40,17 @@ public class UsuariosAdminService implements UsuariosAdminUseCase {
                 .orElseThrow(() -> new RecursoNoEncontradoException(
                         "Usuario con id " + id + " no encontrado"));
 
+        if (datos.getUsuario() != null && !datos.getUsuario().isBlank()) {
+            if (usuarioRepo.existePorUsuario(datos.getUsuario()) &&
+                !String.valueOf(usuario.getId()).equals(String.valueOf(
+                    usuarioRepo.buscarPorUsuario(datos.getUsuario())
+                        .map(u -> u.getId()).orElse(null)))) {
+                throw new RuntimeException("Ese usuario ya está en uso");
+            }
+            usuario.setUsuario(datos.getUsuario());
+        }
         if (datos.getNombre() != null)    usuario.setNombre(datos.getNombre());
+        if (datos.getUsuario() != null)    usuario.setUsuario(datos.getUsuario());
         if (datos.getApellidos() != null) usuario.setApellidos(datos.getApellidos());
         if (datos.getTelefono() != null)  usuario.setTelefono(datos.getTelefono());
         if (datos.getRol() != null)       usuario.setRol(datos.getRol());

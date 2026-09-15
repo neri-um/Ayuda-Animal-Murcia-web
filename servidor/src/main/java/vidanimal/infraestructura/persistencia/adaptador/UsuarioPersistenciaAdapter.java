@@ -30,8 +30,8 @@ public class UsuarioPersistenciaAdapter implements UsuarioRepositorioPort {
     }
 
     @Override
-    public Optional<Usuario> buscarPorEmail(String email) {
-        return repositorio.findByEmail(email);
+    public Optional<Usuario> buscarPorUsuario(String usuario) {
+        return repositorio.findByUsuario(usuario);
     }
 
     @Override
@@ -50,8 +50,8 @@ public class UsuarioPersistenciaAdapter implements UsuarioRepositorioPort {
     }
 
     @Override
-    public boolean existePorEmail(String email) {
-        return repositorio.existsByEmail(email);
+    public boolean existePorUsuario(String usuario) {
+        return repositorio.existsByUsuario(usuario);
     }
 
     @Override

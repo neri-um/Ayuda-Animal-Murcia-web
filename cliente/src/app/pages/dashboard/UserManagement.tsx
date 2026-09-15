@@ -23,11 +23,12 @@ const avatarStyleMap: Record<string, React.CSSProperties> = {
 const avatarStyleDefault: React.CSSProperties = { backgroundColor: '#9ca3af' };
 
 type UserFormData = {
-  name: string;
+  usuario: string;
+  nombre: string;
   email: string;
   password: string;
-  role: UserRole;
-  phone: string;
+  rol: UserRole;
+  telefono: string;
 };
 
 function ToggleSwitch({ active, onChange, loading }: { active: boolean; onChange: (val: boolean) => void; loading?: boolean }) {
@@ -59,9 +60,10 @@ export default function UserManagement() {
   const roleOptions: string[] = enums?.roles ?? ['VOLUNTARIO', 'ENCARGADO', 'ADMIN'];
 
   const emptyForm: UserFormData = {
-    name: '', email: '', password: '',
-    role: (roleOptions[0] as UserRole) ?? 'VOLUNTARIO',
-    phone: '',
+    usuario: '',
+    nombre: '', email: '', password: '',
+    rol: (roleOptions[0] as UserRole) ?? 'VOLUNTARIO',
+    telefono: '',
   };
 
   const [search, setSearch] = useState('');
@@ -82,15 +84,15 @@ export default function UserManagement() {
 
   const filtered = users.filter(u => {
     if (u.id === currentUser?.id) return false;
-    if (search && !u.name.toLowerCase().includes(search.toLowerCase()) &&
+    if (search && !u.nombre.toLowerCase().includes(search.toLowerCase()) &&
         !u.email.toLowerCase().includes(search.toLowerCase())) return false;
-    if (roleFilter && u.role !== roleFilter) return false;
+    if (roleFilter && u.rol !== roleFilter) return false;
     return true;
   });
 
   const openAdd = () => {
     setEditId(null);
-    setForm({ ...emptyForm, role: (roleOptions[0] as UserRole) ?? 'VOLUNTARIO' });
+    setForm({ ...emptyForm, rol: (roleOptions[0] as UserRole) ?? 'VOLUNTARIO' });
     setErrors({});
     setApiError(null);
     setShowForm(true);
@@ -98,7 +100,7 @@ export default function UserManagement() {
 
   const openEdit = (user: User) => {
     setEditId(user.id);
-    setForm({ name: user.name, email: user.email, password: '', role: user.role, phone: user.phone || '' });
+    setForm({ usuario: user.usuario, nombre: user.nombre, email: user.email, password: '', rol: user.rol, telefono: user.telefono || '' });
     setErrors({});
     setApiError(null);
     setShowForm(true);
@@ -106,7 +108,8 @@ export default function UserManagement() {
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
-    if (!form.name.trim()) newErrors.name = 'Nombre obligatorio';
+    if (!form.usuario.trim()) newErrors.usuario = 'Usuario obligatorio';
+    if (!form.nombre.trim()) newErrors.nombre = 'Nombre obligatorio';
     if (!form.email.trim()) newErrors.email = 'Email obligatorio';
     if (!editId && !form.password.trim()) newErrors.password = 'Contraseña obligatoria';
     if (form.password && form.password.length < 6) newErrors.password = 'Mínimo 6 caracteres';
@@ -123,11 +126,11 @@ export default function UserManagement() {
     setApiError(null);
     try {
       if (editId) {
-        const updates: Partial<User> = { name: form.name, email: form.email, role: form.role, phone: form.phone };
+        const updates: Partial<User> = { usuario: form.usuario, nombre: form.nombre, email: form.email, rol: form.rol, telefono: form.telefono };
         if (form.password) updates.password = form.password;
         await updateUser(editId, updates);
       } else {
-        await addUser({ name: form.name, email: form.email, password: form.password, role: form.role, phone: form.phone, active: true });
+        await addUser({ usuario: form.usuario, nombre: form.nombre, email: form.email, password: form.password, rol: form.rol, telefono: form.telefono, activo: true });
       }
       setShowForm(false);
     } catch {
@@ -141,7 +144,7 @@ export default function UserManagement() {
     setTogglingId(user.id);
     setApiError(null);
     try {
-      await toggleUserActive(user.id, !user.active);
+      await toggleUserActive(user.id, !user.activo);
     } catch {
       setApiError('Error al cambiar el estado del usuario.');
     } finally {
@@ -153,7 +156,7 @@ export default function UserManagement() {
     setLoading(true);
     setApiError(null);
     try {
-      await toggleUserActive(user.id, !user.active);
+      await toggleUserActive(user.id, !user.activo);
       setConfirmToggle(null);
     } catch {
       setApiError('Error al cambiar el estado del usuario.');
@@ -164,9 +167,9 @@ export default function UserManagement() {
 
   const stats = {
     total:      users.filter(u => u.id !== currentUser?.id).length,
-    active:     users.filter(u => u.active && u.id !== currentUser?.id).length,
-    volunteers: users.filter(u => u.role === 'VOLUNTARIO').length,
-    managers:   users.filter(u => u.role === 'ENCARGADO').length,
+    active:     users.filter(u => u.activo && u.id !== currentUser?.id).length,
+    volunteers: users.filter(u => u.rol === 'VOLUNTARIO').length,
+    managers:   users.filter(u => u.rol === 'ENCARGADO').length,
   };
 
   return (
@@ -252,36 +255,36 @@ export default function UserManagement() {
             {filtered.map(user => (
               <div
                 key={user.id}
-                className={`flex flex-col md:grid md:grid-cols-[3fr_2fr_2fr_1fr_auto] gap-4 items-start md:items-center px-6 py-4 hover:bg-gray-50 transition-colors ${!user.active ? 'opacity-50' : ''}`}
+                className={`flex flex-col md:grid md:grid-cols-[3fr_2fr_2fr_1fr_auto] gap-4 items-start md:items-center px-6 py-4 hover:bg-gray-50 transition-colors ${!user.activo ? 'opacity-50' : ''}`}
               >
                 <div className="flex items-center gap-3">
                   <div
                     className="w-10 h-10 rounded-full flex items-center justify-center text-white flex-shrink-0"
-                    style={{ ...(avatarStyleMap[user.role] ?? avatarStyleDefault), fontWeight: 600 }}
+                    style={{ ...(avatarStyleMap[user.rol] ?? avatarStyleDefault), fontWeight: 600 }}
                   >
-                    {user.name.charAt(0).toUpperCase()}
+                    {user.nombre.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <p className="text-sm text-gray-800" style={{ fontWeight: 500 }}>{user.name}</p>
+                    <p className="text-sm text-gray-800" style={{ fontWeight: 500 }}>{user.nombre}</p>
                     <span
                       className="text-xs px-2 py-0.5 rounded-full border"
-                      style={roleStyleMap[user.role] ?? roleStyleDefault}
+                      style={roleStyleMap[user.rol] ?? roleStyleDefault}
                     >
-                      {formatEnum(user.role)}
+                      {formatEnum(user.rol)}
                     </span>
                   </div>
                 </div>
                 <span className="text-sm text-gray-500 hidden md:block">{user.email}</span>
-                <span className="text-sm text-gray-500 hidden md:block">{user.phone || '—'}</span>
+                <span className="text-sm text-gray-500 hidden md:block">{user.telefono || '—'}</span>
 
                 <div className="hidden md:flex items-center gap-2">
                   <ToggleSwitch
-                    active={user.active}
+                    active={user.activo}
                     onChange={() => handleToggleDirect(user)}
                     loading={togglingId === user.id}
                   />
-                  <span className="text-xs" style={{ color: user.active ? '#3d7a55' : '#9ca3af' }}>
-                    {user.active ? 'Activo' : 'Inactivo'}
+                  <span className="text-xs" style={{ color: user.activo ? '#3d7a55' : '#9ca3af' }}>
+                    {user.activo ? 'Activo' : 'Inactivo'}
                   </span>
                 </div>
 
@@ -292,12 +295,12 @@ export default function UserManagement() {
                   <button
                     onClick={() => setConfirmToggle(user)}
                     className="p-2 rounded-lg transition-colors"
-                    style={user.active ? { color: '#ef4444' } : { color: '#68B686' }}
-                    onMouseEnter={e => (e.currentTarget.style.backgroundColor = user.active ? '#fee2e2' : '#eaf4ee')}
+                    style={user.activo ? { color: '#ef4444' } : { color: '#68B686' }}
+                    onMouseEnter={e => (e.currentTarget.style.backgroundColor = user.activo ? '#fee2e2' : '#eaf4ee')}
                     onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
-                    title={user.active ? 'Desactivar cuenta' : 'Activar cuenta'}
+                    title={user.activo ? 'Desactivar cuenta' : 'Activar cuenta'}
                   >
-                    {user.active ? <UserX className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
+                    {user.activo ? <UserX className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
@@ -319,14 +322,27 @@ export default function UserManagement() {
                 <label className="block text-sm text-gray-700 mb-1">Nombre completo *</label>
                 <input
                   type="text"
-                  value={form.name}
-                  onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                  value={form.nombre}
+                  onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))}
                   placeholder="María García López"
-                  className={`w-full border rounded-xl px-3 py-2 text-sm focus:outline-none ${errors.name ? 'border-red-400' : 'border-gray-200'}`}
-                  onFocus={e => !errors.name && (e.currentTarget.style.borderColor = '#68B686')}
-                  onBlur={e => !errors.name && (e.currentTarget.style.borderColor = '#e5e7eb')}
+                  className={`w-full border rounded-xl px-3 py-2 text-sm focus:outline-none ${errors.nombre ? 'border-red-400' : 'border-gray-200'}`}
+                  onFocus={e => !errors.nombre && (e.currentTarget.style.borderColor = '#68B686')}
+                  onBlur={e => !errors.nombre && (e.currentTarget.style.borderColor = '#e5e7eb')}
                 />
-                {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+                {errors.nombre && <p className="text-red-500 text-xs mt-1">{errors.nombre}</p>}
+              </div>
+               <div>
+                <label className="block text-sm text-gray-700 mb-1">Nombre de usuario *</label>
+                <input
+                  type="text"
+                  value={form.usuario}
+                  onChange={e => setForm(f => ({ ...f, usuario: e.target.value }))}
+                  placeholder="usuario"
+                  className={`w-full border rounded-xl px-3 py-2 text-sm focus:outline-none ${errors.usuario ? 'border-red-400' : 'border-gray-200'}`}
+                  onFocus={e => !errors.usuario && (e.currentTarget.style.borderColor = '#68B686')}
+                  onBlur={e => !errors.usuario && (e.currentTarget.style.borderColor = '#e5e7eb')}
+                />
+                {errors.usuario && <p className="text-red-500 text-xs mt-1">{errors.usuario}</p>}
               </div>
               <div>
                 <label className="block text-sm text-gray-700 mb-1">Email *</label>
@@ -360,8 +376,8 @@ export default function UserManagement() {
                 <div>
                   <label className="block text-sm text-gray-700 mb-1">Rol *</label>
                   <select
-                    value={form.role}
-                    onChange={e => setForm(f => ({ ...f, role: e.target.value as UserRole }))}
+                    value={form.rol}
+                    onChange={e => setForm(f => ({ ...f, rol: e.target.value as UserRole }))}
                     className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none"
                     onFocus={e => (e.currentTarget.style.borderColor = '#68B686')}
                     onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
@@ -375,8 +391,8 @@ export default function UserManagement() {
                   <label className="block text-sm text-gray-700 mb-1">Teléfono</label>
                   <input
                     type="tel"
-                    value={form.phone}
-                    onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
+                    value={form.telefono}
+                    onChange={e => setForm(f => ({ ...f, telefono: e.target.value }))}
                     placeholder="612 345 678"
                     className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none"
                     onFocus={e => (e.currentTarget.style.borderColor = '#68B686')}
@@ -406,12 +422,12 @@ export default function UserManagement() {
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setConfirmToggle(null)} />
           <div className="relative bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
             <h3 className="text-gray-800 mb-2">
-              {confirmToggle.active ? 'Desactivar cuenta' : 'Activar cuenta'}
+              {confirmToggle.activo ? 'Desactivar cuenta' : 'Activar cuenta'}
             </h3>
             <p className="text-gray-500 text-sm mb-5">
-              {confirmToggle.active
-                ? `¿Desactivar la cuenta de ${confirmToggle.name}? No podrá acceder al sistema.`
-                : `¿Activar la cuenta de ${confirmToggle.name}?`
+              {confirmToggle.activo
+                ? `¿Desactivar la cuenta de ${confirmToggle.nombre}? No podrá acceder al sistema.`
+                : `¿Activar la cuenta de ${confirmToggle.nombre}?`
               }
             </p>
             <div className="flex gap-3">
@@ -420,9 +436,9 @@ export default function UserManagement() {
                 onClick={() => handleToggleActive(confirmToggle)}
                 disabled={loading}
                 className="flex-1 text-white py-2.5 rounded-xl text-sm disabled:opacity-60"
-                style={{ backgroundColor: confirmToggle.active ? '#ef4444' : '#68B686' }}
+                style={{ backgroundColor: confirmToggle.activo ? '#ef4444' : '#68B686' }}
               >
-                {loading ? 'Guardando...' : confirmToggle.active ? 'Desactivar' : 'Activar'}
+                {loading ? 'Guardando...' : confirmToggle.activo ? 'Desactivar' : 'Activar'}
               </button>
             </div>
           </div>

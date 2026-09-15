@@ -176,7 +176,7 @@ export default function Requests() {
 
                     {isManager && volunteer && (
                       <p className="text-xs text-gray-400 mb-2">
-                        Solicitado por: <span className="text-gray-600">{volunteer.name}</span>
+                        Solicitado por: <span className="text-gray-600">{volunteer.nombre}</span>
                       </p>
                     )}
 
@@ -193,7 +193,7 @@ export default function Requests() {
 
                     {req.managerNote && (
                       <div className="mt-2 rounded-xl p-3 text-sm" style={req.status === 'ACEPTADA' ? { backgroundColor: '#dce8ed', color: '#213448' } : { backgroundColor: '#fee2e2', color: '#b91c1c' }}>
-                        <span className="text-xs opacity-70 block mb-0.5">Respuesta del encargado{manager ? ` (${manager.name})` : ''}:</span>
+                        <span className="text-xs opacity-70 block mb-0.5">Respuesta del encargado{manager ? ` (${manager.nombre})` : ''}:</span>
                         {req.managerNote}
                       </div>
                     )}

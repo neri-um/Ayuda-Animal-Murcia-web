@@ -23,6 +23,9 @@ public class Usuario {
 	private Long id;
 
 	@Column(nullable = false, unique = true)
+	private String usuario;
+
+	@Column(nullable = false, unique = true)
 	private String email;
 
 	@Column(nullable = false)
@@ -51,11 +54,13 @@ public class Usuario {
 
 	@OneToMany(mappedBy = "voluntario")
 	private List<SolicitudProducto> solicitudesProducto = new LinkedList<>();
+    public Object getUsuario;
 
 	public Usuario() {
 	}
 
-	public Usuario(String email, String password, String nombre, String apellidos, String telefono, Rol rol) {
+	public Usuario(String usuario, String email, String password, String nombre, String apellidos, String telefono, Rol rol) {
+		this.usuario = usuario;
 		this.email = email;
 		this.password = password;
 		this.nombre = nombre;
@@ -72,6 +77,14 @@ public class Usuario {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public String getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(String usuario) {
+		this.usuario = usuario;
 	}
 
 	public String getEmail() {

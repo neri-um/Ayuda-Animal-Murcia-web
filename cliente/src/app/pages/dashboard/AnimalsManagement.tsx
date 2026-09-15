@@ -263,7 +263,7 @@ export default function AnimalsManagement() {
   const [errorMes, setErrorMes]           = useState<string | null>(null);
   const [eliminando, setEliminando]       = useState(false);
 
-  const rol = (currentUser?.role ?? '').toUpperCase();
+  const rol = (currentUser?.rol ?? '').toUpperCase();
   const esAdmin      = rol === 'ADMIN';
   const esEncargado  = rol === 'ENCARGADO';
   const esVoluntario = rol === 'VOLUNTARIO';
@@ -272,7 +272,7 @@ export default function AnimalsManagement() {
     if (!volunteerId) return undefined;
     const u = users?.find((u: any) => String(u.id) === String(volunteerId));
     if (!u) return undefined;
-    return u.name + ((u as any).apellidos ? ' ' + (u as any).apellidos : '');
+    return u.nombre + ((u as any).apellidos ? ' ' + (u as any).apellidos : '');
   };
 
   const matchFilter = (a: Animal) => {

@@ -5,7 +5,9 @@ import vidanimal.dominio.modelo.Usuario;
 
 public class UsuarioEditarDTO {
 
+
     private String nombre;
+    private String usuario;
     private String apellidos;
     private String telefono;
     private String rol;
@@ -14,6 +16,7 @@ public class UsuarioEditarDTO {
     public Usuario toDominio() {
         Usuario u = new Usuario();
         u.setNombre(this.nombre);
+        u.setUsuario(usuario);
         u.setApellidos(this.apellidos);
         u.setTelefono(this.telefono);
 
@@ -30,6 +33,14 @@ public class UsuarioEditarDTO {
         } catch (Exception e) {
             throw new RuntimeException("Rol inválido: " + rol + ". Valores válidos: ADMIN, ENCARGADO, VOLUNTARIO");
         }
+    }
+
+    public String getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(String usuario) {
+        this.usuario = usuario;
     }
 
     public String getNombre() {

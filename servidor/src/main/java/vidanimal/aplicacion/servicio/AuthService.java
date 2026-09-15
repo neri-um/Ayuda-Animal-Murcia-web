@@ -20,20 +20,20 @@ public class AuthService implements AuthUseCase {
     }
 
     @Override
-    public Usuario login(String email, String password) {
-        Usuario usuario = usuarioRepo.buscarPorEmail(email)
+    public Usuario login(String usuario, String password) {
+        Usuario u = usuarioRepo.buscarPorUsuario(usuario)
                 .orElseThrow(() -> new RecursoNoEncontradoException(
-                        "Usuario con email " + email + " no encontrado"));
+                        "Usuario con nombre" + usuario + " no encontrado"));
 
-        if (!usuario.isActivo()) {
+        if (!u.isActivo()) {
             throw new RuntimeException("La cuenta está desactivada");
         }
 
-        if (!passwordEncoder.matches(password, usuario.getPassword())) {
+        if (!passwordEncoder.matches(password, u.getPassword())) {
             throw new RuntimeException("Credenciales inválidas");
         }
 
-        return usuario;
+        return u;
     }
 
     @Override

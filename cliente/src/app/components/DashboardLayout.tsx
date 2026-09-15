@@ -96,11 +96,11 @@ export default function DashboardLayout() {
             className="w-9 h-9 rounded-full flex items-center justify-center text-sm"
             style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e', fontWeight: 600 }}
           >
-            {currentUser.name.charAt(0).toUpperCase()}
+            {currentUser.nombre.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-white text-sm truncate" style={{ fontWeight: 500 }}>{currentUser.name}</p>
-            <p className="text-xs" style={{ color: '#727272' }}>{roleLabels[currentUser.role]}</p>
+            <p className="text-white text-sm truncate" style={{ fontWeight: 500 }}>{currentUser.nombre}</p>
+            <p className="text-xs" style={{ color: '#727272' }}>{roleLabels[currentUser.rol]}</p>
           </div>
         </div>
         <button
@@ -153,7 +153,7 @@ export default function DashboardLayout() {
               className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs"
               style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e', fontWeight: 600 }}
             >
-              {roleLabels[currentUser.role]}
+              {roleLabels[currentUser.rol]}
             </div>
           </div>
         </header>

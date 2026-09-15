@@ -10,7 +10,7 @@ import vidanimal.dominio.modelo.Usuario;
 
 public interface UsuarioRepositorio extends JpaRepository<Usuario, Long> {
 
-    Optional<Usuario> findByEmail(String email);
+    Optional<Usuario> findByUsuario(String usuario);
 
     List<Usuario> findAllByOrderByNombre();
 
@@ -18,5 +18,5 @@ public interface UsuarioRepositorio extends JpaRepository<Usuario, Long> {
 
     List<Usuario> findByNombreContainingIgnoreCaseOrderByNombre(String nombre);
 
-    boolean existsByEmail(String email);
+    boolean existsByUsuario(String usuario);
 }

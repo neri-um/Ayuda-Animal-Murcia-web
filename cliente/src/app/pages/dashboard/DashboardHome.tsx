@@ -102,13 +102,13 @@ export default function DashboardHome() {
     if (!volunteerId) return undefined;
     const u = users?.find((u: any) => String(u.id) === String(volunteerId));
     if (!u) return undefined;
-    return u.name + ((u as any).apellidos ? ' ' + (u as any).apellidos : '');
+    return u.nombre + ((u as any).apellidos ? ' ' + (u as any).apellidos : '');
   };
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-gray-900">Bienvenido/a, {currentUser?.name.split(' ')[0]}</h1>
+        <h1 className="text-gray-900">Bienvenido/a, {currentUser?.nombre.split(' ')[0]}</h1>
         <p className="text-gray-500 text-sm mt-1">Aquí tienes un resumen del estado de la protectora.</p>
       </div>
 
