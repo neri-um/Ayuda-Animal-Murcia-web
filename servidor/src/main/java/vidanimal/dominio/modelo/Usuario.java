@@ -54,7 +54,6 @@ public class Usuario {
 
 	@OneToMany(mappedBy = "voluntario")
 	private List<SolicitudProducto> solicitudesProducto = new LinkedList<>();
-    public Object getUsuario;
 
 	public Usuario() {
 	}
