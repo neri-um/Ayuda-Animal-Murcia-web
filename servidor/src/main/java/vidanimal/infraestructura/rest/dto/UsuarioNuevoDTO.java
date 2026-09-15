@@ -7,6 +7,9 @@ import vidanimal.dominio.modelo.Usuario;
 
 public class UsuarioNuevoDTO {
 
+    @NotBlank(message = "El usuario es obligatorio")
+    private String usuario;
+
     @NotBlank(message = "El email es obligatorio")
     private String email;
 
@@ -24,6 +27,7 @@ public class UsuarioNuevoDTO {
 
     public Usuario toDominio() {
         Usuario u = new Usuario();
+        u.setUsuario(usuario);
         u.setEmail(this.email);
         u.setPassword(this.password);
         u.setNombre(this.nombre);
@@ -39,6 +43,14 @@ public class UsuarioNuevoDTO {
         } catch (Exception e) {
             throw new RuntimeException("Rol inválido: " + rol + ". Valores válidos: ADMIN, ENCARGADO, VOLUNTARIO");
         }
+    }
+
+    public String getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(String usuario) {
+        this.usuario = usuario;
     }
 
     public String getEmail() {

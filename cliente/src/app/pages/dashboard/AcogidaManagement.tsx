@@ -191,7 +191,7 @@ export default function AcogidaManagement() {
 
   const borrarAcogida = async (id: number) => {
     if (!token) return;
-    if ((currentUser?.role ?? '').toUpperCase() !== 'ADMIN') {
+    if ((currentUser?.rol ?? '').toUpperCase() !== 'ADMIN') {
       alert('Solo el administrador puede eliminar casas de acogida');
       return;
     }

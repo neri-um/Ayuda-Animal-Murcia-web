@@ -4,7 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import vidanimal.aplicacion.input.AuthUseCase;
 import vidanimal.dominio.modelo.Usuario;
@@ -24,12 +27,12 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDTO dto) {
 
-        Usuario usuario = servicio.login(dto.getEmail(), dto.getPassword());
+        Usuario usuario = servicio.login(dto.getUsuario(), dto.getPassword());
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("sub", usuario.getId().toString());
         claims.put("nombre", usuario.getNombre());
-        claims.put("email", usuario.getEmail());
+        claims.put("usuario", usuario.getUsuario());
         claims.put("roles", usuario.getRol().name());
 
         String token = JwtUtil.generarToken(claims);

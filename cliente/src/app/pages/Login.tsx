@@ -5,7 +5,7 @@ import { useAuth } from '../context/AppContext';
 import { usePageMeta } from '../hooks/usePageMeta';
 import LOGO_URL from '../public/logopng.png';
 
-// Paleta extraída 1:1 del Home.tsx
+// Paleta 
 // fondo:      #f7f7f7
 // superficie: #ffffff
 // negro:      #2e2e2e
@@ -21,7 +21,7 @@ export default function Login() {
     noindex: true,
   });
 
-  const [email, setEmail]       = useState('');
+  const [usuario, setUsuario]       = useState('');
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading]   = useState(false);
@@ -42,10 +42,10 @@ export default function Login() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    const ok = await login(email, password);
+    const ok = await login(usuario, password);
     setLoading(false);
     if (ok) navigate('/dashboard');
-    else setError('Email o contraseña incorrectos, o cuenta desactivada.');
+    else setError('Usuario o contraseña incorrectos, o cuenta desactivada.');
   };
 
   return (
@@ -90,15 +90,15 @@ export default function Login() {
 
               <div>
                 <label
-                  htmlFor="login-email"
+                  htmlFor="login-usuario"
                   style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#2e2e2e', marginBottom: '0.35rem' }}
                 >
-                  Email
+                  Usuario
                 </label>
                 <input
-                  id="login-email" type="email" value={email} required
-                  placeholder="tu@correo.org"
-                  onChange={e => { setEmail(e.target.value); setError(''); }}
+                  id="login-usuario" type="text" value={usuario} required
+                  placeholder="usuario"
+                  onChange={e => { setUsuario(e.target.value); setError(''); }}
                   onFocus={e  => (e.currentTarget.style.borderColor = '#2e2e2e')}
                   onBlur={e   => (e.currentTarget.style.borderColor = '#d9d9d9')}
                   style={{

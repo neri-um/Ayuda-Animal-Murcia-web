@@ -37,7 +37,7 @@ export default function Warehouse() {
 
   const getNombreVoluntario = (volunteerId: string): string => {
     const u = users?.find(u => String(u.id) === String(volunteerId));
-    return u ? u.name : `Voluntario #${volunteerId}`;
+    return u ? u.nombre : `Voluntario #${volunteerId}`;
   };
 
   const openEditProduct = (p: Product) => {

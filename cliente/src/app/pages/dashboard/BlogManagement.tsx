@@ -40,7 +40,7 @@ export default function BlogManagement() {
   const imgInputRef = useRef<HTMLInputElement>(null);
   const galeriaInputRef = useRef<HTMLInputElement>(null);
 
-  const esAdmin = (currentUser?.role ?? '').toUpperCase() === 'ADMIN';
+  const esAdmin = (currentUser?.rol ?? '').toUpperCase() === 'ADMIN';
   const misAnimales = esAdmin
     ? animalsTodos
     : (animalsTodos ?? []).filter(a => String(a.volunteerId) === String(currentUser?.id));

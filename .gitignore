@@ -22,3 +22,5 @@ servidor/target/
 
 # Análisis temporal (informes de tsc/scan generados en el cliente)
 cliente/*.txt
+
+temp_delete_marina.py

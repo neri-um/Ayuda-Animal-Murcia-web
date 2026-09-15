@@ -80,13 +80,16 @@ export interface EntradaBlogInput {
 }
 
 export interface User {
-  id: number;
+  id: string;
+  usuario: string;
   email: string;
   nombre: string;
   apellidos?: string;
   telefono?: string;
   rol: UserRole;
   fechaAlta?: string;
+  activo: boolean;
+  password?: string;
 }
 
 export interface Product {

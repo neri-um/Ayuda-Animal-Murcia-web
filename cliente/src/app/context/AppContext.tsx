@@ -219,13 +219,14 @@ function rolFromBackend(rol: string): UserRole {
 function mapUserFromBackend(u: any): User {
   return {
     id: String(u.id),
-    name: u.nombre ?? '',
+    usuario: u.usuario ?? '',
     email: u.email ?? '',
-    password: '',
-    role: rolFromBackend(u.rol),
-    phone: u.telefono ?? '',
-    active: u.activo !== undefined ? Boolean(u.activo) : true,
-    createdAt: u.fechaCreacion ?? new Date().toISOString().slice(0, 10),
+    nombre: u.nombre ?? '',
+    apellidos: u.apellidos,
+    telefono: u.telefono ?? '',
+    rol: rolFromBackend(u.rol),
+    fechaAlta: u.fechaAlta,
+    activo: u.activo !== undefined ? Boolean(u.activo) : true,
   };
 }
 
@@ -418,23 +419,25 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => { fetchAnimals(); }, [fetchAnimals]);
   useEffect(() => { fetchAllAnimals(); }, [fetchAllAnimals]);
 
-  const login = useCallback(async (email: string, password: string): Promise<boolean> => {
+  const login = useCallback(async (usuario: string, password: string): Promise<boolean> => {
     try {
       const res = await fetch(`${BASE}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ usuario, password }),
       });
       if (!res.ok) return false;
       const data = await res.json();
       const user: User = {
         id: String(data.usuario.id),
-        name: data.usuario.nombre,
+        usuario: data.usuario.usuario ?? '',
         email: data.usuario.email,
-        role: rolFromBackend(data.usuario.rol),
-        active: true,
-        password: '',
-        createdAt: new Date().toISOString().slice(0, 10),
+        nombre: data.usuario.nombre,
+        apellidos: data.usuario.apellidos,
+        telefono: data.usuario.telefono,
+        rol: rolFromBackend(data.usuario.rol),
+        fechaAlta: data.usuario.fechaAlta,
+        activo: true,
       };
       setToken(data.token);
       setCurrentUser(user);
@@ -624,13 +627,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (token) fetchUsers();
   }, [token, fetchUsers]);
 
-  const addUser = useCallback(async (user: Omit<User, 'id' | 'createdAt'>) => {
+  const addUser = useCallback(async (user: Omit<User, 'id' | 'fechaAlta'>) => {
     const res = await fetch(`${BASE}/usuarios`, {
       method: 'POST',
       headers: jsonHeaders(token),
       body: JSON.stringify({
-        nombre: user.name, email: user.email, password: user.password,
-        rol: rolToBackend(user.role), telefono: user.phone ?? '', activo: user.active,
+        usuario: user.usuario,
+        nombre: user.nombre, email: user.email, password: user.password,
+        rol: rolToBackend(user.rol), telefono: user.telefono ?? '', activo: user.activo,
       }),
     });
     if (!res.ok) throw new Error('Error al crear usuario');
@@ -639,12 +643,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const updateUser = useCallback(async (id: string, updates: Partial<User>) => {
     const body: Record<string, any> = {};
-    if (updates.name !== undefined) body.nombre = updates.name;
+    if (updates.usuario !== undefined) body.usuario = updates.usuario;
+    if (updates.nombre !== undefined) body.nombre = updates.nombre;
     if (updates.email !== undefined) body.email = updates.email;
     if (updates.password) body.password = updates.password;
-    if (updates.role !== undefined) body.rol = rolToBackend(updates.role);
-    if (updates.phone !== undefined) body.telefono = updates.phone;
-    if (updates.active !== undefined) body.activo = updates.active;
+    if (updates.rol !== undefined) body.rol = rolToBackend(updates.rol);
+    if (updates.telefono !== undefined) body.telefono = updates.telefono;
+    if (updates.activo !== undefined) body.activo = updates.activo;
     const res = await fetch(`${BASE}/usuarios/${id}`, {
       method: 'PUT', headers: jsonHeaders(token), body: JSON.stringify(body),
     });
@@ -653,7 +658,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [token, fetchUsers]);
 
   const toggleUserActive = useCallback(async (id: string, active: boolean) => {
-    setUsers(prev => prev.map(u => u.id === id ? { ...u, active } : u));
+    setUsers(prev => prev.map(u => u.id === id ? { ...u, activo: active } : u));
     try {
       const patchRes = await fetch(`${BASE}/usuarios/${id}/activo`, {
         method: 'PATCH',
@@ -665,10 +670,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setUsers(prev => { usuario = prev.find(u => u.id === id); return prev; });
       const putBody: Record<string, any> = { activo: active };
       if (usuario) {
-        putBody.nombre = usuario.name;
+        putBody.usuario = usuario.usuario;
+        putBody.nombre = usuario.nombre;
         putBody.email = usuario.email;
-        putBody.rol = rolToBackend(usuario.role);
-        putBody.telefono = usuario.phone ?? '';
+        putBody.rol = rolToBackend(usuario.rol);
+        putBody.telefono = usuario.telefono ?? '';
       }
       const putRes = await fetch(`${BASE}/usuarios/${id}`, {
         method: 'PUT', headers: jsonHeaders(token), body: JSON.stringify(putBody),
@@ -676,7 +682,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       if (!putRes.ok) throw new Error('Error al cambiar el estado del usuario');
       await fetchUsers();
     } catch (err) {
-      setUsers(prev => prev.map(u => u.id === id ? { ...u, active: !active } : u));
+      setUsers(prev => prev.map(u => u.id === id ? { ...u, activo: !active } : u));
       throw err;
     }
   }, [token, fetchUsers]);
@@ -815,7 +821,7 @@ export function useAuth() {
   const canAccess = (minRole: UserRole): boolean => {
     if (!currentUser) return false;
     const roles: UserRole[] = ['VOLUNTARIO', 'ENCARGADO', 'ADMIN'];
-    return roles.indexOf(currentUser.role) >= roles.indexOf(minRole);
+    return roles.indexOf(currentUser.rol) >= roles.indexOf(minRole);
   };
   return { currentUser, login, logout, canAccess, token };
 }

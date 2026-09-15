@@ -59,15 +59,15 @@ export default function AnimalDetailDashboard() {
     );
   }
 
-  const rol = (currentUser?.role ?? '').toUpperCase();
+  const rol = (currentUser?.rol ?? '').toUpperCase();
   const esAdmin      = rol === 'ADMIN';
   const puedeEditar  = esAdmin || String(animal.volunteerId) === String(currentUser?.id);
   const puedePublicar = esAdmin || rol === 'ENCARGADO' || rol === 'VOLUNTARIO';
 
-  // El contexto ya mapea: nombre (backend) → name (frontend), id como string
+  // El contexto ya mapea el Usuario del backend (nombre, apellidos, rol, ...) con id como string
   const responsable = users?.find((u: any) => String(u.id) === String(animal.volunteerId));
   const nombreResponsable = responsable
-    ? `${responsable.name}${(responsable as any).apellidos ? ' ' + (responsable as any).apellidos : ''}`
+    ? `${responsable.nombre}${(responsable as any).apellidos ? ' ' + (responsable as any).apellidos : ''}`
     : (animal.volunteerId ? 'Sin asignar' : 'Sin asignar');
 
   const chip = (label: string, active: boolean) => (
