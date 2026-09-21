@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { ClipboardList, CheckCircle, XCircle, RotateCcw, Package, RefreshCw, Calendar, Loader2 } from 'lucide-react';
+import { Link } from 'react-router';
+import { ClipboardList, CheckCircle, XCircle, RotateCcw, Package, RefreshCw, Calendar, ArrowLeft } from 'lucide-react';
 import { useApp, useAuth } from '../../context/AppContext';
 import { ProductRequest, RequestStatus } from '../../types';
 import { RequestStatusBadge } from '../../components/StatusBadge';
@@ -317,14 +318,22 @@ export default function Requests() {
           </div>
         </div>
       )}
-      {loading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/50 backdrop-blur-sm">
-          <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-100 flex items-center gap-3">
-            <Loader2 className="w-5 h-5 animate-spin text-[#547792]" />
-            <span className="text-sm font-medium text-gray-700">En progreso...</span>
-          </div>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-sm">
+        <div className="text-center px-4">
+          <p className="text-7xl font-black mb-4" style={{ color: '#f7e3b0' }}>
+            <ClipboardList className="w-20 h-20 mx-auto" />
+          </p>
+          <h1 className="text-2xl font-bold mb-2" style={{ color: '#2e2e2e' }}>
+            Trabajo en progreso
+          </h1>
+          <p className="text-sm mb-6" style={{ color: '#727272' }}>
+            Esta sección aún está en desarrollo. Estamos trabajando en ello.
+          </p>
+          <Link to="/dashboard" className="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-opacity hover:opacity-80" style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e' }}>
+            <ArrowLeft className="w-4 h-4" /> Volver al panel
+          </Link>
         </div>
-      )}
+      </div>
     </div>
   );
 }
