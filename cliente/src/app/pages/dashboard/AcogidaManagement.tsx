@@ -324,7 +324,7 @@ export default function AcogidaManagement() {
                       </div>
                     )}
 
-                    <div className="flex items-center gap-1.5 px-3 py-2.5 border-t border-gray-100">
+                    <div className="flex flex-wrap items-center gap-1.5 px-3 py-2.5 border-t border-gray-100">
                       {a.estado === 'PENDIENTE' && (
                         <>
                           <button
@@ -353,34 +353,36 @@ export default function AcogidaManagement() {
 
                       <div className="flex-1" />
 
-                      <button
-                        onClick={() => abrirReubicar(a)}
-                        className="p-1.5 rounded-lg text-blue-500 hover:bg-blue-50 transition-colors"
-                        title="Reubicar animal"
-                      >
-                        <ArrowLeftRight className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => exportarPDF(a)}
-                        className="p-1.5 rounded-lg text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                        title="Exportar PDF"
-                      >
-                        <FileDown className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => cambiarEstado(a.id, a.estado === 'DISPONIBLE' ? 'NO_DISPONIBLE' : 'DISPONIBLE')}
-                        className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition-colors"
-                        title={a.estado === 'DISPONIBLE' ? 'No disponible' : 'Disponible'}
-                      >
-                        <Pause className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => borrarAcogida(a.id)}
-                        className="p-1.5 rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors"
-                        title="Eliminar"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center gap-1.5 ml-auto">
+                        <button
+                          onClick={() => abrirReubicar(a)}
+                          className="p-1.5 rounded-lg text-blue-500 hover:bg-blue-50 transition-colors"
+                          title="Reubicar animal"
+                        >
+                          <ArrowLeftRight className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => exportarPDF(a)}
+                          className="p-1.5 rounded-lg text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                          title="Exportar PDF"
+                        >
+                          <FileDown className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => cambiarEstado(a.id, a.estado === 'DISPONIBLE' ? 'NO_DISPONIBLE' : 'DISPONIBLE')}
+                          className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition-colors"
+                          title={a.estado === 'DISPONIBLE' ? 'No disponible' : 'Disponible'}
+                        >
+                          <Pause className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => borrarAcogida(a.id)}
+                          className="p-1.5 rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+                          title="Eliminar"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
