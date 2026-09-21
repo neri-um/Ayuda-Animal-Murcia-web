@@ -410,6 +410,14 @@ export default function Warehouse() {
           </div>
         </div>
       )}
+      {loading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/50 backdrop-blur-sm">
+          <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-100 flex items-center gap-3">
+            <Loader2 className="w-5 h-5 animate-spin text-[#547792]" />
+            <span className="text-sm font-medium text-gray-700">En progreso...</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
