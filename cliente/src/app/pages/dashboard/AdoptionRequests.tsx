@@ -23,6 +23,7 @@ export default function AdoptionRequests() {
     especie: string | null;
     cachorro: boolean | null;
     secciones: { titulo: string; ids: string[] }[];
+    mapa: Record<string, string>;
   }[]>([]);
   const [loading, setLoading] = useState(true);
   const [filtroEstado, setFiltroEstado] = useState<EstadoSolicitudCuestionario | 'TODAS'>('TODAS');
@@ -71,17 +72,18 @@ export default function AdoptionRequests() {
         especie: string | null;
         cachorro: boolean | null;
         secciones: { titulo: string; ids: string[] }[];
+        mapa: Record<string, string>;
       }[] = [];
 
-      const recorrer = (nodo: any, secciones: { titulo: string; ids: string[] }[]) => {
+      const recorrer = (nodo: any, secciones: { titulo: string; ids: string[] }[], formMap: Record<string, string>) => {
         if (Array.isArray(nodo)) {
-          nodo.forEach(p => recorrer(p, secciones));
+          nodo.forEach(p => recorrer(p, secciones, formMap));
           return;
         }
         if (nodo && typeof nodo === 'object') {
           if (typeof nodo.id === 'string' && (nodo.pregunta || nodo.label)) {
             const texto = nodo.pregunta ?? nodo.label ?? nodo.id;
-            if (texto && !map[nodo.id]) map[nodo.id] = texto;
+            if (texto && !formMap[nodo.id]) formMap[nodo.id] = texto;
           }
           if (
             typeof nodo.titulo === 'string' &&
@@ -93,19 +95,22 @@ export default function AdoptionRequests() {
               .map((p: any) => p.id);
             if (ids.length > 0) secciones.push({ titulo: nodo.titulo, ids });
           }
-          Object.values(nodo).forEach(v => recorrer(v, secciones));
+          Object.values(nodo).forEach(v => recorrer(v, secciones, formMap));
         }
       };
 
       (Array.isArray(data) ? data : []).forEach((f: any) => {
         const secciones: { titulo: string; ids: string[] }[] = [];
-        recorrer(f.preguntas, secciones);
+        const formMap: Record<string, string> = {};
+        recorrer(f.preguntas, secciones, formMap);
+        Object.assign(map, formMap);
         if (secciones.length > 0) {
           formularios.push({
             nombre: f.nombre ?? '',
             especie: f.especie ?? null,
             cachorro: f.cachorro ?? null,
             secciones,
+            mapa: formMap,
           });
         }
       });
@@ -207,20 +212,20 @@ export default function AdoptionRequests() {
     const idsEnSecciones = new Set(secciones.flatMap(sec => sec.ids));
     const sueltas = Object.keys(respuestas).filter(id => !idsEnSecciones.has(id));
 
-    return { secciones, sueltas, tipoFormulario: elegido?.nombre ?? 'Solicitud de adopción' };
+    return { secciones, sueltas, tipoFormulario: elegido?.nombre ?? 'Solicitud de adopción', mapa: elegido?.mapa ?? {} };
   };
 
   const exportarPDF = (s: SolicitudAdopcion) => {
     const respuestas = s.respuestas ?? {};
     const respuestaHTML = (id: string, v: string) => {
-      const pregunta = preguntasMap[id] ?? id.replace(/_/g, ' ');
+      const pregunta = mapa[id] ?? preguntasMap[id] ?? id.replace(/_/g, ' ');
       return `<div class="qa">
           <div class="pregunta">${pregunta}</div>
           <div class="respuesta">${v || '-'}</div>
         </div>`;
     };
 
-    const { secciones, sueltas, tipoFormulario } = contextoCuestionario(s);
+    const { secciones, sueltas, tipoFormulario, mapa } = contextoCuestionario(s);
 
     const conRespuesta = (ids: string[]) => ids.filter(id => respuestas[id] !== undefined);
 
@@ -356,7 +361,7 @@ export default function AdoptionRequests() {
       ) : (
         <div className="space-y-3">
           {solicitudesFiltradas.map(s => {
-            const { secciones, sueltas } = contextoCuestionario(s);
+            const { secciones, sueltas, mapa } = contextoCuestionario(s);
             return (
             <div key={s.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
               {/* Cabecera: nombre + estado (clic expande respuestas) */}
@@ -472,7 +477,7 @@ export default function AdoptionRequests() {
                               {ids.map(preguntaId => (
                                 <div key={preguntaId}>
                                   <dt className="text-xs text-gray-500">
-                                    {preguntasMap[preguntaId] ?? preguntaId.replace(/_/g, ' ')}
+                                    {mapa[preguntaId] ?? preguntasMap[preguntaId] ?? preguntaId.replace(/_/g, ' ')}
                                   </dt>
                                   <dd className="text-sm text-gray-800 font-medium mt-0.5">{s.respuestas[preguntaId] || '—'}</dd>
                                 </div>
@@ -491,7 +496,7 @@ export default function AdoptionRequests() {
                             {sueltas.map(preguntaId => (
                               <div key={preguntaId}>
                                 <dt className="text-xs text-gray-500">
-                                  {preguntasMap[preguntaId] ?? preguntaId.replace(/_/g, ' ')}
+                                  {mapa[preguntaId] ?? preguntasMap[preguntaId] ?? preguntaId.replace(/_/g, ' ')}
                                 </dt>
                                 <dd className="text-sm text-gray-800 font-medium mt-0.5">{s.respuestas[preguntaId] || '—'}</dd>
                               </div>
