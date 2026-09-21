@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Edit2, Trash2, Package, AlertTriangle, Search, Send, XCircle } from 'lucide-react';
+import { Plus, Edit2, Trash2, Package, AlertTriangle, Search, Send, XCircle, Loader2 } from 'lucide-react';
 import { Link } from 'react-router';
 import { useApp, useAuth } from '../../context/AppContext';
 import { Product } from '../../types';

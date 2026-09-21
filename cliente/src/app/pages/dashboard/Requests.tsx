@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ClipboardList, CheckCircle, XCircle, RotateCcw, Package, RefreshCw, Calendar } from 'lucide-react';
+import { ClipboardList, CheckCircle, XCircle, RotateCcw, Package, RefreshCw, Calendar, Loader2 } from 'lucide-react';
 import { useApp, useAuth } from '../../context/AppContext';
 import { ProductRequest, RequestStatus } from '../../types';
 import { RequestStatusBadge } from '../../components/StatusBadge';
