@@ -327,7 +327,7 @@ export default function Requests() {
             Trabajo en progreso
           </h1>
           <p className="text-sm mb-6" style={{ color: '#727272' }}>
-            Esta sección aún está en desarrollo. Estamos trabajando en ello.
+            Esta sección aún está en desarrollo.
           </p>
           <Link to="/dashboard" className="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-opacity hover:opacity-80" style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e' }}>
             <ArrowLeft className="w-4 h-4" /> Volver al panel
