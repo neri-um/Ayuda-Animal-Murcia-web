@@ -24,3 +24,7 @@ servidor/target/
 cliente/*.txt
 
 temp_delete_marina.py
+
+# Credenciales/scripts de la BD Aiven (NUNCA subir)
+_ops/
+_scripts_prod/
