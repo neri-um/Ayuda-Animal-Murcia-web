@@ -404,7 +404,7 @@ export default function AdoptionRequests() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5 px-4 py-3 mt-3 border-t border-gray-100">
+              <div className="flex flex-wrap items-center gap-1.5 px-4 py-3 mt-3 border-t border-gray-100">
                 {s.estado === 'PENDIENTE' ? (
                   <>
                     <button
@@ -432,7 +432,6 @@ export default function AdoptionRequests() {
                     {formatEnum(s.estado)}
                   </span>
                 )}
-                <div className="flex-1" />
                 <a
                   href={s.telefono ? `https://wa.me/${s.telefono.replace(/\D/g, '')}` : '#'}
                   target="_blank"
@@ -441,6 +440,7 @@ export default function AdoptionRequests() {
                 >
                   <MessageCircle className="w-4 h-4" /> WhatsApp
                 </a>
+                <div className="flex-1" />
                 <button
                   onClick={() => abrirReubicar(s)}
                   disabled={actualizando === s.id}
