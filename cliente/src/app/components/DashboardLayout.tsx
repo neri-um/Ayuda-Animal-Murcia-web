@@ -2,7 +2,7 @@ import { Link, Outlet, useNavigate, useLocation } from 'react-router';
 import {
   LayoutDashboard, PawPrint, Package,
   ClipboardList, Users, LogOut, ChevronRight, ClipboardCheck, FileText, Newspaper,
-  Home,
+  Home, History,
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AppContext';
@@ -25,6 +25,7 @@ const navItems: NavItem[] = [
   { to: '/dashboard/blog', label: 'Blog', icon: <Newspaper className="w-5 h-5" /> },
   { to: '/dashboard/formularios', label: 'Formularios', icon: <FileText className="w-5 h-5" />},
   { to: '/dashboard/usuarios', label: 'Usuarios', icon: <Users className="w-5 h-5" />, minRole: 'ADMIN' },
+  { to: '/dashboard/auditoria', label: 'Historial', icon: <History className="w-5 h-5" />, minRole: 'ADMIN' },
 ];
 
 function NavLink({ item, onClick }: { item: NavItem; onClick?: () => void }) {

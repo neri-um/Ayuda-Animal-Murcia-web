@@ -77,6 +77,8 @@ public class SecurityConfig {
                     .hasAnyAuthority("VOLUNTARIO", "ENCARGADO", "ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/vidanimal/adopciones/*")
                     .hasAnyAuthority("ADMIN")
+                .requestMatchers("/vidanimal/auditoria/**")
+                    .hasAnyAuthority("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/vidanimal/formularios")
                     .hasAnyAuthority("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/vidanimal/formularios/*")
