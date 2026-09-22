@@ -31,6 +31,7 @@ import FormularioManagement from './pages/dashboard/FormularioManagement';
 import Blog from './pages/Blog';
 import EntradaBlogDetail from './pages/EntradaBlogDetail';
 import BlogManagement from './pages/dashboard/BlogManagement';
+import HistorialCambios from './pages/dashboard/HistorialCambios';
 import ErrorPagina from './pages/ErrorPagina';
 
 export const router = createBrowserRouter([
@@ -81,6 +82,7 @@ export const router = createBrowserRouter([
       { path: 'blog', element: <BlogManagement /> },
       { path: 'usuarios', element: <UserManagement /> },
       { path: 'formularios', element: <FormularioManagement /> },
+      { path: 'auditoria', element: <HistorialCambios /> },
     ],
   },
 ]);
