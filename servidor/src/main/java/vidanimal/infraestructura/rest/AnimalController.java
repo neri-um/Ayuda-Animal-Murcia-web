@@ -62,9 +62,6 @@ public class AnimalController {
 	@GetMapping("/{id}")
 	public ResponseEntity<AnimalPublicoDTO> obtener(@PathVariable Long id) {
 		Animal animal = animales.obtenerPorId(id);
-		if (animal.getEstado() != Estado.EN_ADOPCION) {
-			return ResponseEntity.notFound().build();
-		}
 		return ResponseEntity.ok(AnimalPublicoDTO.fromDominio(animal));
 	}
 
