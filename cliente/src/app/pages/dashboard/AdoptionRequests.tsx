@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ClipboardList, CheckCircle, XCircle, Clock, Search, ChevronDown, ChevronUp, Loader2, FileDown, ArrowLeftRight, X, Trash2 } from 'lucide-react';
+import { ClipboardList, CheckCircle, XCircle, Clock, Search, ChevronDown, ChevronUp, Loader2, FileDown, ArrowLeftRight, X, Trash2, MessageCircle } from 'lucide-react';
 import { useApp, useAuth } from '../../context/AppContext';
 import { useEnums, formatEnum } from '../../hooks/useEnums';
 import type { SolicitudAdopcion, EstadoSolicitudCuestionario } from '../../types/adoption';
@@ -433,6 +433,14 @@ export default function AdoptionRequests() {
                   </span>
                 )}
                 <div className="flex-1" />
+                <a
+                  href={s.telefono ? `https://wa.me/${s.telefono.replace(/\D/g, '')}` : '#'}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-green-700 bg-green-50 hover:bg-green-100 transition-colors"
+                >
+                  <MessageCircle className="w-4 h-4" /> WhatsApp
+                </a>
                 <button
                   onClick={() => abrirReubicar(s)}
                   disabled={actualizando === s.id}
