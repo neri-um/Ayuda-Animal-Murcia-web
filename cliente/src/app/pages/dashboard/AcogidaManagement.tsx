@@ -13,13 +13,14 @@ import {
 } from '../../services/acogidas';
 import { API_BASE as BASE, leerMensajeError } from '../../services/api';
 
-type SeccionKey = 'PENDIENTE' | 'DISPONIBLE' | 'ACTIVA' | 'NO_DISPONIBLE';
+type SeccionKey = 'PENDIENTE' | 'DISPONIBLE' | 'ACTIVA' | 'NO_DISPONIBLE' | 'RECHAZADA';
 
 const SECCIONES: { key: SeccionKey; label: string; icono: ReactNode }[] = [
   { key: 'DISPONIBLE', label: 'Disponibles', icono: <Home className="w-4 h-4 text-gray-400" /> },
   { key: 'PENDIENTE', label: 'Pendientes', icono: <Clock className="w-4 h-4 text-gray-400" /> },
   { key: 'ACTIVA', label: 'Usadas', icono: <PawPrint className="w-4 h-4 text-gray-400" /> },
   { key: 'NO_DISPONIBLE', label: 'No disponibles', icono: <Ban className="w-4 h-4 text-gray-400" /> },
+  { key: 'RECHAZADA', label: 'Rechazadas', icono: <XCircle className="w-4 h-4 text-gray-400" /> },
 ];
 
 const COLOR_SECCION: Record<SeccionKey, string> = {
@@ -27,6 +28,7 @@ const COLOR_SECCION: Record<SeccionKey, string> = {
   DISPONIBLE: 'border-l-green-500',
   ACTIVA: 'border-l-blue-500',
   NO_DISPONIBLE: 'border-l-gray-400',
+  RECHAZADA: 'border-l-red-400',
 };
 
 export default function AcogidaManagement() {
