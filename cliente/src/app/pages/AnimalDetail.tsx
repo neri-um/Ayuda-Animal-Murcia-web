@@ -47,11 +47,14 @@ function recortarTexto(texto: string, maxPalabras = 25): string {
 
 export default function AnimalDetail() {
   const { id: param } = useParams<{ id: string }>();
-  const { animals } = useApp();
+  const { animals, animalDelMesExtra } = useApp();
   const navigate = useNavigate();
   const [index, setIndex] = useState(0);
   const [copied, setCopied] = useState(false);
-  const animal = animals.find(a => toSlug(a.name) === param || a.id === param);
+  const animal = animals.find(a => toSlug(a.name) === param || a.id === param)
+    ?? (animalDelMesExtra && (toSlug(animalDelMesExtra.name) === param || String(animalDelMesExtra.id) === param)
+      ? animalDelMesExtra
+      : undefined);
   const [entradas, setEntradas] = useState<EntradaBlog[]>([]);
   const [blogLoading, setBlogLoading] = useState(false);
   useEffect(() => {
