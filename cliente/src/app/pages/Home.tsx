@@ -18,10 +18,8 @@ function formatFecha(fecha: string): string {
 }
 
 export default function Home() {
-  const { animals, animalDelMesId, animalDelMesExtra } = useApp();
-  const animalDelMes = animalDelMesId
-    ? animals.find(a => a.id === animalDelMesId) ?? (animalDelMesExtra && animalDelMesExtra.id === animalDelMesId ? animalDelMesExtra : undefined)
-    : undefined;
+  const { animals, animalDelMesId } = useApp();
+  const animalDelMes = animalDelMesId ? animals.find(a => a.id === animalDelMesId) : undefined;
   const [novedades, setNovedades] = useState<EntradaBlog[]>([]);
 
   useEffect(() => {
