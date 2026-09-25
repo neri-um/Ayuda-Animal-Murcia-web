@@ -1,5 +1,5 @@
 package vidanimal.dominio.modelo;
 
 public enum EstadoAcogida {
-    PENDIENTE, ACTIVA, DISPONIBLE, NO_DISPONIBLE, RECHAZADA, RECHAZADA
+    PENDIENTE, ACTIVA, DISPONIBLE, NO_DISPONIBLE, RECHAZADA
 }
