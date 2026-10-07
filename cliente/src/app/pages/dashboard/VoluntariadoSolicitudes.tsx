@@ -53,7 +53,7 @@ export default function VoluntariadoSolicitudes() {
   const [decision, setDecision] = useState<{ solicitud: SolicitudColaboracion; estado: 'ACEPTADA' | 'RECHAZADA' } | null>(null);
   const [mensaje, setMensaje] = useState('');
   const [eliminarId, setEliminarId] = useState<number | null>(null);
-  const [colapsadas, setSeccionesColapsadas] = useState<Record<string, boolean>>({});
+  const [seccionesColapsadas, setSeccionesColapsadas] = useState<Record<string, boolean>>({});
 
   const cargar = useCallback(async () => {
     if (!token) return;
