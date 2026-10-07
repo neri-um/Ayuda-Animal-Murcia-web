@@ -131,17 +131,6 @@ export default function VoluntariadoSolicitudes() {
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
-        {SECCIONES.map(({ key, label }) => (
-          <div key={key} className="rounded-2xl p-4 text-center border border-gray-100 bg-white">
-            <div className={`text-2xl font-bold ${key === 'PENDIENTE' ? 'text-[#b89a2e]' : key === 'ACEPTADA' ? 'text-[#6A994E]' : 'text-[#9C2B1B]'}`}>
-              {solicitudes.filter(s => s.estado === key).length}
-            </div>
-            <div className="text-xs text-gray-500">{label}</div>
-          </div>
-        ))}
-      </div>
-
       <div className="bg-white rounded-2xl border border-gray-100 p-4 flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
