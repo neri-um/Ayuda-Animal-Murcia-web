@@ -229,7 +229,10 @@ Todos los endpoints cuelgan de `/vidanimal`. Los permisos se definen en
 | GET | `/blog/{id}` | Entrada individual | público |
 | POST/PUT/DELETE | `/blog(/{id})` | CRUD de entradas | VOLUNTARIO+ |
 | POST | `/contacto` | Formulario de contacto → email (Resend) | público |
-| POST | `/colaboracion` | Solicitud de colaboración → email (Resend) | público |
+| POST | `/colaboracion` | Solicitud de colaboración: se guarda y se avisa por email | público |
+| GET | `/colaboracion` | Listado de solicitudes de voluntariado/acogida | VOLUNTARIO+ |
+| PATCH | `/colaboracion/{id}/estado` | Aceptar/rechazar solicitud (avisa por email al solicitante) | VOLUNTARIO+ |
+| DELETE | `/colaboracion/{id}` | Eliminar solicitud | ADMIN |
 
 ### Otros
 

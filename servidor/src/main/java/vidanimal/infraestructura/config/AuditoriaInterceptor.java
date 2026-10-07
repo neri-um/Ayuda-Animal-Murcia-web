@@ -106,6 +106,7 @@ public class AuditoriaInterceptor implements HandlerInterceptor {
             case "blog":           seccion = "Blog";          break;
             case "usuarios":       seccion = "Usuarios";      break;
             case "formularios":    seccion = "Formularios";   break;
+            case "colaboracion":   seccion = "Voluntariado";  break;
             default:               seccion = "Otros";         break;
         }
         return new Seccion(seccion, sufijo);

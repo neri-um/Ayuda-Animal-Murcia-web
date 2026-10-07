@@ -2,7 +2,7 @@ import { Link, Outlet, useNavigate, useLocation } from 'react-router';
 import {
   LayoutDashboard, PawPrint, Package,
   ClipboardList, Users, LogOut, ChevronRight, ClipboardCheck, FileText, Newspaper,
-  Home, History,
+  Home, History, HandHeart,
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AppContext';
@@ -22,6 +22,7 @@ const navItems: NavItem[] = [
   { to: '/dashboard/solicitudes', label: 'Solicitudes', icon: <ClipboardList className="w-5 h-5" /> },
   { to: '/dashboard/adopciones', label: 'Adopciones', icon: <ClipboardCheck className="w-5 h-5" /> },
   { to: '/dashboard/acogidas', label: 'Acogidas', icon: <Home className="w-5 h-5" /> },
+  { to: '/dashboard/voluntariado', label: 'Voluntariado', icon: <HandHeart className="w-5 h-5" /> },
   { to: '/dashboard/blog', label: 'Blog', icon: <Newspaper className="w-5 h-5" /> },
   { to: '/dashboard/formularios', label: 'Formularios', icon: <FileText className="w-5 h-5" />},
   { to: '/dashboard/usuarios', label: 'Usuarios', icon: <Users className="w-5 h-5" />, minRole: 'ADMIN' },
@@ -61,11 +62,18 @@ export default function DashboardLayout() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const mainRef = useRef<HTMLElement>(null);
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
 
   useEffect(() => {
+    if (hash) {
+      const destino = mainRef.current?.querySelector(hash);
+      if (destino) {
+        destino.scrollIntoView({ behavior: 'auto', block: 'start' });
+        return;
+      }
+    }
     mainRef.current?.scrollTo({ top: 0, behavior: 'auto' });
-  }, [pathname]);
+  }, [pathname, hash]);
 
   if (!currentUser) {
     navigate('/login');

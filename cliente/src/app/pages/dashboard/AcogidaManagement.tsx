@@ -23,12 +23,14 @@ const SECCIONES: { key: SeccionKey; label: string; icono: ReactNode }[] = [
   { key: 'RECHAZADA', label: 'Rechazadas', icono: <XCircle className="w-4 h-4 text-gray-400" /> },
 ];
 
+// Paleta de estados: pendiente #D4AF37 · aceptado/disponible #6A994E ·
+// rechazado #9C2B1B · no disponible #9CA3AF
 const COLOR_SECCION: Record<SeccionKey, string> = {
-  PENDIENTE: 'border-l-amber-400',
-  DISPONIBLE: 'border-l-green-500',
+  PENDIENTE: 'border-l-[#D4AF37]',
+  DISPONIBLE: 'border-l-[#6A994E]',
   ACTIVA: 'border-l-blue-500',
-  NO_DISPONIBLE: 'border-l-gray-400',
-  RECHAZADA: 'border-l-red-400',
+  NO_DISPONIBLE: 'border-l-[#9CA3AF]',
+  RECHAZADA: 'border-l-[#9C2B1B]',
 };
 
 export default function AcogidaManagement() {
@@ -296,7 +298,7 @@ export default function AcogidaManagement() {
                           )}
                           {a.solicitudEstado === 'PENDIENTE' && a.estado !== 'PENDIENTE' && (
                             <span
-                              className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 border border-amber-200 whitespace-nowrap"
+                              className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-[#D4AF37] text-[#2e2e2e] border border-[#b89a2e] whitespace-nowrap"
                               title="La casa ya no está pendiente pero la solicitud sigue sin gestionar"
                             >
                               <Clock className="w-3.5 h-3.5" />
@@ -340,13 +342,13 @@ export default function AcogidaManagement() {
                         <>
                           <button
                             onClick={() => aceptarSolicitud(a)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-green-700 bg-green-50 hover:bg-green-100 transition-colors"
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-[#6A994E] bg-[#6A994E]/10 hover:bg-[#6A994E]/20 transition-colors"
                           >
                             <CheckCircle className="w-3.5 h-3.5" /> Aceptar
                           </button>
                           <button
                             onClick={() => rechazarSolicitud(a)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 transition-colors"
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-[#9C2B1B] bg-[#9C2B1B]/10 hover:bg-[#9C2B1B]/20 transition-colors"
                           >
                             <XCircle className="w-3.5 h-3.5" /> Rechazar
                           </button>

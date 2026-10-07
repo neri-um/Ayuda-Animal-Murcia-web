@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
-import { PawPrint, ClipboardList, FileText, AlertTriangle, ChevronRight, User, Home } from 'lucide-react';
+import { PawPrint, ClipboardList, FileText, AlertTriangle, ChevronRight, User, Home, HandHeart } from 'lucide-react';
 import { useApp, useAuth } from '../../context/AppContext';
 import { AnimalStatusBadge } from '../../components/StatusBadge';
 
@@ -67,6 +67,7 @@ export default function DashboardHome() {
 
   const [adopcionesPendientes, setAdopcionesPendientes] = useState(0);
   const [acogidasPendientes, setAcogidasPendientes] = useState(0);
+  const [voluntariadoPendientes, setVoluntariadoPendientes] = useState(0);
 
   useEffect(() => {
     if (!token) return;
@@ -89,6 +90,18 @@ export default function DashboardHome() {
       .then((data: any[]) => {
         if (Array.isArray(data)) {
           setAcogidasPendientes(data.filter(a => a.estado === 'PENDIENTE').length);
+        }
+      })
+      .catch(() => {});
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
+    fetch(`${BASE}/colaboracion`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(res => (res.ok ? res.json() : []))
+      .then((data: any[]) => {
+        if (Array.isArray(data)) {
+          setVoluntariadoPendientes(data.filter(s => s.estado === 'PENDIENTE').length);
         }
       })
       .catch(() => {});
@@ -145,6 +158,14 @@ export default function DashboardHome() {
           label="Solicitudes almacén"
           value={pendingRequests}
           sub={pendingRequests === 1 ? 'pendiente' : 'pendientes'}
+          color="bg-[#dce8ed]"
+        />
+        <StatCard
+          to="/dashboard/voluntariado"
+          icon={<HandHeart className="w-5 h-5" style={{ color: '#547792' }} />}
+          label="Solicitudes de voluntariado"
+          value={voluntariadoPendientes}
+          sub="sin gestionar"
           color="bg-[#dce8ed]"
         />
       </div>
