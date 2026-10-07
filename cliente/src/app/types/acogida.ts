@@ -1,7 +1,7 @@
 
 import type { EstadoSolicitudCuestionario } from './adoption';
 
-export type EstadoAcogida = 'PENDIENTE' | 'ACTIVA' | 'DISPONIBLE' | 'NO_DISPONIBLE';
+export type EstadoAcogida = 'PENDIENTE' | 'ACTIVA' | 'DISPONIBLE' | 'NO_DISPONIBLE' | 'RECHAZADA';
 export type EspecieAcogida = 'PERRO' | 'GATO';
 
 export interface Acogida {

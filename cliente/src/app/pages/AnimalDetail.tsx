@@ -2,7 +2,7 @@ import { useParams, Link, useNavigate } from 'react-router';
 import {
   ArrowLeft, Heart, Calendar, Ruler, User2,
   CheckCircle, PawPrint, ChevronLeft, ChevronRight, ImageOff, Cat, Dog, Newspaper, ArrowRight, HeartHandshake,
-  Share2, Facebook, Twitter, Send, Copy, Check, Home
+  Share2, Facebook, Twitter, Send, Copy, Check, Home, Loader2
 } from 'lucide-react';
 import { useMemo, useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
@@ -47,7 +47,7 @@ function recortarTexto(texto: string, maxPalabras = 25): string {
 
 export default function AnimalDetail() {
   const { id: param } = useParams<{ id: string }>();
-  const { animals } = useApp();
+  const { animals, animalsLoading } = useApp();
   const navigate = useNavigate();
   const [index, setIndex] = useState(0);
   const [copied, setCopied] = useState(false);
@@ -81,6 +81,15 @@ export default function AnimalDetail() {
     image: images[0] || undefined,
     path: animal ? `/animales/${toSlug(animal.name)}` : undefined,
   });
+
+  if (animalsLoading) {
+    return (
+      <div className="flex items-center justify-center py-16 text-gray-400 gap-3">
+        <Loader2 className="w-5 h-5 animate-spin" />
+        <span className="text-sm">Cargando animal...</span>
+      </div>
+    );
+  }
 
   if (!animal) {
     return (

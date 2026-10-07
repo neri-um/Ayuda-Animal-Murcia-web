@@ -104,6 +104,13 @@ public class AcogidaService implements AcogidaUseCase {
             s.getAcogida().setEstado(EstadoAcogida.DISPONIBLE);
         }
 
+        // Rechazar una solicitud = la casa de acogida queda RECHAZADA (si no está en uso).
+        if (nuevoEstado == EstadoSolicitudCuestionario.RECHAZADA
+                && s.getAcogida() != null
+                && s.getAcogida().getEstado() != EstadoAcogida.ACTIVA) {
+            s.getAcogida().setEstado(EstadoAcogida.RECHAZADA);
+        }
+
         return solicitudRepo.guardar(s);
     }
 
