@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import vidanimal.aplicacion.input.SolicitudVoluntariadoUseCase;
 import vidanimal.dominio.modelo.SolicitudVoluntariado;
 import vidanimal.infraestructura.rest.dto.ColaboracionDTO;
+import vidanimal.infraestructura.rest.dto.CrauDTO;
 import vidanimal.infraestructura.rest.dto.DecisionSolicitudVoluntariadoDTO;
 import vidanimal.infraestructura.rest.dto.SolicitudVoluntariadoRespuestaDTO;
 
@@ -73,6 +74,14 @@ public class ColaboracionController {
                 toDTO(solicitudUseCase.cambiarEstado(id, dto.getEstado(), dto.getMensaje())));
     }
 
+    @PatchMapping("/{id}/crau")
+    public ResponseEntity<SolicitudVoluntariadoRespuestaDTO> actualizarCrau(
+            @PathVariable Long id,
+            @RequestBody CrauDTO dto) {
+        return ResponseEntity.ok(
+                toDTO(solicitudUseCase.actualizarCrau(id, dto.getCrau())));
+    }
+
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
@@ -91,6 +100,7 @@ public class ColaboracionController {
         dto.setFechaDecision(s.getFechaDecision());
         dto.setEstado(s.getEstado());
         dto.setMensajeRespuesta(s.getMensajeRespuesta());
+        dto.setCrau(s.getCrau());
         try {
             dto.setRespuestas(objectMapper.readValue(s.getRespuestas(), Map.class));
         } catch (Exception e) {

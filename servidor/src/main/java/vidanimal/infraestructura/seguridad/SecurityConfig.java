@@ -83,6 +83,8 @@ public class SecurityConfig {
                     .hasAnyAuthority("VOLUNTARIO", "ENCARGADO", "ADMIN")
                 .requestMatchers(HttpMethod.PATCH, "/vidanimal/colaboracion/*/estado")
                     .hasAnyAuthority("VOLUNTARIO", "ENCARGADO", "ADMIN")
+                .requestMatchers(HttpMethod.PATCH, "/vidanimal/colaboracion/*/crau")
+                    .hasAnyAuthority("VOLUNTARIO", "ENCARGADO", "ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/vidanimal/colaboracion/*")
                     .hasAnyAuthority("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/vidanimal/formularios")

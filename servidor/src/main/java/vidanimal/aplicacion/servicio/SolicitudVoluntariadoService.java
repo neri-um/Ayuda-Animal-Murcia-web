@@ -92,6 +92,18 @@ public class SolicitudVoluntariadoService implements SolicitudVoluntariadoUseCas
     }
 
     @Override
+    public SolicitudVoluntariado actualizarCrau(Long id, Integer crau) {
+        if (crau != null && crau < 0) {
+            throw new IllegalArgumentException("Los CRAU no pueden ser negativos.");
+        }
+        SolicitudVoluntariado solicitud = repo.buscarPorId(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Solicitud no encontrada: " + id));
+
+        solicitud.setCrau(crau);
+        return repo.guardar(solicitud);
+    }
+
+    @Override
     public void eliminar(Long id) {
         if (repo.buscarPorId(id).isEmpty()) {
             throw new RecursoNoEncontradoException("Solicitud no encontrada: " + id);
