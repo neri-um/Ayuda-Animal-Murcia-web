@@ -20,6 +20,7 @@ public class SolicitudVoluntariadoRespuestaDTO {
     private LocalDate fechaDecision;
     private EstadoSolicitudCuestionario estado;
     private String mensajeRespuesta;
+    private Integer crau;
     private Map<String, String> respuestas = new LinkedHashMap<>();
 
     public Long getId() { return id; }
@@ -45,6 +46,9 @@ public class SolicitudVoluntariadoRespuestaDTO {
 
     public String getMensajeRespuesta() { return mensajeRespuesta; }
     public void setMensajeRespuesta(String mensajeRespuesta) { this.mensajeRespuesta = mensajeRespuesta; }
+
+    public Integer getCrau() { return crau; }
+    public void setCrau(Integer crau) { this.crau = crau; }
 
     public Map<String, String> getRespuestas() { return respuestas; }
     public void setRespuestas(Map<String, String> respuestas) {

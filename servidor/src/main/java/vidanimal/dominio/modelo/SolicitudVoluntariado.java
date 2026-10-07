@@ -47,6 +47,9 @@ public class SolicitudVoluntariado {
     @Column(columnDefinition = "TEXT")
     private String mensajeRespuesta;
 
+    /** Créditos CRAU asignados a la persona (voluntariado universitario UMU). */
+    private Integer crau;
+
     public Long getId() {
         return id;
     }
@@ -117,5 +120,13 @@ public class SolicitudVoluntariado {
 
     public void setMensajeRespuesta(String mensajeRespuesta) {
         this.mensajeRespuesta = mensajeRespuesta;
+    }
+
+    public Integer getCrau() {
+        return crau;
+    }
+
+    public void setCrau(Integer crau) {
+        this.crau = crau;
     }
 }

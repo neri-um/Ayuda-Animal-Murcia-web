@@ -1,22 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   Loader2, Search, ChevronDown, ChevronUp, CheckCircle, XCircle, MessageCircle,
-  Trash2, RefreshCw, Calendar, ClipboardList,
+  Trash2, RefreshCw, Calendar, ClipboardList, Plus, Minus, Info,
 } from 'lucide-react';
 import { useAuth } from '../../context/AppContext';
 import {
-  listarSolicitudesColaboracion, decidirSolicitudColaboracion,
+  listarSolicitudesColaboracion, decidirSolicitudColaboracion, actualizarCrauSolicitud,
   eliminarSolicitudColaboracion, type SolicitudColaboracion,
 } from '../../services/colaboracion';
+import CrauNota from '../../components/colaborar/CrauInfo';
 
 type EstadoSolicitud = 'PENDIENTE' | 'ACEPTADA' | 'RECHAZADA';
-
-// Paleta de estados: pendiente #D4AF37 · aceptado #6A994E · rechazado #9C2B1B
-const ESTADO_CHIP: Record<EstadoSolicitud, string> = {
-  PENDIENTE: 'bg-[#D4AF37] text-[#2e2e2e]',
-  ACEPTADA:  'bg-[#6A994E] text-white',
-  RECHAZADA: 'bg-[#9C2B1B] text-white',
-};
 
 const TIPO_LABEL: Record<string, string> = {
   VOLUNTARIADO:     'Voluntariado',
@@ -28,6 +22,12 @@ const SECCIONES: { key: EstadoSolicitud; label: string; border: string; dot: str
   { key: 'PENDIENTE', label: 'Pendientes', border: 'border-l-[#D4AF37]', dot: 'bg-[#D4AF37]' },
   { key: 'ACEPTADA',  label: 'Aceptadas',  border: 'border-l-[#6A994E]', dot: 'bg-[#6A994E]' },
   { key: 'RECHAZADA', label: 'Rechazadas', border: 'border-l-[#9C2B1B]', dot: 'bg-[#9C2B1B]' },
+];
+
+// Dos columnas por tipo: voluntariado/casa de acogida (azul) y voluntariado UMU (rojo anaranjado).
+const COLUMNAS: { key: 'NORMAL' | 'UMU'; label: string; color: string; tipos: string[] }[] = [
+  { key: 'NORMAL', label: 'Voluntariado', color: '#547792', tipos: ['VOLUNTARIADO', 'ACOGIDA'] },
+  { key: 'UMU', label: 'Voluntariado UMU', color: '#E8663B', tipos: ['VOLUNTARIADO_UMU'] },
 ];
 
 function formatFecha(iso: string | null): string {
@@ -46,14 +46,15 @@ export default function VoluntariadoSolicitudes() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busqueda, setBusqueda] = useState('');
-  const [tipoFiltro, setTipoFiltro] = useState('');
   const [seccion, setSeccion] = useState<EstadoSolicitud | ''>('PENDIENTE');
   const [expandida, setExpandida] = useState<number | null>(null);
   const [actualizando, setActualizando] = useState<number | null>(null);
+  const [guardandoCrau, setGuardandoCrau] = useState<number | null>(null);
   const [decision, setDecision] = useState<{ solicitud: SolicitudColaboracion; estado: 'ACEPTADA' | 'RECHAZADA' } | null>(null);
   const [mensaje, setMensaje] = useState('');
   const [eliminarId, setEliminarId] = useState<number | null>(null);
   const [seccionesColapsadas, setSeccionesColapsadas] = useState<Record<string, boolean>>({});
+  const [mostrarReglas, setMostrarReglas] = useState(false);
 
   const cargar = useCallback(async () => {
     if (!token) return;
@@ -87,6 +88,22 @@ export default function VoluntariadoSolicitudes() {
     }
   };
 
+  const cambiarCrau = async (s: SolicitudColaboracion, delta: number) => {
+    if (!token) return;
+    const nuevo = Math.max(0, (s.crau ?? 0) + delta);
+    if (nuevo === (s.crau ?? 0)) return;
+    setGuardandoCrau(s.id);
+    try {
+      const actualizada = await actualizarCrauSolicitud(token, s.id, nuevo);
+      setSolicitudes(prev => prev.map(x => (x.id === actualizada.id ? actualizada : x)));
+      setError(null);
+    } catch (e: any) {
+      setError(e?.message ?? 'No se pudieron actualizar los CRAU.');
+    } finally {
+      setGuardandoCrau(null);
+    }
+  };
+
   const confirmarEliminar = async () => {
     if (eliminarId === null || !token) return;
     setActualizando(eliminarId);
@@ -102,16 +119,12 @@ export default function VoluntariadoSolicitudes() {
   };
 
   const coincide = (s: SolicitudColaboracion) => {
-    if (tipoFiltro && s.tipo !== tipoFiltro) return false;
     if (!busqueda) return true;
     const texto = busqueda.toLowerCase();
     return (s.nombre ?? '').toLowerCase().includes(texto) || s.email.toLowerCase().includes(texto);
   };
 
-  const grupos = SECCIONES
-    .filter(g => !seccion || g.key === seccion)
-    .map(g => ({ ...g, items: solicitudes.filter(s => s.estado === g.key && coincide(s)) }))
-    .filter(g => g.items.length > 0);
+  const filtradas = solicitudes.filter(coincide);
 
   return (
     <div className="space-y-6">
@@ -122,14 +135,24 @@ export default function VoluntariadoSolicitudes() {
             Altas recibidas desde la web: voluntariado, voluntariado UMU y casas de acogida.
           </p>
         </div>
-        <button
-          onClick={cargar}
-          disabled={loading}
-          className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50"
-        >
-          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Actualizar
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setMostrarReglas(v => !v)}
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+          >
+            <Info className="w-4 h-4" /> Reglas CRAU
+          </button>
+          <button
+            onClick={cargar}
+            disabled={loading}
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Actualizar
+          </button>
+        </div>
       </div>
+
+      {mostrarReglas && <CrauNota />}
 
       <div className="bg-white rounded-2xl border border-gray-100 p-4 flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
@@ -143,21 +166,11 @@ export default function VoluntariadoSolicitudes() {
           />
         </div>
         <select
-          value={tipoFiltro}
-          onChange={e => setTipoFiltro(e.target.value)}
-          className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none"
-        >
-          <option value="">Todos los tipos</option>
-          {Object.entries(TIPO_LABEL).map(([valor, etiqueta]) => (
-            <option key={valor} value={valor}>{etiqueta}</option>
-          ))}
-        </select>
-        <select
           value={seccion}
           onChange={e => setSeccion(e.target.value as EstadoSolicitud | '')}
           className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none"
         >
-          <option value="">Todas</option>
+          <option value="">Todos los estados</option>
           {SECCIONES.map(g => (
             <option key={g.key} value={g.key}>{g.label}</option>
           ))}
@@ -175,142 +188,187 @@ export default function VoluntariadoSolicitudes() {
           <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3 text-[#547792]" />
           <p className="text-sm">Cargando solicitudes...</p>
         </div>
-      ) : grupos.length === 0 ? (
+      ) : filtradas.length === 0 ? (
         <div className="bg-white rounded-2xl border border-gray-100 text-center py-16 text-gray-400">
           <ClipboardList className="w-10 h-10 mx-auto mb-3 opacity-50" />
           <p>No hay solicitudes con estos filtros</p>
         </div>
       ) : (
-        grupos.map(({ key, label, border, dot, items }) => {
-          const colapsada = seccionesColapsadas[key];
-          return (
-            <div key={key} className={`bg-white rounded-2xl border border-gray-100 border-l-4 ${border}`}>
-              <button
-                onClick={() => setSeccionesColapsadas(prev => ({ ...prev, [key]: !prev[key] }))}
-                className="w-full flex items-center justify-between gap-2 px-4 sm:px-5 py-4"
-              >
-                <span className="flex items-center gap-2 text-sm font-semibold text-gray-800">
-                  <span className={`w-2.5 h-2.5 rounded-full ${dot}`} />
-                  {label}
-                  <span className="text-xs font-normal text-gray-400">({items.length})</span>
-                </span>
-                {colapsada ? <ChevronDown className="w-4 h-4 text-gray-400" /> : <ChevronUp className="w-4 h-4 text-gray-400" />}
-              </button>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
+          {COLUMNAS.map(col => {
+            const itemsCol = filtradas.filter(s => col.tipos.includes(s.tipo));
+            const seccionesConItems = SECCIONES.filter(sec =>
+              (!seccion || sec.key === seccion) && itemsCol.some(s => s.estado === sec.key));
 
-              {!colapsada && (
-                <div className="px-4 sm:px-5 pb-4 space-y-3">
-                  {items.map(s => {
-                    const abierta = expandida === s.id;
-                    const respuestas = Object.entries(s.respuestas ?? {});
-                    const telefono = s.respuestas?.['Teléfono de contacto'] ?? '';
-
-                    return (
-                      <div key={s.id} className="rounded-xl border border-gray-100">
-                        <div className="p-4">
-                          <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-3">
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-2 flex-wrap mb-1.5">
-                                <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${ESTADO_CHIP[s.estado]}`}>
-                                  {label}
-                                </span>
-                                <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#dce8ed] text-[#213448]">
-                                  {TIPO_LABEL[s.tipo] ?? s.tipo}
-                                </span>
-                                <span className="text-xs text-gray-400 flex items-center gap-1">
-                                  <Calendar className="w-3.5 h-3.5" /> {formatFecha(s.fechaSolicitud)}
-                                </span>
-                              </div>
-                              <p className="text-sm font-medium text-gray-800 truncate">{s.nombre ?? 'Sin nombre'}</p>
-                              <p className="text-xs text-gray-500 truncate">{s.email}</p>
-                            </div>
-
-                            <div className="flex flex-wrap items-center gap-1.5 lg:justify-end">
-                              {s.estado === 'PENDIENTE' && (
-                                <>
-                                  <button
-                                    onClick={() => { setDecision({ solicitud: s, estado: 'ACEPTADA' }); setMensaje(''); }}
-                                    disabled={actualizando === s.id}
-                                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#6A994E] bg-[#6A994E]/10 hover:bg-[#6A994E]/20 transition-colors disabled:opacity-50"
-                                  >
-                                    {actualizando === s.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                                    Aceptar
-                                  </button>
-                                  <button
-                                    onClick={() => { setDecision({ solicitud: s, estado: 'RECHAZADA' }); setMensaje(''); }}
-                                    disabled={actualizando === s.id}
-                                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#9C2B1B] bg-[#9C2B1B]/10 hover:bg-[#9C2B1B]/20 transition-colors disabled:opacity-50"
-                                  >
-                                    <XCircle className="w-4 h-4" /> Rechazar
-                                  </button>
-                                </>
-                              )}
-                              <a
-                                href={telefono ? `https://wa.me/${telefono.replace(/\D/g, '')}` : '#'}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-green-700 bg-green-50 hover:bg-green-100 transition-colors"
-                              >
-                                <MessageCircle className="w-4 h-4" /> WhatsApp
-                              </a>
-                              <button
-                                onClick={() => setExpandida(abierta ? null : s.id)}
-                                className="p-2 rounded-xl text-gray-500 hover:bg-gray-50 transition-colors"
-                                title={abierta ? 'Ocultar respuestas' : 'Ver respuestas'}
-                              >
-                                {abierta ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                              </button>
-                              {esAdmin && (
-                                <button
-                                  onClick={() => setEliminarId(s.id)}
-                                  disabled={actualizando === s.id}
-                                  className="p-2 rounded-xl text-red-300 hover:bg-red-50 hover:text-red-500 transition-colors disabled:opacity-50"
-                                  title="Eliminar solicitud"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
-                              )}
-                            </div>
-                          </div>
-
-                          {s.mensajeRespuesta && (
-                            <div
-                              className="mt-3 rounded-xl px-3 py-2 text-xs"
-                              style={s.estado === 'ACEPTADA'
-                                ? { backgroundColor: 'rgba(106,153,78,0.08)', color: '#3f5f2d' }
-                                : { backgroundColor: 'rgba(156,43,27,0.08)', color: '#7d2317' }}
-                            >
-                              <span className="opacity-70 block mb-0.5">
-                                Mensaje enviado · {formatFecha(s.fechaDecision)}
-                              </span>
-                              {s.mensajeRespuesta}
-                            </div>
-                          )}
-                        </div>
-
-                        {abierta && (
-                          <div className="border-t border-gray-100 bg-gray-50/70 px-4 py-3">
-                            {respuestas.length === 0 ? (
-                              <p className="text-xs text-gray-400">Sin respuestas registradas.</p>
-                            ) : (
-                              <div className="grid sm:grid-cols-2 gap-x-6 gap-y-2">
-                                {respuestas.map(([pregunta, respuesta]) => (
-                                  <div key={pregunta} className="text-xs">
-                                    <span className="block text-gray-400">{pregunta}</span>
-                                    <span className="text-gray-700 break-words">{respuesta || '—'}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
+            return (
+              <div key={col.key} className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: col.color }} />
+                  <h2 className="text-sm font-semibold" style={{ color: col.color }}>{col.label}</h2>
+                  <span className="text-xs text-gray-400">({itemsCol.length})</span>
                 </div>
-              )}
-            </div>
-          );
-        })
+
+                {seccionesConItems.length === 0 ? (
+                  <div className="bg-white rounded-2xl border border-gray-100 text-center py-10 text-gray-400 text-sm">
+                    No hay solicitudes
+                  </div>
+                ) : seccionesConItems.map(sec => {
+                  const items = itemsCol.filter(s => s.estado === sec.key);
+                  const clave = `${col.key}-${sec.key}`;
+                  const colapsada = seccionesColapsadas[clave];
+                  return (
+                    <div key={sec.key} className={`bg-white rounded-2xl border border-gray-100 border-l-4 ${sec.border}`}>
+                      <button
+                        onClick={() => setSeccionesColapsadas(prev => ({ ...prev, [clave]: !prev[clave] }))}
+                        className="w-full flex items-center justify-between gap-2 px-4 sm:px-5 py-4"
+                      >
+                        <span className="flex items-center gap-2 text-sm font-semibold text-gray-800">
+                          <span className={`w-2.5 h-2.5 rounded-full ${sec.dot}`} />
+                          {sec.label}
+                          <span className="text-xs font-normal text-gray-400">({items.length})</span>
+                        </span>
+                        {colapsada ? <ChevronDown className="w-4 h-4 text-gray-400" /> : <ChevronUp className="w-4 h-4 text-gray-400" />}
+                      </button>
+
+                      {!colapsada && (
+                        <div className="px-4 sm:px-5 pb-4 space-y-3">
+                          {items.map(s => {
+                            const abierta = expandida === s.id;
+                            const respuestas = Object.entries(s.respuestas ?? {});
+                            const telefono = s.respuestas?.['Teléfono de contacto'] ?? '';
+
+                            return (
+                              <div key={s.id} className="rounded-xl border border-gray-100 border-l-4" style={{ borderLeftColor: col.color }}>
+                                <div className="p-4">
+                                  <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-3">
+                                    <div className="min-w-0 flex-1">
+                                      <div className="flex items-center gap-2 flex-wrap mb-1.5">
+                                        <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#dce8ed] text-[#213448]">
+                                          {TIPO_LABEL[s.tipo] ?? s.tipo}
+                                        </span>
+                                        <span className="text-xs text-gray-400 flex items-center gap-1">
+                                          <Calendar className="w-3.5 h-3.5" /> {formatFecha(s.fechaSolicitud)}
+                                        </span>
+                                      </div>
+                                      <p className="text-sm font-medium text-gray-800 truncate">{s.nombre ?? 'Sin nombre'}</p>
+                                      <p className="text-xs text-gray-500 truncate">{s.email}</p>
+                                    </div>
+
+                                    <div className="flex flex-wrap items-center gap-1.5 lg:justify-end">
+                                      {col.key === 'UMU' && (
+                                        <div className="inline-flex items-center rounded-xl border border-gray-200">
+                                          <span className="text-xs text-gray-500 pl-2 pr-1">CRAU</span>
+                                          <button
+                                            onClick={() => cambiarCrau(s, -1)}
+                                            disabled={guardandoCrau === s.id || (s.crau ?? 0) <= 0}
+                                            title="Quitar un CRAU"
+                                            className="p-1.5 text-gray-400 hover:text-gray-700 disabled:opacity-40"
+                                          >
+                                            <Minus className="w-3.5 h-3.5" />
+                                          </button>
+                                          <span className="w-6 text-center text-sm font-semibold text-gray-700">
+                                            {guardandoCrau === s.id ? <Loader2 className="w-3.5 h-3.5 animate-spin mx-auto" /> : (s.crau ?? 0)}
+                                          </span>
+                                          <button
+                                            onClick={() => cambiarCrau(s, 1)}
+                                            disabled={guardandoCrau === s.id}
+                                            title="Añadir un CRAU"
+                                            className="p-1.5 text-gray-400 hover:text-gray-700 disabled:opacity-40"
+                                          >
+                                            <Plus className="w-3.5 h-3.5" />
+                                          </button>
+                                        </div>
+                                      )}
+                                      {s.estado === 'PENDIENTE' && (
+                                        <>
+                                          <button
+                                            onClick={() => { setDecision({ solicitud: s, estado: 'ACEPTADA' }); setMensaje(''); }}
+                                            disabled={actualizando === s.id}
+                                            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#6A994E] bg-[#6A994E]/10 hover:bg-[#6A994E]/20 transition-colors disabled:opacity-50"
+                                          >
+                                            {actualizando === s.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                                            Aceptar
+                                          </button>
+                                          <button
+                                            onClick={() => { setDecision({ solicitud: s, estado: 'RECHAZADA' }); setMensaje(''); }}
+                                            disabled={actualizando === s.id}
+                                            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#9C2B1B] bg-[#9C2B1B]/10 hover:bg-[#9C2B1B]/20 transition-colors disabled:opacity-50"
+                                          >
+                                            <XCircle className="w-4 h-4" /> Rechazar
+                                          </button>
+                                        </>
+                                      )}
+                                      <a
+                                        href={telefono ? `https://wa.me/${telefono.replace(/\D/g, '')}` : '#'}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-green-700 bg-green-50 hover:bg-green-100 transition-colors"
+                                      >
+                                        <MessageCircle className="w-4 h-4" /> WhatsApp
+                                      </a>
+                                      <button
+                                        onClick={() => setExpandida(abierta ? null : s.id)}
+                                        className="p-2 rounded-xl text-gray-500 hover:bg-gray-50 transition-colors"
+                                        title={abierta ? 'Ocultar respuestas' : 'Ver respuestas'}
+                                      >
+                                        {abierta ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                      </button>
+                                      {esAdmin && (
+                                        <button
+                                          onClick={() => setEliminarId(s.id)}
+                                          disabled={actualizando === s.id}
+                                          className="p-2 rounded-xl text-red-300 hover:bg-red-50 hover:text-red-500 transition-colors disabled:opacity-50"
+                                          title="Eliminar solicitud"
+                                        >
+                                          <Trash2 className="w-4 h-4" />
+                                        </button>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  {s.mensajeRespuesta && (
+                                    <div
+                                      className="mt-3 rounded-xl px-3 py-2 text-xs"
+                                      style={s.estado === 'ACEPTADA'
+                                        ? { backgroundColor: 'rgba(106,153,78,0.08)', color: '#3f5f2d' }
+                                        : { backgroundColor: 'rgba(156,43,27,0.08)', color: '#7d2317' }}
+                                    >
+                                      <span className="opacity-70 block mb-0.5">
+                                        Mensaje enviado · {formatFecha(s.fechaDecision)}
+                                      </span>
+                                      {s.mensajeRespuesta}
+                                    </div>
+                                  )}
+                                </div>
+
+                                {abierta && (
+                                  <div className="border-t border-gray-100 bg-gray-50/70 px-4 py-3">
+                                    {respuestas.length === 0 ? (
+                                      <p className="text-xs text-gray-400">Sin respuestas registradas.</p>
+                                    ) : (
+                                      <div className="grid sm:grid-cols-2 gap-x-6 gap-y-2">
+                                        {respuestas.map(([pregunta, respuesta]) => (
+                                          <div key={pregunta} className="text-xs">
+                                            <span className="block text-gray-400">{pregunta}</span>
+                                            <span className="text-gray-700 break-words">{respuesta || '—'}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
       )}
 
       {decision && (

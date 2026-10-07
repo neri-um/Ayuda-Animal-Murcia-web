@@ -14,6 +14,7 @@ export interface SolicitudColaboracion {
   fechaDecision: string | null;
   estado: EstadoSolicitudColaboracion;
   mensajeRespuesta: string | null;
+  crau?: number | null;
   respuestas: Record<string, string>;
 }
 
@@ -53,6 +54,20 @@ export async function decidirSolicitudColaboracion(
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify({ estado, mensaje }),
+  });
+  if (!res.ok) throw await leerMensajeError(res);
+  return res.json();
+}
+
+export async function actualizarCrauSolicitud(
+  token: string,
+  id: number,
+  crau: number,
+): Promise<SolicitudColaboracion> {
+  const res = await fetch(`${BASE}/colaboracion/${id}/crau`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ crau }),
   });
   if (!res.ok) throw await leerMensajeError(res);
   return res.json();
