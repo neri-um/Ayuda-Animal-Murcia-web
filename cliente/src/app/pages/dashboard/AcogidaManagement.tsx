@@ -28,7 +28,7 @@ const COLOR_SECCION: Record<SeccionKey, string> = {
   DISPONIBLE: 'border-l-green-500',
   ACTIVA: 'border-l-blue-500',
   NO_DISPONIBLE: 'border-l-gray-400',
-  RECHAZADA: 'border-l-red-500',
+  RECHAZADA: 'border-l-red-400',
 };
 
 export default function AcogidaManagement() {
