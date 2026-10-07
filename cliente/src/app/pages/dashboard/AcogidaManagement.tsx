@@ -290,8 +290,17 @@ export default function AcogidaManagement() {
                           </p>
                           {(a.animalNombre || a.respuestas?.animal_concreto) && (
                             <span className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full bg-[#f7e3b0] text-gray-900 whitespace-nowrap">
-                              <PawPrint className="w-3.5 h-3.5 text-gray-900" />
+                              <PawPrint className="w-3.5 h-3.5" />
                               {a.animalNombre || a.respuestas?.animal_concreto}
+                            </span>
+                          )}
+                          {a.solicitudEstado === 'PENDIENTE' && a.estado !== 'PENDIENTE' && (
+                            <span
+                              className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 border border-amber-200 whitespace-nowrap"
+                              title="La casa ya no está pendiente pero la solicitud sigue sin gestionar"
+                            >
+                              <Clock className="w-3.5 h-3.5" />
+                              Solicitud sin resolver
                             </span>
                           )}
                         </div>
@@ -327,7 +336,7 @@ export default function AcogidaManagement() {
                     )}
 
                     <div className="flex flex-wrap items-center gap-1.5 px-3 py-2.5 border-t border-gray-100">
-                      {a.estado === 'PENDIENTE' && (
+                      {a.solicitudEstado === 'PENDIENTE' && (
                         <>
                           <button
                             onClick={() => aceptarSolicitud(a)}
@@ -372,8 +381,13 @@ export default function AcogidaManagement() {
                         </button>
                         <button
                           onClick={() => cambiarEstado(a.id, a.estado === 'DISPONIBLE' ? 'NO_DISPONIBLE' : 'DISPONIBLE')}
-                          className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition-colors"
-                          title={a.estado === 'DISPONIBLE' ? 'No disponible' : 'Disponible'}
+                          disabled={a.solicitudEstado === 'PENDIENTE'}
+                          className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-200 hover:text-gray-400 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                          title={
+                            a.solicitudEstado === 'PENDIENTE'
+                              ? 'Gestiona primero la solicitud (aceptar o rechazar)'
+                              : a.estado === 'DISPONIBLE' ? 'No disponible' : 'Disponible'
+                          }
                         >
                           <Pause className="w-4 h-4" />
                         </button>

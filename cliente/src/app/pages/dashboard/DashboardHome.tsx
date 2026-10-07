@@ -82,11 +82,13 @@ export default function DashboardHome() {
 
   useEffect(() => {
     if (!token) return;
-    fetch(`${BASE}/acogidas/solicitudes`, { headers: { Authorization: `Bearer ${token}` } })
+    // Cuenta casas de acogida pendientes: la misma fuente que la sección
+    // "Pendientes" de /dashboard/acogidas, para que ambos números coincidan.
+    fetch(`${BASE}/acogidas`, { headers: { Authorization: `Bearer ${token}` } })
       .then(res => (res.ok ? res.json() : []))
       .then((data: any[]) => {
         if (Array.isArray(data)) {
-          setAcogidasPendientes(data.filter(s => s.estado === 'PENDIENTE').length);
+          setAcogidasPendientes(data.filter(a => a.estado === 'PENDIENTE').length);
         }
       })
       .catch(() => {});

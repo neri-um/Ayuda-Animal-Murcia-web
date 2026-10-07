@@ -72,7 +72,6 @@ interface AppContextType {
   confirmReturn: (id: string, managerId: string) => Promise<void>;
   animalDelMesId: string | null;
   setAnimalDelMesId: (id: string | null) => Promise<void>;
-  animalDelMesExtra: Animal | null;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -354,8 +353,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const logoutEnProgreso = useRef(false);
   // Animal del mes que no está en la lista pública (ADOPTADO/FALLECIDO/PRE_ADOPCION)
   // para que la tarjeta del Home y su ficha sigan funcionando tras "salir" de adopción.
-  // Se mantiene APARTE de 'animals' para no contaminar la lista pública (/adoptar).
-  const [animalDelMesExtra, setAnimalDelMesExtra] = useState<Animal | null>(null);
+  const animalDelMesExtraRef = useRef<Animal | null>(null);
 
   useEffect(() => {
     cancelRetry.current = false;
@@ -370,7 +368,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         .then(data => {
           if (cancelRetry.current || !data) return;
           const animal = mapAnimalFromBackend(data);
-          setAnimalDelMesExtra(animal);
+          animalDelMesExtraRef.current = animal;
+          setAnimals(prev =>
+            prev.some(a => a.id === animal.id)
+              ? prev
+              : [...prev, animal]
+          );
         })
         .catch(() => { /* si falla, simplemente no se muestra la tarjeta */ });
     });
@@ -400,6 +403,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       if (contentType && contentType.includes('application/json')) {
         const data = await res.json();
         const mapeados = Array.isArray(data) ? data.map(mapAnimalFromBackend) : [];
+        if (animalDelMesExtraRef.current
+            && !mapeados.some(a => a.id === animalDelMesExtraRef.current!.id)) {
+          mapeados.push(animalDelMesExtraRef.current);
+        }
         setAnimals(mapeados);
       } else {
         setAnimals([]);
@@ -818,7 +825,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       products, productsLoading, fetchProducts, addProduct, updateProduct, deleteProduct,
       requests, requestsLoading, fetchRequests, addRequest, updateRequestStatus,
       notifyReturn, confirmReturn,
-      animalDelMesId, setAnimalDelMesId, animalDelMesExtra,
+      animalDelMesId, setAnimalDelMesId,
     }}>
       {children}
     </AppContext.Provider>

@@ -75,7 +75,7 @@ function formatEspecie(species: string): string {
 
 export default function AcogidaAnimalForm() {
   const { id } = useParams<{ id: string }>();
-  const { animals } = useApp();
+  const { animals, animalsLoading } = useApp();
   const navigate = useNavigate();
 
   const [secciones, setSecciones] = useState<SeccionFormulario[]>([]);
@@ -131,6 +131,15 @@ export default function AcogidaAnimalForm() {
       .catch(() => setSecciones([]))
       .finally(() => setLoadingForm(false));
   }, [id, animal?.id, animals.length]);
+
+  if (animalsLoading) {
+    return (
+      <div className="flex items-center justify-center py-16 text-gray-400 gap-3">
+        <Loader2 className="w-5 h-5 animate-spin" />
+        <span className="text-sm">Cargando animal...</span>
+      </div>
+    );
+  }
 
   if (!animal) {
     return (

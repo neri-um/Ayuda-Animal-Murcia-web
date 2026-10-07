@@ -26,7 +26,7 @@ export default function AdoptionRequests() {
     mapa: Record<string, string>;
   }[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filtroEstado, setFiltroEstado] = useState<EstadoSolicitudCuestionario | 'TODAS'>('TODAS');
+  const [seccionColapsada, setSeccionColapsada] = useState<Record<string, boolean>>({});
   const [busqueda, setBusqueda] = useState('');
   const [expandida, setExpandida] = useState<number | null>(null);
   const [actualizando, setActualizando] = useState<number | null>(null);
@@ -39,7 +39,16 @@ export default function AdoptionRequests() {
   const [borrando, setBorrando] = useState(false);
   const [errorBorrar, setErrorBorrar] = useState<string | null>(null);
 
-  const estadosFiltro = ['TODAS', ...(enums?.estadosSolicitudAdopcion ?? ['PENDIENTE', 'ACEPTADA', 'RECHAZADA'])] as const;
+  const SECCIONES: {
+    key: EstadoSolicitudCuestionario;
+    label: string;
+    color: string;
+    icono: React.ReactNode;
+  }[] = [
+    { key: 'PENDIENTE', label: 'Pendientes', color: 'border-l-amber-400', icono: <Clock className="w-4 h-4 text-gray-400" /> },
+    { key: 'ACEPTADA',  label: 'Aceptadas',  color: 'border-l-green-500', icono: <CheckCircle className="w-4 h-4 text-gray-400" /> },
+    { key: 'RECHAZADA', label: 'Rechazadas', color: 'border-l-red-500', icono: <XCircle className="w-4 h-4 text-gray-400" /> },
+  ];
 
   const fetchSolicitudes = useCallback(async () => {
     if (!token) return;
@@ -280,12 +289,12 @@ export default function AdoptionRequests() {
   };
 
   const solicitudesFiltradas = solicitudes.filter(s => {
-    const coincideEstado = filtroEstado === 'TODAS' || s.estado === filtroEstado;
-    const coincideBusqueda =
-      s.nombreAdoptante.toLowerCase().includes(busqueda.toLowerCase()) ||
-      s.email.toLowerCase().includes(busqueda.toLowerCase()) ||
-      (s.animalNombre ?? '').toLowerCase().includes(busqueda.toLowerCase());
-    return coincideEstado && coincideBusqueda;
+    const q = busqueda.toLowerCase();
+    return (
+      s.nombreAdoptante.toLowerCase().includes(q) ||
+      s.email.toLowerCase().includes(q) ||
+      (s.animalNombre ?? '').toLowerCase().includes(q)
+    );
   });
 
   const contadores: Record<string, number> = {
@@ -322,22 +331,6 @@ export default function AdoptionRequests() {
             onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
           />
         </div>
-        <div className="flex gap-2 flex-wrap">
-          {estadosFiltro.map(estado => (
-            <button
-              key={estado}
-              onClick={() => setFiltroEstado(estado as EstadoSolicitudCuestionario | 'TODAS')}
-              className={`px-3 py-2 rounded-xl text-xs font-medium transition-colors border ${
-                filtroEstado === estado
-                  ? 'text-white border-transparent'
-                  : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
-              }`}
-              style={filtroEstado === estado ? { backgroundColor: '#547792', borderColor: '#547792' } : {}}
-            >
-              {estado === 'TODAS' ? 'Todas' : formatEnum(estado)} ({contadores[estado] ?? 0})
-            </button>
-          ))}
-        </div>
       </div>
 
       {error && (
@@ -351,16 +344,40 @@ export default function AdoptionRequests() {
           <Loader2 className="w-5 h-5 animate-spin" />
           <span className="text-sm">Cargando solicitudes...</span>
         </div>
-      ) : solicitudesFiltradas.length === 0 ? (
+      ) : solicitudes.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <ClipboardList className="w-10 h-10 text-gray-300 mb-3" />
-          <p className="text-gray-500 text-sm">
-            No hay solicitudes{filtroEstado !== 'TODAS' ? ` con estado «${formatEnum(filtroEstado)}»` : ''}.
-          </p>
+          <p className="text-gray-500 text-sm">Todavía no hay solicitudes de adopción.</p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {solicitudesFiltradas.map(s => {
+        <div className="space-y-4">
+          {SECCIONES.map(sec => {
+            const itemsSeccion = solicitudesFiltradas.filter(s => s.estado === sec.key);
+            const colapsada = seccionColapsada[sec.key] ?? false;
+            return (
+            <div key={sec.key} className={`rounded-2xl border border-gray-100 border-l-4 ${sec.color} overflow-hidden bg-white shadow-sm`}>
+              <button
+                onClick={() => setSeccionColapsada(prev => ({ ...prev, [sec.key]: !colapsada }))}
+                className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50/60 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  {sec.icono}
+                  <span className="text-sm font-medium text-gray-800">{sec.label}</span>
+                  <span className="text-xs text-gray-400">({itemsSeccion.length})</span>
+                </div>
+                {colapsada
+                  ? <ChevronDown className="w-4 h-4 text-gray-400" />
+                  : <ChevronUp className="w-4 h-4 text-gray-400" />}
+              </button>
+              {!colapsada && (
+                <div className="px-3 pb-3 space-y-3 bg-gray-50/60">
+            {itemsSeccion.length === 0 ? (
+              <p className="text-xs text-gray-400 text-center py-5">
+                {busqueda
+                  ? 'Ninguna solicitud de esta sección coincide con la búsqueda.'
+                  : `No hay solicitudes ${sec.label.toLowerCase()}.`}
+              </p>
+            ) : itemsSeccion.map(s => {
             const { secciones, sueltas, mapa } = contextoCuestionario(s);
             return (
             <div key={s.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
@@ -516,6 +533,11 @@ export default function AdoptionRequests() {
                   ) : (
                     <p className="text-sm text-gray-400">Sin respuestas registradas.</p>
                   )}
+                </div>
+              )}
+            </div>
+            );
+          })}
                 </div>
               )}
             </div>
