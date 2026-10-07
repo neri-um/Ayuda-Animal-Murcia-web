@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { Plus, Edit2, Trash2, Package, AlertTriangle, Search, Send, XCircle, ArrowLeft } from 'lucide-react';
+import { Plus, Edit2, Trash2, Package, AlertTriangle, Search, Send, XCircle } from 'lucide-react';
 import { Link } from 'react-router';
 import { useApp, useAuth } from '../../context/AppContext';
 import { Product } from '../../types';
 import { useEnums, formatEnum } from '../../hooks/useEnums';
+
+const CONSUMIBLE_CATEGORIES = ['ALIMENTACION', 'MEDICAMENTO', 'HIGIENE'];
+const isConsumible = (categoria: string) => CONSUMIBLE_CATEGORIES.includes(categoria);
 
 export default function Warehouse() {
   const { products, requests, users, addProduct, updateProduct, deleteProduct, addRequest } = useApp();
@@ -13,6 +16,7 @@ export default function Warehouse() {
 
   const categories = enums?.categoriasProducto ?? [];
 
+  const [groupFilter, setGroupFilter] = useState<'CONSUMIBLE' | 'OBJETO'>('CONSUMIBLE');
   const [search, setSearch] = useState('');
   const [catFilter, setCatFilter] = useState('');
   const [showForm, setShowForm] = useState(false);
@@ -27,10 +31,17 @@ export default function Warehouse() {
   const [error, setError] = useState<string | null>(null);
 
   const filtered = products.filter(p => {
+    const inGroup = groupFilter === 'CONSUMIBLE' ? isConsumible(p.categoria) : !isConsumible(p.categoria);
+    if (!inGroup) return false;
     if (search && !p.nombre.toLowerCase().includes(search.toLowerCase())) return false;
     if (catFilter && p.categoria !== catFilter) return false;
     return true;
   });
+
+  const groupCount = (group: 'CONSUMIBLE' | 'OBJETO') =>
+    products.filter(p => group === 'CONSUMIBLE' ? isConsumible(p.categoria) : !isConsumible(p.categoria)).length;
+
+  const categoriesInGroup = categories.filter(c => groupFilter === 'CONSUMIBLE' ? isConsumible(c) : !isConsumible(c));
 
   const assignedVolunteers = (productId: string) =>
     requests.filter(r => r.productId === productId && r.status === 'ACEPTADA' && !r.returnConfirmed);
@@ -126,6 +137,23 @@ export default function Warehouse() {
         <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">{error}</div>
       )}
 
+      <div className="grid grid-cols-2 gap-1.5 bg-gray-100 rounded-2xl p-1.5">
+        {([
+          { key: 'CONSUMIBLE', label: 'Alimentación' },
+          { key: 'OBJETO', label: 'Objetos' },
+        ] as const).map(g => (
+          <button
+            key={g.key}
+            onClick={() => { setGroupFilter(g.key); setCatFilter(''); }}
+            className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm transition-colors ${groupFilter === g.key ? 'bg-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+            style={groupFilter === g.key ? { color: '#213448', fontWeight: 600 } : undefined}
+          >
+            {g.label}
+            <span className={`text-xs px-1.5 py-0.5 rounded-full ${groupFilter === g.key ? 'text-white' : 'bg-gray-200 text-gray-500'}`} style={groupFilter === g.key ? { backgroundColor: '#547792' } : undefined}>{groupCount(g.key)}</span>
+          </button>
+        ))}
+      </div>
+
       <div className="bg-white rounded-2xl border border-gray-100 p-4 flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -147,7 +175,7 @@ export default function Warehouse() {
           onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
         >
           <option value="">Todas las categorías</option>
-          {categories.map(c => (
+          {categoriesInGroup.map(c => (
             <option key={c} value={c}>{formatEnum(c)}</option>
           ))}
         </select>
@@ -157,7 +185,7 @@ export default function Warehouse() {
         {filtered.length === 0 ? (
           <div className="col-span-full bg-white rounded-2xl border border-gray-100 text-center py-16 text-gray-400">
             <Package className="w-10 h-10 mx-auto mb-3 opacity-50" />
-            <p>No hay productos en el almacén</p>
+            <p>{groupFilter === 'CONSUMIBLE' ? 'No hay productos de alimentación o consumibles' : 'No hay objetos o equipos en el almacén'}</p>
           </div>
         ) : filtered.map(p => {
           const assigned  = p.stockTotal - p.stockDisponible;
@@ -201,19 +229,17 @@ export default function Warehouse() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-2 text-center">
-                <div className="bg-gray-50 rounded-xl p-2">
-                  <div className="text-base" style={{ fontWeight: 700, color: '#213448' }}>{p.stockTotal}</div>
-                  <div className="text-xs text-gray-400">Total</div>
-                </div>
-                <div className="rounded-xl p-2" style={{ backgroundColor: assigned > 0 ? '#fefce8' : '#f9fafb' }}>
-                  <div className="text-base" style={{ fontWeight: 700, color: assigned > 0 ? '#854d0e' : '#6b7280' }}>{assigned}</div>
-                  <div className="text-xs text-gray-400">Asignado</div>
-                </div>
+              <div className={`grid gap-2 text-center ${isConsumible(p.categoria) ? 'grid-cols-1' : 'grid-cols-2'}`}>
                 <div className="rounded-xl p-2" style={{ backgroundColor: available === 0 ? '#fee2e2' : '#f0fdf4' }}>
                   <div className="text-base" style={{ fontWeight: 700, color: available === 0 ? '#b91c1c' : '#166534' }}>{available}</div>
                   <div className="text-xs text-gray-400">Disponible</div>
                 </div>
+                {!isConsumible(p.categoria) && (
+                  <div className="rounded-xl p-2" style={{ backgroundColor: assigned > 0 ? '#fefce8' : '#f9fafb' }}>
+                    <div className="text-base" style={{ fontWeight: 700, color: assigned > 0 ? '#854d0e' : '#6b7280' }}>{assigned}</div>
+                    <div className="text-xs text-gray-400">En uso</div>
+                  </div>
+                )}
               </div>
 
               {p.descripcion && (
@@ -410,22 +436,6 @@ export default function Warehouse() {
           </div>
         </div>
       )}
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-sm">
-        <div className="text-center px-4">
-          <p className="text-7xl font-black mb-4" style={{ color: '#f7e3b0' }}>
-            <Package className="w-20 h-20 mx-auto" />
-          </p>
-          <h1 className="text-2xl font-bold mb-2" style={{ color: '#2e2e2e' }}>
-            Trabajo en progreso
-          </h1>
-          <p className="text-sm mb-6" style={{ color: '#727272' }}>
-            Esta sección aún está en desarrollo.
-          </p>
-          <Link to="/dashboard" className="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-opacity hover:opacity-80" style={{ backgroundColor: '#f7e3b0', color: '#2e2e2e' }}>
-            <ArrowLeft className="w-4 h-4" /> Volver al panel
-          </Link>
-        </div>
-      </div>
     </div>
   );
 }

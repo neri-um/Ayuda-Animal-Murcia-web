@@ -6,13 +6,6 @@ import type { SolicitudAdopcion, EstadoSolicitudCuestionario } from '../../types
 
 import { API_BASE as BASE, leerMensajeError } from '../../services/api';
 
-// Paleta de estados: pendiente #D4AF37 · aceptado #6A994E · rechazado #9C2B1B
-const ESTADO_COLORS: Record<EstadoSolicitudCuestionario, string> = {
-  PENDIENTE: 'bg-[#D4AF37] text-[#2e2e2e]',
-  ACEPTADA:  'bg-[#6A994E] text-white',
-  RECHAZADA: 'bg-[#9C2B1B] text-white',
-};
-
 export default function AdoptionRequests() {
   const { token } = useAuth();
   const { animalsTodos } = useApp();
@@ -388,12 +381,7 @@ export default function AdoptionRequests() {
                 className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left hover:bg-gray-50/60 transition-colors"
               >
                 <div className="min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-medium text-gray-900 text-sm">{s.nombreAdoptante}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${ESTADO_COLORS[s.estado]}`}>
-                      {formatEnum(s.estado)}
-                    </span>
-                  </div>
+                  <span className="font-medium text-gray-900 text-sm">{s.nombreAdoptante}</span>
                   <p className="text-xs text-gray-500 mt-1 truncate">{s.email}</p>
                 </div>
                 {expandida === s.id
