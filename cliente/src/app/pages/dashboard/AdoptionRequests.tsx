@@ -6,10 +6,11 @@ import type { SolicitudAdopcion, EstadoSolicitudCuestionario } from '../../types
 
 import { API_BASE as BASE, leerMensajeError } from '../../services/api';
 
+// Paleta de estados: pendiente #D4AF37 · aceptado #6A994E · rechazado #9C2B1B
 const ESTADO_COLORS: Record<EstadoSolicitudCuestionario, string> = {
-  PENDIENTE: 'bg-amber-100 text-amber-700',
-  ACEPTADA:  'bg-green-100 text-green-700',
-  RECHAZADA: 'bg-red-100 text-red-600',
+  PENDIENTE: 'bg-[#D4AF37] text-[#2e2e2e]',
+  ACEPTADA:  'bg-[#6A994E] text-white',
+  RECHAZADA: 'bg-[#9C2B1B] text-white',
 };
 
 export default function AdoptionRequests() {
@@ -45,9 +46,9 @@ export default function AdoptionRequests() {
     color: string;
     icono: React.ReactNode;
   }[] = [
-    { key: 'PENDIENTE', label: 'Pendientes', color: 'border-l-amber-400', icono: <Clock className="w-4 h-4 text-gray-400" /> },
-    { key: 'ACEPTADA',  label: 'Aceptadas',  color: 'border-l-green-500', icono: <CheckCircle className="w-4 h-4 text-gray-400" /> },
-    { key: 'RECHAZADA', label: 'Rechazadas', color: 'border-l-red-500', icono: <XCircle className="w-4 h-4 text-gray-400" /> },
+    { key: 'PENDIENTE', label: 'Pendientes', color: 'border-l-[#D4AF37]', icono: <Clock className="w-4 h-4 text-gray-400" /> },
+    { key: 'ACEPTADA',  label: 'Aceptadas',  color: 'border-l-[#6A994E]', icono: <CheckCircle className="w-4 h-4 text-gray-400" /> },
+    { key: 'RECHAZADA', label: 'Rechazadas', color: 'border-l-[#9C2B1B]', icono: <XCircle className="w-4 h-4 text-gray-400" /> },
   ];
 
   const fetchSolicitudes = useCallback(async () => {
@@ -427,7 +428,7 @@ export default function AdoptionRequests() {
                     <button
                       onClick={() => cambiarEstado(s.id, 'ACEPTADA')}
                       disabled={actualizando === s.id}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-green-700 bg-green-50 hover:bg-green-100 transition-colors disabled:opacity-50"
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#6A994E] bg-[#6A994E]/10 hover:bg-[#6A994E]/20 transition-colors disabled:opacity-50"
                     >
                       {actualizando === s.id
                         ? <Loader2 className="w-4 h-4 animate-spin" />
@@ -437,18 +438,13 @@ export default function AdoptionRequests() {
                     <button
                       onClick={() => cambiarEstado(s.id, 'RECHAZADA')}
                       disabled={actualizando === s.id}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 transition-colors disabled:opacity-50"
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#9C2B1B] bg-[#9C2B1B]/10 hover:bg-[#9C2B1B]/20 transition-colors disabled:opacity-50"
                     >
                       <XCircle className="w-4 h-4" />
                       Rechazar
                     </button>
                   </>
-                ) : (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-2 text-xs text-gray-400">
-                    <Clock className="w-4 h-4" />
-                    {formatEnum(s.estado)}
-                  </span>
-                )}
+                ) : null}
                 <a
                   href={s.telefono ? `https://wa.me/${s.telefono.replace(/\D/g, '')}` : '#'}
                   target="_blank"

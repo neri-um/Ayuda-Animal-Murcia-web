@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router';
-import { Plus, Search, Edit2, Trash2, Stethoscope, ChevronDown, ChevronUp, Star, Eye, User, PawPrint } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Stethoscope, ChevronDown, ChevronUp, Star, Eye, User, PawPrint, Newspaper } from 'lucide-react';
 import { useApp, useAuth } from '../../context/AppContext';
 import { Animal, AnimalStatus } from '../../types';
 import { AnimalStatusBadge } from '../../components/StatusBadge';
@@ -149,6 +149,10 @@ function AnimalRow({ animal, responsable, statusOptions, onStatusChange, onDelet
           >
             <Stethoscope className="w-3.5 h-3.5" /> Protocolo
           </Link>
+          <Link to={`/dashboard/animales/${animal.id}#blog`}
+            className="p-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors" title="Blog">
+            <Newspaper className="w-4 h-4" />
+          </Link>
           <Link to={`/dashboard/animales/${animal.id}/edit`}
             className="p-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors" title="Editar">
             <Edit2 className="w-4 h-4" />
@@ -222,6 +226,10 @@ function AnimalCard({ animal, responsable, statusOptions, onStatusChange, onDele
           onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#dce8ed'; e.currentTarget.style.color = '#213448'; }}
         >
           <Stethoscope className="w-3.5 h-3.5" /> Protocolo
+        </Link>
+        <Link to={`/dashboard/animales/${animal.id}#blog`}
+          className="p-2.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors" title="Blog">
+          <Newspaper className="w-4 h-4" />
         </Link>
         <button
           onClick={() => onSetAnimalDelMes(esMes ? null : animal.id)}
@@ -320,11 +328,11 @@ export default function AnimalsManagement() {
   const headerRow = (
     <thead>
       <tr className="text-xs text-gray-500 uppercase tracking-wide border-b border-gray-100">
-        <th className="text-left font-medium py-3 pl-6 pr-4" style={{ width: '40%' }}>Animal</th>
+        <th className="text-left font-medium py-3 pl-6 pr-4" style={{ width: '25%' }}>Animal</th>
         <th className="text-left font-medium py-3 px-4" style={{ width: '70px' }}>Edad</th>
-        <th className="text-left font-medium py-3 px-4" style={{ width: '100px' }}>Sexo</th>
-        <th className="text-left font-medium py-3 px-4" style={{ width: '160px' }}>Estado</th>
-        <th className="text-left font-medium py-3 pl-4 pr-6" style={{ width: '220px' }}>Acciones</th>
+        <th className="text-left font-medium py-3 px-4" style={{ width: '90px' }}>Sexo</th>
+        <th className="text-left font-medium py-3 px-4" style={{ width: '150px' }}>Estado</th>
+        <th className="text-left font-medium py-3 pl-4 pr-6">Acciones</th>
       </tr>
     </thead>
   );
@@ -478,7 +486,7 @@ export default function AnimalsManagement() {
             {showOtros && (
               <>
                 <div className="hidden md:block overflow-x-auto">
-                  <table className="w-full table-fixed min-w-[42rem]">
+              <table className="w-full table-fixed min-w-[52rem]">
                     {headerRow}
                     {otherAnimals.length === 0 ? (
                       <tbody>

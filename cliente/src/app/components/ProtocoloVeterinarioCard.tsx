@@ -282,14 +282,14 @@ export default function ProtocoloVeterinarioCard({ especie, birthDate, protocolo
                   }`}>
                     <div className="flex gap-3 text-sm">
                       <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
-                        !item.completada ? 'bg-amber-400' : 'bg-[#547792]'
+                        !item.completada ? 'bg-[#D4AF37]' : 'bg-[#547792]'
                       }`} />
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           {iconForTratamiento(item.tratamiento)}
                           <span className="font-medium">{formatTratamientoName(item.tratamiento)}</span>
                           {!item.completada && (
-                            <span className="text-xs text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full">Pendiente</span>
+                                <span className="text-xs text-[#2e2e2e] bg-[#D4AF37] px-2 py-0.5 rounded-full">Pendiente</span>
                           )}
                         </div>
                         <p className="text-gray-600 mb-1">{item.descripcion}</p>

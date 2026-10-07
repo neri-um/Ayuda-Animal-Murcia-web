@@ -226,7 +226,7 @@ export default function AnimalDetailDashboard() {
         </div>
       )}
 
-      <div className="bg-white rounded-2xl border border-gray-100 p-6">
+      <div id="blog" className="bg-white rounded-2xl border border-gray-100 p-6" style={{ scrollMarginTop: '5rem' }}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-gray-800 flex items-center gap-2">
             <Newspaper className="w-5 h-5" style={{ color: '#547792' }} />

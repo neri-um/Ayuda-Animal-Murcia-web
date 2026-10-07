@@ -15,7 +15,7 @@ interface RegistroAuditoria {
   fecha?: string;
 }
 
-const SECCIONES = ['Animales', 'Almacén', 'Configuración', 'Adopciones', 'Acogidas', 'Blog', 'Usuarios', 'Formularios', 'Otros'];
+const SECCIONES = ['Animales', 'Almacén', 'Configuración', 'Adopciones', 'Acogidas', 'Voluntariado', 'Blog', 'Usuarios', 'Formularios', 'Otros'];
 
 function formatFecha(fecha?: string): string {
   if (!fecha) return '—';
