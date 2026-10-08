@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
 import {
   Loader2, Search, ChevronDown, ChevronUp, CheckCircle, XCircle, MessageCircle,
-  Trash2, ClipboardList, Award, Heart, GraduationCap, UserSearch, X,
+  Trash2, ClipboardList, Award, Heart, GraduationCap, UserSearch, X, ArrowLeftRight,
 } from 'lucide-react';
 import { useAuth } from '../../context/AppContext';
 import {
@@ -37,34 +37,57 @@ function EstadoMenu({ estado, disabled, onSelect }: {
   onSelect: (e: EstadoSolicitud) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState<{ top?: number; bottom?: number; right: number } | null>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
+
+  const medir = useCallback(() => {
+    const r = btnRef.current?.getBoundingClientRect();
+    if (!r) return;
+    const alto = 140;
+    const arriba = r.top >= alto;
+    setPos({
+      ...(arriba ? { bottom: window.innerHeight - r.top + 6 } : { top: r.bottom + 6 }),
+      right: Math.max(8, window.innerWidth - r.right),
+    });
+  }, []);
 
   useEffect(() => {
     if (!open) return;
-    const handler = (ev: MouseEvent) => {
-      if (ref.current && !ref.current.contains(ev.target as Node)) setOpen(false);
+    medir();
+    const fuera = (ev: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(ev.target as Node)) setOpen(false);
     };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [open]);
-
-  const actual = SECCIONES.find(s => s.key === estado);
+    const cerrar = (ev: KeyboardEvent) => { if (ev.key === 'Escape') setOpen(false); };
+    document.addEventListener('mousedown', fuera);
+    document.addEventListener('keydown', cerrar);
+    window.addEventListener('scroll', medir, true);
+    window.addEventListener('resize', medir);
+    return () => {
+      document.removeEventListener('mousedown', fuera);
+      document.removeEventListener('keydown', cerrar);
+      window.removeEventListener('scroll', medir, true);
+      window.removeEventListener('resize', medir);
+    };
+  }, [open, medir]);
 
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative" ref={wrapRef}>
       <button
+        ref={btnRef}
         type="button"
         disabled={disabled}
         onClick={() => setOpen(v => !v)}
-        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50"
+        className="p-1.5 rounded-lg text-blue-500 hover:bg-blue-50 transition-colors disabled:opacity-50"
         title="Cambiar actividad"
       >
-        <span className={`w-2 h-2 rounded-full ${actual?.dot ?? 'bg-gray-300'}`} />
-        {actual?.label ?? estado}
-        <ChevronDown className="w-3.5 h-3.5" />
+        <ArrowLeftRight className="w-4 h-4" />
       </button>
-      {open && (
-        <div className="absolute z-20 mt-1 left-0 min-w-[10rem] bg-white rounded-xl border border-gray-100 shadow-lg py-1">
+      {open && pos && (
+        <div
+          className="fixed z-[70] w-44 bg-white rounded-xl border border-gray-100 shadow-lg py-1"
+          style={pos}
+        >
           {SECCIONES.map(s => (
             <button
               key={s.key}
@@ -383,11 +406,13 @@ export default function VoluntariadoSolicitudes() {
                                     <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
                                   </a>
                                   <div className="flex-1" />
-                                  <EstadoMenu
-                                    estado={s.estado}
-                                    disabled={actualizando === s.id}
-                                    onSelect={estado => decidir(s, estado)}
-                                  />
+                                  {s.estado !== 'PENDIENTE' && (
+                                    <EstadoMenu
+                                      estado={s.estado}
+                                      disabled={actualizando === s.id}
+                                      onSelect={estado => decidir(s, estado)}
+                                    />
+                                  )}
                                   {esAdmin && (
                                     <button
                                       onClick={() => setEliminarId(s.id)}

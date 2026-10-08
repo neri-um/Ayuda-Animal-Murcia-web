@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -19,11 +20,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import vidanimal.aplicacion.input.AdopcionUseCase;
 import vidanimal.aplicacion.input.AcogidaUseCase;
+import vidanimal.aplicacion.input.FormularioVoluntariadoUseCase;
 import vidanimal.dominio.modelo.Especie;
 import vidanimal.dominio.modelo.FormularioAdopcion;
 import vidanimal.dominio.modelo.FormularioAcogida;
+import vidanimal.dominio.modelo.FormularioVoluntariado;
+import vidanimal.dominio.modelo.TipoColaboracion;
 import vidanimal.infraestructura.rest.dto.FormularioAdopcionDTO;
 import vidanimal.infraestructura.rest.dto.FormularioAcogidaDTO;
+import vidanimal.infraestructura.rest.dto.FormularioVoluntariadoDTO;
 
 @RestController
 @RequestMapping("/vidanimal/formularios")
@@ -31,11 +36,14 @@ public class FormularioController {
 
     private final AdopcionUseCase adopcionUseCase;
     private final AcogidaUseCase acogidaUseCase;
+    private final FormularioVoluntariadoUseCase voluntariadoUseCase;
     private final ObjectMapper objectMapper;
 
-    public FormularioController(AdopcionUseCase adopcionUseCase, AcogidaUseCase acogidaUseCase, ObjectMapper objectMapper) {
+    public FormularioController(AdopcionUseCase adopcionUseCase, AcogidaUseCase acogidaUseCase,
+                                FormularioVoluntariadoUseCase voluntariadoUseCase, ObjectMapper objectMapper) {
         this.adopcionUseCase = adopcionUseCase;
         this.acogidaUseCase  = acogidaUseCase;
+        this.voluntariadoUseCase = voluntariadoUseCase;
         this.objectMapper    = objectMapper;
     }
 
@@ -147,6 +155,76 @@ public class FormularioController {
         dto.setId(f.getId());
         dto.setNombre(f.getNombre());
         dto.setEspecie(f.getEspecie() != null ? f.getEspecie().name() : null);
+        if (f.getPreguntas() != null) {
+            try {
+                dto.setPreguntas(objectMapper.readValue(f.getPreguntas(), Object.class));
+            } catch (Exception e) {
+                dto.setPreguntas(f.getPreguntas());
+            }
+        }
+        return dto;
+    }
+
+    @GetMapping("/voluntariado")
+    public ResponseEntity<List<FormularioVoluntariadoDTO>> listarVoluntariado() {
+        return ResponseEntity.ok(
+                voluntariadoUseCase.listar().stream()
+                        .map(this::toVoluntariadoDTO)
+                        .collect(Collectors.toList()));
+    }
+
+    @GetMapping("/voluntariado/publico")
+    public ResponseEntity<FormularioVoluntariadoDTO> obtenerVoluntariadoPublico(
+            @RequestParam(name = "tipo", required = false) String tipo) {
+        TipoColaboracion t;
+        try {
+            t = TipoColaboracion.desde(tipo != null ? tipo : "VOLUNTARIADO");
+        } catch (IllegalArgumentException e) {
+            t = TipoColaboracion.VOLUNTARIADO;
+        }
+        if (t == TipoColaboracion.ACOGIDA) {
+            t = TipoColaboracion.VOLUNTARIADO;
+        }
+        return voluntariadoUseCase.obtenerPorTipo(t)
+                .map(f -> ResponseEntity.ok(toVoluntariadoDTO(f)))
+                .orElseGet(() -> ResponseEntity.noContent().build());
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("/voluntariado")
+    public ResponseEntity<FormularioVoluntariadoDTO> crearVoluntariado(@RequestBody FormularioVoluntariadoDTO dto) {
+        TipoColaboracion t;
+        try {
+            t = TipoColaboracion.desde(dto.getTipo());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Tipo de formulario inv\u00e1lido: " + dto.getTipo());
+        }
+
+        String preguntasJson;
+        try {
+            preguntasJson = dto.getPreguntas() instanceof String
+                    ? (String) dto.getPreguntas()
+                    : objectMapper.writeValueAsString(dto.getPreguntas());
+        } catch (JsonProcessingException e) {
+            preguntasJson = "{}";
+        }
+
+        FormularioVoluntariado guardado = voluntariadoUseCase.crear(dto.getNombre(), t, preguntasJson);
+        return ResponseEntity.status(HttpStatus.CREATED).body(toVoluntariadoDTO(guardado));
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @DeleteMapping("/voluntariado/{id}")
+    public ResponseEntity<Void> eliminarVoluntariado(@PathVariable Long id) {
+        voluntariadoUseCase.eliminar(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    private FormularioVoluntariadoDTO toVoluntariadoDTO(FormularioVoluntariado f) {
+        FormularioVoluntariadoDTO dto = new FormularioVoluntariadoDTO();
+        dto.setId(f.getId());
+        dto.setNombre(f.getNombre());
+        dto.setTipo(f.getTipo() != null ? f.getTipo().name() : null);
         if (f.getPreguntas() != null) {
             try {
                 dto.setPreguntas(objectMapper.readValue(f.getPreguntas(), Object.class));

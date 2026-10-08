@@ -141,12 +141,59 @@ const PLANTILLA_ACOGIDA = JSON.stringify({
   ]
 }, null, 2);
 
-type Tab = 'adopcion' | 'acogida';
+const PLANTILLA_VOLUNTARIADO = JSON.stringify({
+  titulo: "Solicitud de voluntariado",
+  descripcion: "Completa este cuestionario para colaborar con la protectora.",
+  secciones: [
+    {
+      nro: 1,
+      titulo: "Tus datos",
+      descripcion: "Así podremos ponernos en contacto contigo.",
+      preguntas: [
+        { id: "nombre", pregunta: "Nombre", tipo: "text", obligatoria: true, placeholder: "Nombre y apellidos" },
+        { id: "email", pregunta: "Email", tipo: "email", obligatoria: true, placeholder: "correo@ejemplo.com" },
+        { id: "correo_umu", pregunta: "Correo universitario", tipo: "email", obligatoria: true, placeholder: "alumno@um.es", soloUmu: true },
+        { id: "telefono", pregunta: "Teléfono de contacto", tipo: "tel", obligatoria: true, placeholder: "600 000 000" },
+        { id: "edad", pregunta: "Edad", tipo: "number", obligatoria: true, placeholder: "Tu edad" },
+        { id: "localidad", pregunta: "¿En qué localidad resides?", tipo: "text", obligatoria: true, placeholder: "Murcia, Molina de Segura..." },
+        { id: "vehiculo", pregunta: "¿Dispones de vehículo propio?", tipo: "radio", obligatoria: true,
+          opciones: [ { value: "Sí", label: "Sí" }, { value: "No", label: "No" } ] }
+      ]
+    },
+    {
+      nro: 2,
+      titulo: "Tu participación",
+      descripcion: "Marca todas las tareas que te interesen.",
+      preguntas: [
+        { id: "tareas", pregunta: "Tareas de interés", tipo: "checkbox", obligatoria: true, conOtro: true,
+          opciones: [
+            { value: "Gestionar animales en adopción", label: "Gestionar animales en adopción" },
+            { value: "Difusión en redes sociales", label: "Difusión en redes sociales" },
+            { value: "Transporte de animales (visitas veterinarias, recogidas, etc.)", label: "Transporte de animales (visitas veterinarias, recogidas, etc.)" },
+            { value: "Ayuda en eventos, recaudación de fondos, mercadillos (...)", label: "Ayuda en eventos, recaudación de fondos, mercadillos (...)" },
+            { value: "Tareas administrativas", label: "Tareas administrativas" },
+            { value: "Control de colonias felinas (CER)", label: "Control de colonias felinas (CER)" },
+            { value: "Acogida temporal", label: "Acogida temporal" }
+          ] },
+        { id: "comentario", pregunta: "¿Algún comentario adicional que debamos saber?", tipo: "textarea", obligatoria: false, placeholder: "Cuéntanos cualquier cosa que quieras que sepamos..." }
+      ]
+    }
+  ]
+}, null, 2);
+
+type Tab = 'adopcion' | 'acogida' | 'voluntariado';
 
 interface FormularioAcogidaAdmin {
   id?: number;
   nombre: string;
   especie: string | null;
+  preguntasRaw: string;
+}
+
+interface FormularioVoluntariadoAdmin {
+  id?: number;
+  nombre: string;
+  tipo: string;
   preguntasRaw: string;
 }
 
@@ -163,11 +210,13 @@ export default function FormularioManagement() {
 
   const [formulariosAdopcion, setFormulariosAdopcion] = useState<FormularioAdopcionAdmin[]>([]);
   const [formulariosAcogida, setFormulariosAcogida] = useState<FormularioAcogidaAdmin[]>([]);
+  const [formulariosVoluntariado, setFormulariosVoluntariado] = useState<FormularioVoluntariadoAdmin[]>([]);
 
   const [form, setForm] = useState({
     nombre: '',
     especie: '' as string,
     cachorro: '' as string,
+    tipoVoluntariado: 'VOLUNTARIADO' as string,
     preguntasRaw: PLANTILLA_PREGUNTAS,
   });
 
@@ -211,12 +260,32 @@ export default function FormularioManagement() {
     }
   }, [token]);
 
+  const fetchFormulariosVoluntariado = useCallback(async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${BASE}/formularios/voluntariado`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw await leerMensajeError(res);
+      const data = await res.json();
+      setFormulariosVoluntariado(
+        (Array.isArray(data) ? data : []).map((f: any) => ({
+          ...f,
+          preguntasRaw: f.preguntasRaw
+            ?? (f.preguntas != null ? JSON.stringify(f.preguntas, null, 2) : ''),
+        }))
+      );
+    } catch (e: any) {
+      setError(e?.message ?? 'No se pudieron cargar los formularios de voluntariado.');
+    }
+  }, [token]);
+
   const fetchFormularios = useCallback(async () => {
     setLoading(true);
     setError(null);
-    await Promise.all([fetchFormulariosAdopcion(), fetchFormulariosAcogida()]);
+    await Promise.all([fetchFormulariosAdopcion(), fetchFormulariosAcogida(), fetchFormulariosVoluntariado()]);
     setLoading(false);
-  }, [fetchFormulariosAdopcion, fetchFormulariosAcogida]);
+  }, [fetchFormulariosAdopcion, fetchFormulariosAcogida, fetchFormulariosVoluntariado]);
 
   useEffect(() => { fetchFormularios(); }, [fetchFormularios]);
 
@@ -227,8 +296,10 @@ export default function FormularioManagement() {
     setError(null);
     if (tab === 'adopcion') {
       setForm(f => ({ ...f, preguntasRaw: PLANTILLA_PREGUNTAS, nombre: '', especie: '', cachorro: '' }));
-    } else {
+    } else if (tab === 'acogida') {
       setForm(f => ({ ...f, preguntasRaw: PLANTILLA_ACOGIDA, nombre: '', especie: '', cachorro: '' }));
+    } else {
+      setForm(f => ({ ...f, preguntasRaw: PLANTILLA_VOLUNTARIADO, nombre: '', especie: '', cachorro: '', tipoVoluntariado: 'VOLUNTARIADO' }));
     }
   }, [tab]);
 
@@ -298,6 +369,50 @@ export default function FormularioManagement() {
     }
   };
 
+  const handleSubmitVoluntariado = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validarJson(form.preguntasRaw)) return;
+    setGuardando(true);
+    setError(null);
+    try {
+      const payload = {
+        nombre: form.nombre,
+        tipo: form.tipoVoluntariado,
+        preguntas: JSON.parse(form.preguntasRaw),
+      };
+      const res = await fetch(`${BASE}/formularios/voluntariado`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw await leerMensajeError(res);
+      setForm({ nombre: '', especie: '', cachorro: '', tipoVoluntariado: 'VOLUNTARIADO', preguntasRaw: PLANTILLA_VOLUNTARIADO });
+      setMostrarFormulario(false);
+      await fetchFormulariosVoluntariado();
+    } catch (e: any) {
+      setError(e?.message ?? 'No se pudo guardar el formulario de voluntariado.');
+    } finally {
+      setGuardando(false);
+    }
+  };
+
+  const handleEliminarVoluntariado = async (id: number) => {
+    if (!window.confirm('¿Seguro que quieres eliminar este formulario de voluntariado?')) return;
+    setEliminando(id);
+    try {
+      const res = await fetch(`${BASE}/formularios/voluntariado/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw await leerMensajeError(res);
+      await fetchFormulariosVoluntariado();
+    } catch (e: any) {
+      setError(e?.message ?? 'No se pudo eliminar el formulario de voluntariado.');
+    } finally {
+      setEliminando(null);
+    }
+  };
+
   const handleEliminarAdopcion = async (id: number) => {
     if (!window.confirm('¿Seguro que quieres eliminar este formulario?')) return;
     setEliminando(id);
@@ -340,20 +455,24 @@ export default function FormularioManagement() {
       (e.currentTarget.style.borderColor = '#e5e7eb'),
   };
 
+  const isAdopcion = tab === 'adopcion';
   const isAcogida = tab === 'acogida';
-  const formularios = isAcogida ? formulariosAcogida : formulariosAdopcion;
+  const isVoluntariado = tab === 'voluntariado';
+  const formularios = isAdopcion ? formulariosAdopcion : isAcogida ? formulariosAcogida : formulariosVoluntariado;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-semibold text-gray-900">
-            {isAcogida ? 'Formularios de acogida' : 'Formularios de adopción'}
+            {isAcogida ? 'Formularios de acogida' : isVoluntariado ? 'Formularios de voluntariado' : 'Formularios de adopción'}
           </h1>
           <p className="text-sm text-gray-500 mt-0.5">
             {isAcogida
               ? 'Configura el cuestionario de casas de acogida'
-              : 'Configura los cuestionarios según especie y edad'}
+              : isVoluntariado
+                ? 'Configura los cuestionarios de voluntariado y voluntariado UMU'
+                : 'Configura los cuestionarios según especie y edad'}
           </p>
         </div>
         <button
@@ -369,7 +488,7 @@ export default function FormularioManagement() {
       </div>
 
       <div className="flex gap-2">
-        {(['adopcion', 'acogida'] as const).map(t => (
+        {(['adopcion', 'acogida', 'voluntariado'] as const).map(t => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -380,14 +499,16 @@ export default function FormularioManagement() {
             }`}
             style={tab === t ? { backgroundColor: '#547792' } : {}}
           >
-            {t === 'adopcion' ? 'Adopción' : 'Acogida'}
+            {t === 'adopcion' ? 'Adopción' : t === 'acogida' ? 'Acogida' : 'Voluntariado'}
           </button>
         ))}
       </div>
 
       {mostrarFormulario && (
-        <form onSubmit={isAcogida ? handleSubmitAcogida : handleSubmitAdopcion} className="bg-white rounded-2xl border border-gray-100 p-6 space-y-4 shadow-sm">
-          <h2 className="text-base font-semibold text-gray-800 mb-2">Nuevo formulario {isAcogida ? 'de acogida' : 'de adopción'}</h2>
+        <form onSubmit={isAdopcion ? handleSubmitAdopcion : isAcogida ? handleSubmitAcogida : handleSubmitVoluntariado} className="bg-white rounded-2xl border border-gray-100 p-6 space-y-4 shadow-sm">
+          <h2 className="text-base font-semibold text-gray-800 mb-2">
+            Nuevo formulario {isAcogida ? 'de acogida' : isVoluntariado ? 'de voluntariado' : 'de adopción'}
+          </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm text-gray-700 mb-1">Nombre *</label>
@@ -395,40 +516,57 @@ export default function FormularioManagement() {
                 type="text"
                 value={form.nombre}
                 onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))}
-                placeholder={isAcogida ? 'Ej: Formulario casa de acogida' : 'Ej: Formulario perro adulto'}
+                placeholder={isAcogida ? 'Ej: Formulario casa de acogida' : isVoluntariado ? 'Ej: Cuestionario voluntariado' : 'Ej: Formulario perro adulto'}
                 required
                 className={inputClass}
                 {...focusStyle}
               />
             </div>
-            <div>
-              <label className="block text-sm text-gray-700 mb-1">Especie</label>
-              <select
-                value={form.especie}
-                onChange={e => setForm(f => ({ ...f, especie: e.target.value }))}
-                className={inputClass}
-                {...focusStyle}
-              >
-                <option value="">Todas las especies (genérico)</option>
-                {ESPECIES.map(esp => (
-                  <option key={esp} value={esp}>{esp.charAt(0) + esp.slice(1).toLowerCase()}</option>
-                ))}
-              </select>
-            </div>
-            {!isAcogida && (
+            {isVoluntariado ? (
               <div>
-                <label className="block text-sm text-gray-700 mb-1">¿Para cachorro?</label>
+                <label className="block text-sm text-gray-700 mb-1">Tipo *</label>
                 <select
-                  value={form.cachorro}
-                  onChange={e => setForm(f => ({ ...f, cachorro: e.target.value }))}
+                  value={form.tipoVoluntariado}
+                  onChange={e => setForm(f => ({ ...f, tipoVoluntariado: e.target.value }))}
                   className={inputClass}
                   {...focusStyle}
                 >
-                  <option value="">Cualquier edad</option>
-                  <option value="true">Sí (cachorro)</option>
-                  <option value="false">No (adulto)</option>
+                  <option value="VOLUNTARIADO">Voluntariado</option>
+                  <option value="VOLUNTARIADO_UMU">Voluntariado UMU</option>
                 </select>
               </div>
+            ) : (
+              <>
+                <div>
+                  <label className="block text-sm text-gray-700 mb-1">Especie</label>
+                  <select
+                    value={form.especie}
+                    onChange={e => setForm(f => ({ ...f, especie: e.target.value }))}
+                    className={inputClass}
+                    {...focusStyle}
+                  >
+                    <option value="">Todas las especies (genérico)</option>
+                    {ESPECIES.map(esp => (
+                      <option key={esp} value={esp}>{esp.charAt(0) + esp.slice(1).toLowerCase()}</option>
+                    ))}
+                  </select>
+                </div>
+                {!isAcogida && (
+                  <div>
+                    <label className="block text-sm text-gray-700 mb-1">¿Para cachorro?</label>
+                    <select
+                      value={form.cachorro}
+                      onChange={e => setForm(f => ({ ...f, cachorro: e.target.value }))}
+                      className={inputClass}
+                      {...focusStyle}
+                    >
+                      <option value="">Cualquier edad</option>
+                      <option value="true">Sí (cachorro)</option>
+                      <option value="false">No (adulto)</option>
+                    </select>
+                  </div>
+                )}
+              </>
             )}
           </div>
           <div>
@@ -449,9 +587,11 @@ export default function FormularioManagement() {
               </p>
             )}
             <p className="text-xs text-gray-400 mt-1">
-              {isAcogida
-                ? 'Estructura con secciones: { "titulo": "...", "secciones": [{ "nro": 1, "titulo": "...", "preguntas": [...] }] }'
-                : 'Tipos válidos: text, textarea, select, radio, number, email, tel'}
+              {isVoluntariado
+                ? 'Estructura con secciones: { "titulo": "...", "secciones": [{ "nro": 1, "titulo": "...", "preguntas": [...] }] }. Tipos: text, textarea, select, radio, checkbox, number, email, tel. Usa "soloUmu": true para preguntas solo UMU.'
+                : isAcogida
+                  ? 'Estructura con secciones: { "titulo": "...", "secciones": [{ "nro": 1, "titulo": "...", "preguntas": [...] }] }'
+                  : 'Tipos válidos: text, textarea, select, radio, number, email, tel'}
             </p>
           </div>
           {error && <p className="text-sm text-red-500">{error}</p>}
@@ -488,7 +628,9 @@ export default function FormularioManagement() {
           <p className="text-gray-500 text-sm">
             {isAcogida
               ? 'No hay formularios de acogida configurados.'
-              : 'No hay formularios configurados todavía.'}
+              : isVoluntariado
+                ? 'No hay formularios de voluntariado configurados.'
+                : 'No hay formularios configurados todavía.'}
           </p>
           <p className="text-gray-400 text-xs mt-1">Crea uno con el botón «Nuevo formulario».</p>
         </div>
@@ -500,12 +642,18 @@ export default function FormularioManagement() {
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-gray-900 text-sm">{f.nombre}</p>
                   <p className="text-xs text-gray-500 mt-0.5">
-                    {f.especie ?? 'Todas las especies'}
-                    {!isAcogida && (
-                      f.cachorro !== null && f.cachorro !== undefined
-                        ? f.cachorro ? ' · Cachorro' : ' · Adulto'
-                        : ' · Cualquier edad'
-                    )}
+                    {isVoluntariado
+                      ? (f.tipo === 'VOLUNTARIADO_UMU' ? 'Voluntariado UMU' : 'Voluntariado')
+                      : (
+                        <>
+                          {f.especie ?? 'Todas las especies'}
+                          {!isAcogida && (
+                            f.cachorro !== null && f.cachorro !== undefined
+                              ? f.cachorro ? ' · Cachorro' : ' · Adulto'
+                              : ' · Cualquier edad'
+                          )}
+                        </>
+                      )}
                   </p>
                 </div>
                 <button
@@ -519,7 +667,7 @@ export default function FormularioManagement() {
                 </button>
                 {f.id != null && (
                   <button
-                    onClick={() => isAcogida ? handleEliminarAcogida(f.id!) : handleEliminarAdopcion(f.id!)}
+                    onClick={() => isAdopcion ? handleEliminarAdopcion(f.id!) : isAcogida ? handleEliminarAcogida(f.id!) : handleEliminarVoluntariado(f.id!)}
                     disabled={eliminando === f.id}
                     className="p-2 rounded-xl text-red-400 hover:bg-red-50 transition-colors disabled:opacity-50"
                     title="Eliminar formulario"
