@@ -1,5 +1,6 @@
 package vidanimal.dominio.modelo;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 import jakarta.persistence.*;
 
@@ -98,21 +99,27 @@ public class Producto {
 		this.stockDisponible = stockDisponible;
 	}
 
+	@JsonProperty("paraPerro")
 	public boolean isParaPerro() { return paraPerro; }
 	public void setParaPerro(boolean paraPerro) { this.paraPerro = paraPerro; }
 
+	@JsonProperty("paraGato")
 	public boolean isParaGato() { return paraGato; }
 	public void setParaGato(boolean paraGato) { this.paraGato = paraGato; }
 
+	@JsonProperty("stockMinimo")
 	public int getStockMinimo() { return stockMinimo; }
 	public void setStockMinimo(int stockMinimo) { this.stockMinimo = stockMinimo; }
 
+	@JsonProperty("fechaCaducidad")
 	public LocalDate getFechaCaducidad() { return fechaCaducidad; }
 	public void setFechaCaducidad(LocalDate fechaCaducidad) { this.fechaCaducidad = fechaCaducidad; }
 
+	@JsonProperty("reservadoCer")
 	public boolean isReservadoCer() { return reservadoCer; }
 	public void setReservadoCer(boolean reservadoCer) { this.reservadoCer = reservadoCer; }
 
+	@JsonProperty("caducado")
 	public boolean isCaducado() {
 		return fechaCaducidad != null && fechaCaducidad.isBefore(java.time.LocalDate.now());
 	}
