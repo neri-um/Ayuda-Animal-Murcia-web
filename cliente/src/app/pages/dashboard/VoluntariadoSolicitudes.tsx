@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, type ReactNode } from 'react';
 import {
   Loader2, Search, ChevronDown, ChevronUp, CheckCircle, XCircle, MessageCircle,
-  Trash2, RefreshCw, ClipboardList, Info, Award,
+  Trash2, RefreshCw, ClipboardList, Info, Award, Heart, GraduationCap,
 } from 'lucide-react';
 import { useAuth } from '../../context/AppContext';
 import {
@@ -19,11 +19,13 @@ const SECCIONES: { key: EstadoSolicitud; label: string; border: string; dot: str
   { key: 'RECHAZADA', label: 'Rechazadas', border: 'border-l-[#9C2B1B]', dot: 'bg-[#9C2B1B]' },
 ];
 
-// Dos columnas por tipo: voluntariado/casa de acogida (azul) y voluntariado UMU (rojo anaranjado).
-const COLUMNAS: { key: 'NORMAL' | 'UMU'; label: string; color: string; tipos: string[] }[] = [
-  { key: 'NORMAL', label: 'Voluntariado', color: '#547792', tipos: ['VOLUNTARIADO', 'ACOGIDA'] },
-  { key: 'UMU', label: 'Voluntariado UMU', color: '#E8663B', tipos: ['VOLUNTARIADO_UMU'] },
+// Dos columnas por tipo: voluntariado/casa de acogida y voluntariado UMU.
+const COLUMNAS: { key: 'NORMAL' | 'UMU'; label: string; icono: ReactNode; tipos: string[] }[] = [
+  { key: 'NORMAL', label: 'Voluntariado', icono: <Heart className="w-5 h-5 text-gray-600" />, tipos: ['VOLUNTARIADO', 'ACOGIDA'] },
+  { key: 'UMU', label: 'Voluntariado UMU', icono: <GraduationCap className="w-5 h-5 text-gray-600" />, tipos: ['VOLUNTARIADO_UMU'] },
 ];
+
+const ROJO_UMU = '#BD2A33';
 
 function formatFecha(iso: string | null): string {
   if (!iso) return '—';
@@ -41,12 +43,10 @@ export default function VoluntariadoSolicitudes() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busqueda, setBusqueda] = useState('');
-  const [seccion, setSeccion] = useState<EstadoSolicitud | ''>('PENDIENTE');
+  const [seccion, setSeccion] = useState<EstadoSolicitud | ''>('');
   const [expandida, setExpandida] = useState<number | null>(null);
   const [actualizando, setActualizando] = useState<number | null>(null);
   const [guardandoCrau, setGuardandoCrau] = useState<number | null>(null);
-  const [decision, setDecision] = useState<{ solicitud: SolicitudColaboracion; estado: 'ACEPTADA' | 'RECHAZADA' } | null>(null);
-  const [mensaje, setMensaje] = useState('');
   const [eliminarId, setEliminarId] = useState<number | null>(null);
   const [seccionesColapsadas, setSeccionesColapsadas] = useState<Record<string, boolean>>({});
   const [mostrarReglas, setMostrarReglas] = useState(false);
@@ -66,15 +66,13 @@ export default function VoluntariadoSolicitudes() {
 
   useEffect(() => { cargar(); }, [cargar]);
 
-  const confirmarDecision = async () => {
-    if (!decision || !token) return;
-    setActualizando(decision.solicitud.id);
+  const decidir = async (solicitud: SolicitudColaboracion, estado: 'ACEPTADA' | 'RECHAZADA') => {
+    if (!token) return;
+    if (estado === 'RECHAZADA' && !window.confirm('¿Rechazar esta solicitud?')) return;
+    setActualizando(solicitud.id);
     try {
-      const actualizada = await decidirSolicitudColaboracion(
-        token, decision.solicitud.id, decision.estado, mensaje.trim());
+      const actualizada = await decidirSolicitudColaboracion(token, solicitud.id, estado, '');
       setSolicitudes(prev => prev.map(s => (s.id === actualizada.id ? actualizada : s)));
-      setDecision(null);
-      setMensaje('');
       setError(null);
     } catch (e: any) {
       setError(e?.message ?? 'No se pudo actualizar la solicitud.');
@@ -188,7 +186,7 @@ export default function VoluntariadoSolicitudes() {
           <p>No hay solicitudes con estos filtros</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           {COLUMNAS.map(col => {
             const itemsCol = filtradas.filter(s => col.tipos.includes(s.tipo));
             const seccionesConItems = SECCIONES.filter(sec =>
@@ -197,8 +195,8 @@ export default function VoluntariadoSolicitudes() {
             return (
               <div key={col.key} className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: col.color }} />
-                  <h2 className="text-sm font-semibold" style={{ color: col.color }}>{col.label}</h2>
+                  {col.icono}
+                  <h2 className="text-lg font-semibold text-gray-900">{col.label}</h2>
                   <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{itemsCol.length}</span>
                 </div>
 
@@ -237,20 +235,24 @@ export default function VoluntariadoSolicitudes() {
                                   onClick={() => setExpandida(abierta ? null : s.id)}
                                   className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left hover:bg-gray-100/60 transition-colors"
                                 >
-                                  <div className="min-w-0">
-                                    <div className="flex items-center gap-2">
-                                      <p className="text-sm font-medium text-gray-900 truncate">{s.nombre ?? 'Sin nombre'}</p>
-                                      {col.key === 'UMU' && crauTotal(s.crauDetalle) > 0 && (
-                                        <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full bg-[#f7e3b0] text-gray-900 whitespace-nowrap">
-                                          <Award className="w-3.5 h-3.5" /> {crauTotal(s.crauDetalle)} CRAU
-                                        </span>
-                                      )}
-                                    </div>
+                                  <div className="min-w-0 flex-1">
+                                    <p className="text-sm font-medium text-gray-900 truncate">{s.nombre ?? 'Sin nombre'}</p>
                                     <p className="text-xs text-gray-500 truncate">{s.email}</p>
                                   </div>
-                                  {abierta
-                                    ? <ChevronUp className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                                    : <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0" />}
+                                  <div className="flex items-center gap-2 flex-shrink-0">
+                                    {col.key === 'UMU' && crauTotal(s.crauDetalle) > 0 && (
+                                      <span
+                                        className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full text-white whitespace-nowrap"
+                                        style={{ backgroundColor: ROJO_UMU }}
+                                        title="CRAU acumulados"
+                                      >
+                                        <Award className="w-3.5 h-3.5" /> {crauTotal(s.crauDetalle)} CRAU
+                                      </span>
+                                    )}
+                                    {abierta
+                                      ? <ChevronUp className="w-4 h-4 text-gray-400" />
+                                      : <ChevronDown className="w-4 h-4 text-gray-400" />}
+                                  </div>
                                 </button>
 
                                 <div className="px-4 grid grid-cols-2 gap-x-4 gap-y-1.5">
@@ -293,7 +295,7 @@ export default function VoluntariadoSolicitudes() {
                                           : { backgroundColor: 'rgba(156,43,27,0.08)', color: '#7d2317' }}
                                       >
                                         <span className="opacity-70 block mb-0.5">
-                                          Mensaje enviado · {formatFecha(s.fechaDecision)}
+                                          Nota interna · {formatFecha(s.fechaDecision)}
                                         </span>
                                         {s.mensajeRespuesta}
                                       </div>
@@ -305,7 +307,7 @@ export default function VoluntariadoSolicitudes() {
                                   {s.estado === 'PENDIENTE' && (
                                     <>
                                       <button
-                                        onClick={() => { setDecision({ solicitud: s, estado: 'ACEPTADA' }); setMensaje(''); }}
+                                        onClick={() => decidir(s, 'ACEPTADA')}
                                         disabled={actualizando === s.id}
                                         className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-[#6A994E] bg-[#6A994E]/10 hover:bg-[#6A994E]/20 transition-colors disabled:opacity-50"
                                       >
@@ -313,7 +315,7 @@ export default function VoluntariadoSolicitudes() {
                                         Aceptar
                                       </button>
                                       <button
-                                        onClick={() => { setDecision({ solicitud: s, estado: 'RECHAZADA' }); setMensaje(''); }}
+                                        onClick={() => decidir(s, 'RECHAZADA')}
                                         disabled={actualizando === s.id}
                                         className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-[#9C2B1B] bg-[#9C2B1B]/10 hover:bg-[#9C2B1B]/20 transition-colors disabled:opacity-50"
                                       >
@@ -354,48 +356,6 @@ export default function VoluntariadoSolicitudes() {
               </div>
             );
           })}
-        </div>
-      )}
-
-      {decision && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setDecision(null)} />
-          <div className="relative bg-white rounded-2xl p-6 max-w-md w-full shadow-xl z-10">
-            <h3 className="text-gray-800 mb-2 flex items-center gap-2">
-              {decision.estado === 'ACEPTADA'
-                ? <CheckCircle className="w-5 h-5 text-[#6A994E]" />
-                : <XCircle className="w-5 h-5 text-[#9C2B1B]" />}
-              {decision.estado === 'ACEPTADA' ? 'Aceptar solicitud' : 'Rechazar solicitud'}
-            </h3>
-            <p className="text-gray-500 text-sm mb-4">
-              Solicitud de <span className="text-gray-700">{decision.solicitud.email}</span>.
-              Puedes añadir una nota interna (no se envía ningún correo).
-            </p>
-            <textarea
-              value={mensaje}
-              onChange={e => setMensaje(e.target.value)}
-              rows={3}
-              placeholder="Ej: te escribiremos para coordinar una reunión en la sede..."
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none resize-none mb-4"
-            />
-            <div className="flex gap-3">
-              <button
-                onClick={() => setDecision(null)}
-                className="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-xl text-sm hover:bg-gray-50"
-                disabled={actualizando !== null}
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={confirmarDecision}
-                disabled={actualizando !== null}
-                className="flex-1 text-white py-2.5 rounded-xl text-sm transition-opacity disabled:opacity-60"
-                style={{ backgroundColor: decision.estado === 'ACEPTADA' ? '#6A994E' : '#9C2B1B' }}
-              >
-                {actualizando !== null ? 'Guardando...' : 'Confirmar'}
-              </button>
-            </div>
-          </div>
         </div>
       )}
 

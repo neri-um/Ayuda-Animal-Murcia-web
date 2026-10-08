@@ -1,4 +1,5 @@
-import { CRAU_CATEGORIAS, crauCategoria, crauTotal } from './CrauInfo';
+import { Check } from 'lucide-react';
+import { CRAU_CATEGORIAS, crauCategoria } from './CrauInfo';
 
 interface CrauTrackerProps {
   detalle: Record<string, number>;
@@ -7,9 +8,7 @@ interface CrauTrackerProps {
 }
 
 export default function CrauTracker({ detalle, guardando = false, onChange }: CrauTrackerProps) {
-  const total = crauTotal(detalle);
-
-  const cambiar = (key: string, valor: number) => {
+  const fijar = (key: string, valor: number) => {
     if (guardando) return;
     const nuevo = { ...detalle };
     if (valor <= 0) {
@@ -21,72 +20,65 @@ export default function CrauTracker({ detalle, guardando = false, onChange }: Cr
   };
 
   return (
-    <div className="rounded-xl overflow-hidden" style={{ backgroundColor: '#f7f3e8', border: '1px solid #e6dcc0' }}>
-      <div className="flex items-center justify-between px-3 py-2" style={{ borderBottom: '1px solid #e6dcc0' }}>
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-bold uppercase tracking-wide" style={{ color: '#5a5344' }}>
-            Créditos CRAU
-          </span>
-          {guardando && <span className="text-[11px] text-[#8a8168]">Guardando…</span>}
-        </div>
-        <span
-          className="px-2.5 py-0.5 rounded-full text-sm font-bold"
-          style={{ backgroundColor: '#2e7d6b', color: '#fff' }}
-          title="CRAU acumulados"
-        >
-          {total} CRAU
+    <div className="rounded-xl border border-gray-100 bg-white overflow-hidden">
+      <div className="flex items-center gap-2 px-3 py-2 border-b border-gray-100">
+        <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+          Créditos CRAU
         </span>
+        <span className="text-[11px] text-gray-400">
+          Marca cada actividad realizada; el CRAU se calcula solo.
+        </span>
+        {guardando && <span className="ml-auto text-[11px] text-gray-400">Guardando…</span>}
       </div>
 
-      <ul className="divide-y" style={{ borderColor: '#ece4cf' }}>
-        {CRAU_CATEGORIAS.map((categoria) => {
-          const unidades = detalle[categoria.key] ?? 0;
-          const ganados = crauCategoria(categoria, unidades);
-          const restante = categoria.bloque > 1 ? categoria.bloque - (unidades % categoria.bloque) : 0;
+      <ul className="divide-y divide-gray-100">
+        {CRAU_CATEGORIAS.map(cat => {
+          const unidades = detalle[cat.key] ?? 0;
+          const ganados = crauCategoria(cat, unidades);
+          const casillas = unidades + 1;
+          const enCiclo = cat.bloque > 1 && unidades > 0 ? (unidades % cat.bloque || cat.bloque) : 0;
+
           return (
-            <li key={categoria.key} className="px-3 py-2.5 flex items-start gap-3">
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold" style={{ color: '#2e2e2e' }}>
-                  {categoria.label}
-                </p>
-                <p className="text-xs leading-snug" style={{ color: '#8a8168' }}>
-                  {categoria.descripcion}
-                  {categoria.bloque > 1 && (
-                    <> · {categoria.crauPorBloque} CRAU / {categoria.bloque} {categoria.unidad}</>
-                  )}
-                </p>
-                <p className="text-[11px] mt-0.5" style={{ color: ganados > 0 ? '#2e7d6b' : '#a89f86' }}>
+            <li key={cat.key} className="px-3 py-2.5">
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-gray-800">{cat.label}</p>
+                  <p className="text-xs text-gray-400">
+                    {cat.descripcion}
+                    {cat.bloque > 1 && <> · {cat.crauPorBloque} CRAU / {cat.bloque} {cat.unidad}</>}
+                  </p>
+                </div>
+                <span className={`text-xs font-bold whitespace-nowrap ${ganados > 0 ? 'text-[#6A994E]' : 'text-gray-300'}`}>
                   {ganados > 0 ? `+${ganados} CRAU` : '0 CRAU'}
-                  {categoria.bloque > 1 && restante < categoria.bloque && (
-                    <> · {unidades % categoria.bloque}/{categoria.bloque} {categoria.unidad} para el siguiente</>
-                  )}
-                </p>
+                </span>
               </div>
 
-              <div className="flex items-center gap-1.5 shrink-0">
-                <button
-                  type="button"
-                  disabled={guardando || unidades === 0}
-                  onClick={() => cambiar(categoria.key, unidades - 1)}
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none disabled:opacity-30 transition-colors"
-                  style={{ backgroundColor: '#e6dcc0', color: '#5a5344' }}
-                  aria-label={`Quitar una unidad de ${categoria.label}`}
-                >
-                  −
-                </button>
-                <span className="w-8 text-center text-sm font-bold tabular-nums" style={{ color: '#2e2e2e' }}>
-                  {unidades}
-                </span>
-                <button
-                  type="button"
-                  disabled={guardando}
-                  onClick={() => cambiar(categoria.key, unidades + 1)}
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none disabled:opacity-30 transition-colors"
-                  style={{ backgroundColor: '#2e7d6b', color: '#fff' }}
-                  aria-label={`Añadir una unidad de ${categoria.label}`}
-                >
-                  +
-                </button>
+              <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                {Array.from({ length: casillas }).map((_, i) => {
+                  const marcada = i < unidades;
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      disabled={guardando}
+                      onClick={() => fijar(cat.key, marcada ? i : i + 1)}
+                      className={`w-6 h-6 rounded-md flex items-center justify-center border transition-colors disabled:opacity-40 ${
+                        marcada
+                          ? 'bg-[#6A994E] border-[#6A994E] text-white'
+                          : 'border-gray-300 text-transparent hover:border-gray-400'
+                      }`}
+                      title={`${cat.label} ${i + 1}`}
+                      aria-label={`${marcada ? 'Quitar' : 'Añadir'} ${cat.label} ${i + 1}`}
+                    >
+                      <Check className="w-4 h-4" />
+                    </button>
+                  );
+                })}
+                {cat.bloque > 1 && enCiclo > 0 && (
+                  <span className="ml-1 text-[11px] text-gray-400">
+                    {enCiclo}/{cat.bloque} {cat.unidad}
+                  </span>
+                )}
               </div>
             </li>
           );
