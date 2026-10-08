@@ -15,17 +15,14 @@ public class NotificacionService {
 
     private final ResendEmailService resendEmailService;
     private final String mailDestination;
-    private final String dashboardAdopcionUrl;
-    private final String dashboardAcogidaUrl;
+    private final String dashboardUrl;
 
     public NotificacionService(ResendEmailService resendEmailService,
                                                 @Value("${adopcion.mail.destination:}") String mailDestination,
-                                                @Value("${adopcion.mail.dashboard-url:https://www.ayudaanimalmurcia.org/dashboard/adopciones}") String dashboardAdopcionUrl,
-                                                @Value("${acogida.mail.dashboard-url:https://www.ayudaanimalmurcia.org/dashboard/acogidas}") String dashboardAcogidaUrl) {
+                                                @Value("${adopcion.mail.dashboard-url:https://www.ayudaanimalmurcia.org/dashboard}") String dashboardUrl) {
         this.resendEmailService = resendEmailService;
         this.mailDestination = mailDestination;
-        this.dashboardAdopcionUrl = dashboardAdopcionUrl;
-        this.dashboardAcogidaUrl = dashboardAcogidaUrl;
+        this.dashboardUrl = dashboardUrl;
     }
 
     @Async("emailExecutor")
@@ -73,11 +70,7 @@ public class NotificacionService {
             sb.append("DNI/NIE: ").append(dni).append("\n");
         }
 
-        String dashboardUrl = esAcogida ? dashboardAcogidaUrl : dashboardAdopcionUrl;
-        if (dashboardUrl != null && !dashboardUrl.isBlank()) {
-            sb.append("\nEntra al Dashboard para leer el formulario completo y descargarlo:\n");
-            sb.append(dashboardUrl).append("\n");
-        }
+        sb.append(TextoNotificacion.cierreDashboard(dashboardUrl));
 
         return sb.toString();
     }

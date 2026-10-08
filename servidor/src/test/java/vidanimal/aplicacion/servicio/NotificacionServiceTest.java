@@ -25,12 +25,11 @@ class NotificacionServiceTest {
     @BeforeEach
     void setUp() {
         service = new NotificacionService(
-                resendEmailService, "destino@example.com", "https://www.ayudaanimalmurcia.org/dashboard/adopciones",
-                "https://www.ayudaanimalmurcia.org/dashboard/acogidas");
+                resendEmailService, "destino@example.com", "https://www.ayudaanimalmurcia.org/dashboard");
     }
 
     @Test
-    void enviarNuevaSolicitud_enviaCorreoSinIdNiRespuestasNiFecha() {
+    void enviarNuevaSolicitud_cierraConElDashboardGeneral() {
         service.enviarNuevaSolicitud(TipoCuestionario.ADOPCION, "Nala",
                 "Ana", "ana@example.com", "600123123", "12345678A");
 
@@ -45,10 +44,32 @@ class NotificacionServiceTest {
                 .contains("Email: ana@example.com")
                 .contains("Teléfono: 600123123")
                 .contains("DNI/NIE: 12345678A")
-                .contains("https://www.ayudaanimalmurcia.org/dashboard/adopciones")
+                .contains("Entra al Dashboard para leer el formulario completo y descargarlo:\n"
+                        + "https://www.ayudaanimalmurcia.org/dashboard")
+                .doesNotContain("/dashboard/adopciones")
+                .doesNotContain("/dashboard/acogidas")
                 .doesNotContain("Respuestas")
                 .doesNotContain("Fecha")
                 .doesNotContain("2026-08-08");
+    }
+
+    @Test
+    void enviarNuevaSolicitud_adopcionYAcogidaUsanElMismoCierre() {
+        service.enviarNuevaSolicitud(TipoCuestionario.ADOPCION, "Nala",
+                "Ana", "ana@example.com", "600123123", "12345678A");
+        service.enviarNuevaSolicitud(TipoCuestionario.ACOGIDA, "Luna",
+                "María", "maria@example.com", "600999999", "87654321B");
+
+        ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
+        verify(resendEmailService, org.mockito.Mockito.times(2))
+                .enviar(eq("destino@example.com"), anyString(), textCaptor.capture());
+
+        String adopcion = textCaptor.getAllValues().get(0);
+        String acogida = textCaptor.getAllValues().get(1);
+        String cierre = "Entra al Dashboard para leer el formulario completo y descargarlo:\n"
+                + "https://www.ayudaanimalmurcia.org/dashboard\n";
+        org.assertj.core.api.Assertions.assertThat(adopcion).endsWith(cierre);
+        org.assertj.core.api.Assertions.assertThat(acogida).endsWith(cierre);
     }
 
     @Test
@@ -72,7 +93,7 @@ class NotificacionServiceTest {
     @Test
     void enviarNuevaSolicitud_sinDashboardUrl_noIncluyeEnlace() {
         NotificacionService sinEnlace =
-                new NotificacionService(resendEmailService, "destino@example.com", " ", " ");
+                new NotificacionService(resendEmailService, "destino@example.com", " ");
 
         sinEnlace.enviarNuevaSolicitud(TipoCuestionario.ADOPCION, "Nala",
                 "Ana", "ana@example.com", "600123123", "12345678A");
@@ -90,8 +111,7 @@ class NotificacionServiceTest {
     @Test
     void enviarNuevaSolicitud_sinDestinoNoEnvia() {
         NotificacionService sinDestino =
-                new NotificacionService(resendEmailService, " ", "https://www.ayudaanimalmurcia.org/dashboard/adopciones",
-                        "https://www.ayudaanimalmurcia.org/dashboard/acogidas");
+                new NotificacionService(resendEmailService, " ", "https://www.ayudaanimalmurcia.org/dashboard");
 
         sinDestino.enviarNuevaSolicitud(TipoCuestionario.ADOPCION, "Nala",
                 "Ana", "ana@example.com", "600123123", "12345678A");

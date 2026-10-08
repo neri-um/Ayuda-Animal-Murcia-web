@@ -1,5 +1,7 @@
 package vidanimal.aplicacion.servicio;
 
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -19,13 +21,28 @@ public class ColaboracionService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ColaboracionService.class);
 
+    /** Orden en el que se muestran los campos del cuestionario de voluntariado. */
+    private static final List<String> ETIQUETAS_VOLUNTARIADO = List.of(
+            "Nombre",
+            "Email",
+            "Correo universitario",
+            "Teléfono de contacto",
+            "Edad",
+            "Localidad de residencia",
+            "¿Dispone de vehículo propio?",
+            "Tareas de interés",
+            "Comentario adicional");
+
     private final ResendEmailService resendEmailService;
     private final String mailDestination;
+    private final String dashboardUrl;
 
     public ColaboracionService(ResendEmailService resendEmailService,
-                               @Value("${adopcion.mail.destination:}") String mailDestination) {
+                               @Value("${adopcion.mail.destination:}") String mailDestination,
+                               @Value("${adopcion.mail.dashboard-url:https://www.ayudaanimalmurcia.org/dashboard}") String dashboardUrl) {
         this.resendEmailService = resendEmailService;
         this.mailDestination = mailDestination;
+        this.dashboardUrl = dashboardUrl;
     }
 
     /**
@@ -64,15 +81,73 @@ public class ColaboracionService {
     }
 
     private String construirContenido(ColaboracionDTO dto, String tipo) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Se ha recibido una nueva solicitud de colaboración.\n\n");
-        sb.append("Tipo: ").append(tipo).append("\n");
-        sb.append("Email del solicitante: ").append(dto.getEmail()).append("\n\n");
+        Map<String, String> respuestas = dto.getRespuestas();
+        boolean esUmu = "VOLUNTARIADO_UMU".equals(tipo);
+        boolean esVoluntariado = tipo.startsWith("VOLUNTARIADO");
 
-        for (Map.Entry<String, String> entrada : dto.getRespuestas().entrySet()) {
-            sb.append(entrada.getKey()).append(": ").append(entrada.getValue()).append("\n");
+        StringBuilder sb = new StringBuilder();
+        sb.append("Se ha recibido una nueva solicitud de ").append(descripcionTipo(tipo)).append(".\n\n");
+        sb.append("Tipo: ").append(tituloTipo(tipo)).append("\n\n");
+
+        if (!esVoluntariado) {
+            for (Map.Entry<String, String> entrada : respuestas.entrySet()) {
+                if (entrada.getValue() == null || entrada.getValue().isBlank()) {
+                    continue;
+                }
+                sb.append(entrada.getKey()).append(": ").append(entrada.getValue().trim()).append("\n");
+            }
+        } else {
+            Map<String, String> pendientes = new LinkedHashMap<>(respuestas);
+            for (String etiqueta : ETIQUETAS_VOLUNTARIADO) {
+                if (!esUmu && "Correo universitario".equals(etiqueta)) {
+                    pendientes.remove(etiqueta);
+                    continue;
+                }
+                String valor = pendientes.remove(etiqueta);
+                if (valor == null || valor.isBlank()) {
+                    continue;
+                }
+                sb.append(etiqueta).append(": ").append(valor.trim()).append("\n");
+            }
+
+            if (!respuestas.containsKey("Email") && dto.getEmail() != null && !dto.getEmail().isBlank()) {
+                sb.append("Email: ").append(dto.getEmail().trim()).append("\n");
+            }
+            for (Map.Entry<String, String> entrada : pendientes.entrySet()) {
+                if (entrada.getValue() == null || entrada.getValue().isBlank()) {
+                    continue;
+                }
+                sb.append(entrada.getKey()).append(": ").append(entrada.getValue().trim()).append("\n");
+            }
         }
 
+        sb.append(TextoNotificacion.cierreDashboard(dashboardUrl));
+
         return sb.toString();
+    }
+
+    private String tituloTipo(String tipo) {
+        switch (tipo) {
+            case "VOLUNTARIADO":
+                return "No universitario";
+            case "VOLUNTARIADO_UMU":
+                return "UMU";
+            case "ACOGIDA":
+                return "Casa de acogida";
+            default:
+                return tipo;
+        }
+    }
+
+    private String descripcionTipo(String tipo) {
+        switch (tipo) {
+            case "VOLUNTARIADO":
+            case "VOLUNTARIADO_UMU":
+                return "voluntariado";
+            case "ACOGIDA":
+                return "casa de acogida";
+            default:
+                return "colaboración";
+        }
     }
 }
