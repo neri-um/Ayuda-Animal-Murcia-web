@@ -15,6 +15,7 @@ export interface SolicitudColaboracion {
   estado: EstadoSolicitudColaboracion;
   mensajeRespuesta: string | null;
   crau?: number | null;
+  crauDetalle?: Record<string, number> | null;
   respuestas: Record<string, string>;
 }
 
@@ -63,11 +64,12 @@ export async function actualizarCrauSolicitud(
   token: string,
   id: number,
   crau: number,
+  crauDetalle: Record<string, number> = {},
 ): Promise<SolicitudColaboracion> {
   const res = await fetch(`${BASE}/colaboracion/${id}/crau`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ crau }),
+    body: JSON.stringify({ crau, crauDetalle }),
   });
   if (!res.ok) throw await leerMensajeError(res);
   return res.json();

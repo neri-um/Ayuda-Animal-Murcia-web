@@ -15,8 +15,8 @@ public interface SolicitudVoluntariadoUseCase {
 
     SolicitudVoluntariado cambiarEstado(Long id, EstadoSolicitudCuestionario estado, String mensaje);
 
-    /** Fija los créditos CRAU (voluntariado UMU) de una solicitud. */
-    SolicitudVoluntariado actualizarCrau(Long id, Integer crau);
+    /** Fija los créditos CRAU (voluntariado UMU) de una solicitud y su desglose por categoría. */
+    SolicitudVoluntariado actualizarCrau(Long id, Integer crau, String crauDetalleJson);
 
     void eliminar(Long id);
 }

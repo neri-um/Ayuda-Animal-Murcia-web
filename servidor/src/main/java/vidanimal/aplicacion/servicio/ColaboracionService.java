@@ -5,10 +5,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import vidanimal.dominio.modelo.TipoColaboracion;
 import vidanimal.infraestructura.rest.dto.ColaboracionDTO;
 
 /**
@@ -50,42 +48,6 @@ public class ColaboracionService {
         String texto = construirContenido(dto, tipo);
 
         return resendEmailService.enviar(mailDestination, asunto, texto);
-    }
-
-    /**
-     * Avisa por correo a la persona solicitante de que su solicitud ha sido
-     * aceptada o rechazada. Se envía en segundo plano para no bloquear la
-     * respuesta del dashboard.
-     */
-    @Async("emailExecutor")
-    public void enviarRespuesta(String email, String nombre, TipoColaboracion tipo,
-                                boolean aceptada, String mensaje) {
-        if (email == null || email.isBlank()) {
-            LOGGER.warn("No se envía respuesta de colaboración: la solicitud no tiene email.");
-            return;
-        }
-
-        String tipoTexto = tipoTexto(tipo);
-        String asunto = "Tu solicitud de " + tipoTexto + " ha sido "
-                + (aceptada ? "aceptada" : "rechazada");
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("Hola").append(nombre != null && !nombre.isBlank() ? " " + nombre : "").append(",\n\n");
-        sb.append("Gracias por tu interés en colaborar con Ayuda Animal Murcia.\n");
-        sb.append("Tu solicitud de ").append(tipoTexto).append(" ha sido ")
-          .append(aceptada ? "ACEPTADA" : "RECHAZADA").append(".\n");
-        if (mensaje != null && !mensaje.isBlank()) {
-            sb.append("\nMensaje del equipo:\n").append(mensaje).append("\n");
-        }
-        sb.append("\nUn saludo,\nAyuda Animal Murcia");
-
-        resendEmailService.enviar(email, asunto, sb.toString());
-    }
-
-    private String tipoTexto(TipoColaboracion tipo) {
-        if (tipo == TipoColaboracion.VOLUNTARIADO_UMU) return "voluntariado (UMU)";
-        if (tipo == TipoColaboracion.ACOGIDA) return "casa de acogida";
-        return "voluntariado";
     }
 
     private String asuntoSegunTipo(String tipo) {

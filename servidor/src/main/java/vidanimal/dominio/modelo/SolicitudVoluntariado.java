@@ -50,6 +50,10 @@ public class SolicitudVoluntariado {
     /** Créditos CRAU asignados a la persona (voluntariado universitario UMU). */
     private Integer crau;
 
+    /** Desglose de CRAU por categoría (JSON: clave → número de unidades). */
+    @Column(columnDefinition = "TEXT")
+    private String crauDetalle;
+
     public Long getId() {
         return id;
     }
@@ -128,5 +132,13 @@ public class SolicitudVoluntariado {
 
     public void setCrau(Integer crau) {
         this.crau = crau;
+    }
+
+    public String getCrauDetalle() {
+        return crauDetalle;
+    }
+
+    public void setCrauDetalle(String crauDetalle) {
+        this.crauDetalle = crauDetalle;
     }
 }

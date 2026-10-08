@@ -7,6 +7,87 @@ export const CRAU_ITEMS: string[] = [
   'El apoyo continuado en la gestión digital de la asociación (actualización de estados en la web/redes, mantenimiento de la información visible al público y soporte en la difusión) durante un periodo de 4 meses equivaldrá a 1 CRAU.',
 ];
 
+export type CrauCategoria = {
+  key: string;
+  label: string;
+  descripcion: string;
+  unidad: string;
+  bloque: number;
+  crauPorBloque: number;
+};
+
+export const CRAU_CATEGORIAS: CrauCategoria[] = [
+  {
+    key: 'acogida',
+    label: 'Casa de acogida',
+    descripcion: '3 meses de acogida de un animal',
+    unidad: 'periodos de 3 meses',
+    bloque: 1,
+    crauPorBloque: 1,
+  },
+  {
+    key: 'mercadillo',
+    label: 'Mercadillos',
+    descripcion: '5 turnos de mercadillo (4 h cada uno)',
+    unidad: 'turnos',
+    bloque: 5,
+    crauPorBloque: 1,
+  },
+  {
+    key: 'ventas',
+    label: 'Ventas solidarias',
+    descripcion: 'Mínimo de ventas de artículos solidarios cumplido',
+    unidad: 'mínimos cumplidos',
+    bloque: 1,
+    crauPorBloque: 1,
+  },
+  {
+    key: 'casosAdultos',
+    label: 'Casos de adultos o complicados',
+    descripcion: '2 casos de animales adultos o de adopción complicada',
+    unidad: 'casos',
+    bloque: 2,
+    crauPorBloque: 3,
+  },
+  {
+    key: 'casosSimples',
+    label: 'Casos simples (cachorros)',
+    descripcion: '4 casos simples',
+    unidad: 'casos',
+    bloque: 4,
+    crauPorBloque: 3,
+  },
+  {
+    key: 'colonias',
+    label: 'Colonias felinas (CER)',
+    descripcion: '4 meses de gestión de colonias del campus de Espinardo',
+    unidad: 'periodos de 4 meses',
+    bloque: 1,
+    crauPorBloque: 1,
+  },
+  {
+    key: 'digital',
+    label: 'Gestión digital',
+    descripcion: '4 meses de apoyo a la gestión digital',
+    unidad: 'periodos de 4 meses',
+    bloque: 1,
+    crauPorBloque: 1,
+  },
+];
+
+export function crauCategoria(categoria: CrauCategoria, unidades: number): number {
+  if (!unidades || unidades <= 0) return 0;
+  return Math.floor(unidades / categoria.bloque) * categoria.crauPorBloque;
+}
+
+export function crauTotal(detalle?: Record<string, number> | null): number {
+  if (!detalle) return 0;
+  return CRAU_CATEGORIAS.reduce(
+    (acc, categoria) => acc + crauCategoria(categoria, detalle[categoria.key] ?? 0),
+    0,
+  );
+}
+
 export default function CrauNota() {
   return (
     <div className="rounded-xl border p-4 text-sm leading-relaxed" style={{ backgroundColor: '#f7f3e8', borderColor: '#e6dcc0', color: '#5a5344' }}>

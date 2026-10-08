@@ -82,17 +82,11 @@ public class SolicitudVoluntariadoService implements SolicitudVoluntariadoUseCas
         solicitud.setEstado(estado);
         solicitud.setFechaDecision(LocalDate.now());
         solicitud.setMensajeRespuesta(mensaje);
-        SolicitudVoluntariado guardada = repo.guardar(solicitud);
-
-        colaboracionService.enviarRespuesta(
-                solicitud.getEmail(), solicitud.getNombre(), solicitud.getTipo(),
-                estado == EstadoSolicitudCuestionario.ACEPTADA, mensaje);
-
-        return guardada;
+        return repo.guardar(solicitud);
     }
 
     @Override
-    public SolicitudVoluntariado actualizarCrau(Long id, Integer crau) {
+    public SolicitudVoluntariado actualizarCrau(Long id, Integer crau, String crauDetalleJson) {
         if (crau != null && crau < 0) {
             throw new IllegalArgumentException("Los CRAU no pueden ser negativos.");
         }
@@ -100,6 +94,7 @@ public class SolicitudVoluntariadoService implements SolicitudVoluntariadoUseCas
                 .orElseThrow(() -> new RecursoNoEncontradoException("Solicitud no encontrada: " + id));
 
         solicitud.setCrau(crau);
+        solicitud.setCrauDetalle(crauDetalleJson);
         return repo.guardar(solicitud);
     }
 

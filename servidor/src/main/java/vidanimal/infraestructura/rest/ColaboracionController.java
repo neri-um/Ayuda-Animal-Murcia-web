@@ -78,8 +78,15 @@ public class ColaboracionController {
     public ResponseEntity<SolicitudVoluntariadoRespuestaDTO> actualizarCrau(
             @PathVariable Long id,
             @RequestBody CrauDTO dto) {
+        String crauDetalleJson;
+        try {
+            crauDetalleJson = objectMapper.writeValueAsString(
+                    dto.getCrauDetalle() != null ? dto.getCrauDetalle() : Map.of());
+        } catch (JsonProcessingException e) {
+            crauDetalleJson = "{}";
+        }
         return ResponseEntity.ok(
-                toDTO(solicitudUseCase.actualizarCrau(id, dto.getCrau())));
+                toDTO(solicitudUseCase.actualizarCrau(id, dto.getCrau(), crauDetalleJson)));
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -101,6 +108,13 @@ public class ColaboracionController {
         dto.setEstado(s.getEstado());
         dto.setMensajeRespuesta(s.getMensajeRespuesta());
         dto.setCrau(s.getCrau());
+        if (s.getCrauDetalle() != null && !s.getCrauDetalle().isBlank()) {
+            try {
+                dto.setCrauDetalle(objectMapper.readValue(s.getCrauDetalle(), Map.class));
+            } catch (Exception e) {
+                dto.setCrauDetalle(Map.of());
+            }
+        }
         try {
             dto.setRespuestas(objectMapper.readValue(s.getRespuestas(), Map.class));
         } catch (Exception e) {
