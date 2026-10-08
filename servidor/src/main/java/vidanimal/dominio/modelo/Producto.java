@@ -1,5 +1,6 @@
 package vidanimal.dominio.modelo;
 
+import java.time.LocalDate;
 import jakarta.persistence.*;
 
 @Entity
@@ -23,6 +24,20 @@ public class Producto {
 
 	@Column(nullable = false)
 	private int stockDisponible;
+
+	@Column(nullable = false, columnDefinition = "boolean default false")
+	private boolean paraPerro;
+
+	@Column(nullable = false, columnDefinition = "boolean default false")
+	private boolean paraGato;
+
+	@Column(nullable = false, columnDefinition = "int default 0")
+	private int stockMinimo;
+
+	private LocalDate fechaCaducidad;
+
+	@Column(nullable = false, columnDefinition = "boolean default false")
+	private boolean reservadoCer;
 
 	public Producto() {
 	}
@@ -81,5 +96,24 @@ public class Producto {
 
 	public void setStockDisponible(int stockDisponible) {
 		this.stockDisponible = stockDisponible;
+	}
+
+	public boolean isParaPerro() { return paraPerro; }
+	public void setParaPerro(boolean paraPerro) { this.paraPerro = paraPerro; }
+
+	public boolean isParaGato() { return paraGato; }
+	public void setParaGato(boolean paraGato) { this.paraGato = paraGato; }
+
+	public int getStockMinimo() { return stockMinimo; }
+	public void setStockMinimo(int stockMinimo) { this.stockMinimo = stockMinimo; }
+
+	public LocalDate getFechaCaducidad() { return fechaCaducidad; }
+	public void setFechaCaducidad(LocalDate fechaCaducidad) { this.fechaCaducidad = fechaCaducidad; }
+
+	public boolean isReservadoCer() { return reservadoCer; }
+	public void setReservadoCer(boolean reservadoCer) { this.reservadoCer = reservadoCer; }
+
+	public boolean isCaducado() {
+		return fechaCaducidad != null && fechaCaducidad.isBefore(java.time.LocalDate.now());
 	}
 }

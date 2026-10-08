@@ -60,8 +60,8 @@ interface AppContextType {
   products: Product[];
   productsLoading: boolean;
   fetchProducts: () => Promise<void>;
-  addProduct: (data: { nombre: string; descripcion: string; categoria: string; stock: number }) => Promise<void>;
-  updateProduct: (id: string, data: { nombre?: string; descripcion?: string; categoria?: string; stock?: number }) => Promise<void>;
+  addProduct: (data: { nombre: string; descripcion: string; categoria: string; stock: number; paraPerro?: boolean; paraGato?: boolean; stockMinimo?: number; fechaCaducidad?: string; reservadoCer?: boolean }) => Promise<void>;
+  updateProduct: (id: string, data: { nombre?: string; descripcion?: string; categoria?: string; stock?: number; paraPerro?: boolean; paraGato?: boolean; stockMinimo?: number; fechaCaducidad?: string; reservadoCer?: boolean }) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
   requests: ProductRequest[];
   requestsLoading: boolean;
@@ -732,7 +732,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => { if (token) fetchProducts(); }, [token, fetchProducts]);
 
-  const addProduct = useCallback(async (data: { nombre: string; descripcion: string; categoria: string; stock: number }) => {
+  const addProduct = useCallback(async (data: { nombre: string; descripcion: string; categoria: string; stock: number; paraPerro?: boolean; paraGato?: boolean; stockMinimo?: number; fechaCaducidad?: string; reservadoCer?: boolean }) => {
     const res = await fetch(`${BASE}/almacen/productos`, {
       method: 'POST', headers: jsonHeaders(token), body: JSON.stringify(data),
     });
@@ -740,7 +740,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await fetchProducts();
   }, [token, fetchProducts]);
 
-  const updateProduct = useCallback(async (id: string, data: { nombre?: string; descripcion?: string; categoria?: string; stock?: number }) => {
+  const updateProduct = useCallback(async (id: string, data: { nombre?: string; descripcion?: string; categoria?: string; stock?: number; paraPerro?: boolean; paraGato?: boolean; stockMinimo?: number; fechaCaducidad?: string; reservadoCer?: boolean }) => {
     const res = await fetch(`${BASE}/almacen/productos/${id}`, {
       method: 'PUT', headers: jsonHeaders(token), body: JSON.stringify(data),
     });

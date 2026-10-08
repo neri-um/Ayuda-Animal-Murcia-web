@@ -99,6 +99,12 @@ export interface Product {
   categoria: CategoriaProducto;
   stockTotal: number;
   stockDisponible: number;
+  paraPerro: boolean;
+  paraGato: boolean;
+  stockMinimo: number;
+  fechaCaducidad?: string;
+  reservadoCer: boolean;
+  caducado: boolean;
 }
 
 export interface ProductRequest {
