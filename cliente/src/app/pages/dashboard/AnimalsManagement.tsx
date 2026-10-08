@@ -111,12 +111,12 @@ function AnimalRow({ animal, responsable, statusOptions, onStatusChange, onDelet
         </>
       </td>
       <td style={{ ...CELL_PAD, paddingRight: '1.5rem' }}>
-        <div className="flex items-center gap-1.5 whitespace-nowrap">
+        <div className="flex items-center gap-1 whitespace-nowrap">
           {/* Botón Animal del mes — visible para todos; el servidor valida el permiso */}
           <button
             onClick={() => onSetAnimalDelMes(esMes ? null : animal.id)}
             title={esMes ? 'Quitar como animal del mes' : 'Marcar como animal del mes'}
-            className="p-2 rounded-lg transition-colors"
+            className="p-1.5 rounded-lg transition-colors"
             style={esMes
               ? { backgroundColor: '#f7e3b0', color: '#2e2e2e' }
               : { color: '#9ca3af' }
@@ -150,15 +150,15 @@ function AnimalRow({ animal, responsable, statusOptions, onStatusChange, onDelet
             <Stethoscope className="w-3.5 h-3.5" /> Protocolo
           </Link>
           <Link to={`/dashboard/animales/${animal.id}#blog`}
-            className="p-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors" title="Blog">
+            className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors" title="Blog">
             <Newspaper className="w-4 h-4" />
           </Link>
           <Link to={`/dashboard/animales/${animal.id}/edit`}
-            className="p-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors" title="Editar">
+            className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors" title="Editar">
             <Edit2 className="w-4 h-4" />
           </Link>
           <button onClick={onDelete}
-            className="p-2 rounded-lg text-red-300 hover:bg-red-50 hover:text-red-500 transition-colors" title="Eliminar">
+            className="p-1.5 rounded-lg text-red-300 hover:bg-red-50 hover:text-red-500 transition-colors" title="Eliminar">
             <Trash2 className="w-4 h-4" />
           </button>
         </div>
@@ -328,32 +328,56 @@ export default function AnimalsManagement() {
   const headerRow = (
     <thead>
       <tr className="text-xs text-gray-500 uppercase tracking-wide border-b border-gray-100">
-        <th className="text-left font-medium py-3 pl-6 pr-4" style={{ width: '25%' }}>Animal</th>
-        <th className="text-left font-medium py-3 px-4" style={{ width: '70px' }}>Edad</th>
-        <th className="text-left font-medium py-3 px-4" style={{ width: '90px' }}>Sexo</th>
-        <th className="text-left font-medium py-3 px-4" style={{ width: '150px' }}>Estado</th>
-        <th className="text-left font-medium py-3 pl-4 pr-6">Acciones</th>
+        <th className="text-left font-medium py-3 pl-6 pr-4">Animal</th>
+        <th className="text-left font-medium py-3 px-4" style={{ width: '64px' }}>Edad</th>
+        <th className="text-left font-medium py-3 px-4" style={{ width: '80px' }}>Sexo</th>
+        <th className="text-left font-medium py-3 px-4" style={{ width: '140px' }}>Estado</th>
+        <th className="text-left font-medium py-3 pl-4 pr-6" style={{ width: '320px' }}>Acciones</th>
       </tr>
     </thead>
   );
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
           <h1 className="text-gray-900">Gestión de animales</h1>
           <p className="text-gray-500 text-sm mt-1">{animalsTodos.length} animales en total</p>
         </div>
-        {(esAdmin || esVoluntario || esEncargado) && (
-          <Link to="/dashboard/animales/nuevo"
-            className="self-start sm:self-auto inline-flex items-center gap-2 text-white px-4 py-2 rounded-xl transition-colors text-sm"
-            style={{ backgroundColor: '#547792' }}
-            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#3d6180')}
-            onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#547792')}
-          >
-            <Plus className="w-4 h-4" /> Añadir animal
-          </Link>
-        )}
+        <div className="flex flex-col items-stretch sm:items-end gap-2 self-start sm:self-auto">
+          {(esAdmin || esVoluntario || esEncargado) && (
+            <Link to="/dashboard/animales/nuevo"
+              className="inline-flex items-center justify-center gap-2 text-white px-4 py-2 rounded-xl transition-colors text-sm"
+              style={{ backgroundColor: '#547792' }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#3d6180')}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#547792')}
+            >
+              <Plus className="w-4 h-4" /> Añadir animal
+            </Link>
+          )}
+          {animalDelMesId && (() => {
+            const adm = animalsTodos.find(a => a.id === animalDelMesId);
+            return adm ? (
+              <div
+                className="flex items-center justify-between gap-3 rounded-2xl px-4 py-2 text-sm"
+                style={{ backgroundColor: '#fef9ec', border: '1px solid #f7e3b0', color: '#2e2e2e' }}
+              >
+                <span className="flex items-center gap-2">
+                  <Star className="w-4 h-4 flex-shrink-0" fill="#2e2e2e" />
+                  <span className="truncate"><strong>Animal del mes:</strong> {adm.name}</span>
+                </span>
+                {esAdmin && (
+                  <button
+                    onClick={() => manejarAnimalDelMes(null)}
+                    className="text-xs underline opacity-60 hover:opacity-100 transition-opacity flex-shrink-0"
+                  >
+                    Quitar
+                  </button>
+                )}
+              </div>
+            ) : null;
+          })()}
+        </div>
       </div>
 
       {errorMes && (
@@ -361,29 +385,6 @@ export default function AnimalsManagement() {
           {errorMes}
         </div>
       )}
-
-      {animalDelMesId && (() => {
-        const adm = animalsTodos.find(a => a.id === animalDelMesId);
-        return adm ? (
-          <div
-            className="flex items-center justify-between gap-3 rounded-2xl px-5 py-3 text-sm"
-            style={{ backgroundColor: '#fef9ec', border: '1px solid #f7e3b0', color: '#2e2e2e' }}
-          >
-            <span className="flex items-center gap-2">
-              <Star className="w-4 h-4" fill="#2e2e2e" />
-              <strong>Animal del mes:</strong> {adm.name}
-            </span>
-            {(esAdmin) && (
-              <button
-                onClick={() => manejarAnimalDelMes(null)}
-                className="text-xs underline opacity-60 hover:opacity-100 transition-opacity"
-              >
-                Quitar
-              </button>
-            )}
-          </div>
-        ) : null;
-      })()}
 
       <div className="bg-white rounded-2xl border border-gray-100 p-4 flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
@@ -426,7 +427,7 @@ export default function AnimalsManagement() {
               <span className="text-xs text-gray-400">{myAnimals.length} animal{myAnimals.length !== 1 ? 'es' : ''}</span>
             </div>
             <div className="hidden md:block overflow-x-auto">
-              <table className="w-full table-fixed min-w-[42rem]">
+              <table className="w-full table-fixed min-w-[48rem]">
                 {headerRow}
                 {myAnimals.length === 0 ? (
                   <tbody>
@@ -486,8 +487,8 @@ export default function AnimalsManagement() {
             {showOtros && (
               <>
                 <div className="hidden md:block overflow-x-auto">
-              <table className="w-full table-fixed min-w-[52rem]">
-                    {headerRow}
+<table className="w-full table-fixed min-w-[48rem]">
+                {headerRow}
                     {otherAnimals.length === 0 ? (
                       <tbody>
                         <tr>

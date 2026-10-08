@@ -1,18 +1,18 @@
 package vidanimal.infraestructura.rest.dto;
 
-import vidanimal.dominio.modelo.EstadoSolicitudCuestionario;
+import vidanimal.dominio.modelo.EstadoSolicitudVoluntariado;
 
 /**
  * Decisión del equipo sobre una solicitud de colaboración: estado nuevo
- * (ACEPTADA o RECHAZADA) y mensaje opcional que se envía a la persona.
+ * (PENDIENTE, ACTIVA, INACTIVA o RECHAZADA) y nota interna opcional.
  */
 public class DecisionSolicitudVoluntariadoDTO {
 
-    private EstadoSolicitudCuestionario estado;
+    private EstadoSolicitudVoluntariado estado;
     private String mensaje;
 
-    public EstadoSolicitudCuestionario getEstado() { return estado; }
-    public void setEstado(EstadoSolicitudCuestionario estado) { this.estado = estado; }
+    public EstadoSolicitudVoluntariado getEstado() { return estado; }
+    public void setEstado(EstadoSolicitudVoluntariado estado) { this.estado = estado; }
 
     public String getMensaje() { return mensaje; }
     public void setMensaje(String mensaje) { this.mensaje = mensaje; }

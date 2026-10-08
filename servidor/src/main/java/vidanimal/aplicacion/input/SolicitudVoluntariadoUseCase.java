@@ -2,7 +2,7 @@ package vidanimal.aplicacion.input;
 
 import java.util.List;
 
-import vidanimal.dominio.modelo.EstadoSolicitudCuestionario;
+import vidanimal.dominio.modelo.EstadoSolicitudVoluntariado;
 import vidanimal.dominio.modelo.SolicitudVoluntariado;
 import vidanimal.infraestructura.rest.dto.ColaboracionDTO;
 
@@ -13,7 +13,7 @@ public interface SolicitudVoluntariadoUseCase {
 
     List<SolicitudVoluntariado> listar();
 
-    SolicitudVoluntariado cambiarEstado(Long id, EstadoSolicitudCuestionario estado, String mensaje);
+    SolicitudVoluntariado cambiarEstado(Long id, EstadoSolicitudVoluntariado estado, String mensaje);
 
     /** Fija los créditos CRAU (voluntariado UMU) de una solicitud y su desglose por categoría. */
     SolicitudVoluntariado actualizarCrau(Long id, Integer crau, String crauDetalleJson);

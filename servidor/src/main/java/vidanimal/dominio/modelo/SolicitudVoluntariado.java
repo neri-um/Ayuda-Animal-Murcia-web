@@ -39,7 +39,7 @@ public class SolicitudVoluntariado {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private EstadoSolicitudCuestionario estado = EstadoSolicitudCuestionario.PENDIENTE;
+    private EstadoSolicitudVoluntariado estado = EstadoSolicitudVoluntariado.PENDIENTE;
 
     @Column(columnDefinition = "TEXT")
     private String respuestas;
@@ -102,11 +102,11 @@ public class SolicitudVoluntariado {
         this.fechaDecision = fechaDecision;
     }
 
-    public EstadoSolicitudCuestionario getEstado() {
+    public EstadoSolicitudVoluntariado getEstado() {
         return estado;
     }
 
-    public void setEstado(EstadoSolicitudCuestionario estado) {
+    public void setEstado(EstadoSolicitudVoluntariado estado) {
         this.estado = estado;
     }
 

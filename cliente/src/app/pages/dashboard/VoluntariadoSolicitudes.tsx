@@ -1,31 +1,86 @@
-import { useState, useEffect, useCallback, type ReactNode } from 'react';
+import { useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
 import {
   Loader2, Search, ChevronDown, ChevronUp, CheckCircle, XCircle, MessageCircle,
-  Trash2, RefreshCw, ClipboardList, Info, Award, Heart, GraduationCap,
+  Trash2, ClipboardList, Award, Heart, GraduationCap, UserSearch, X,
 } from 'lucide-react';
 import { useAuth } from '../../context/AppContext';
 import {
   listarSolicitudesColaboracion, decidirSolicitudColaboracion, actualizarCrauSolicitud,
   eliminarSolicitudColaboracion, type SolicitudColaboracion,
 } from '../../services/colaboracion';
-import CrauNota, { crauTotal } from '../../components/colaborar/CrauInfo';
+import { crauTotal } from '../../components/colaborar/CrauInfo';
+import { TAREAS } from '../../components/colaborar/VoluntariadoForm';
 import CrauTracker from '../../components/colaborar/CrauTracker';
 
-type EstadoSolicitud = 'PENDIENTE' | 'ACEPTADA' | 'RECHAZADA';
+type EstadoSolicitud = 'PENDIENTE' | 'ACTIVA' | 'INACTIVA' | 'RECHAZADA';
 
 const SECCIONES: { key: EstadoSolicitud; label: string; border: string; dot: string }[] = [
   { key: 'PENDIENTE', label: 'Pendientes', border: 'border-l-[#D4AF37]', dot: 'bg-[#D4AF37]' },
-  { key: 'ACEPTADA',  label: 'Aceptadas',  border: 'border-l-[#6A994E]', dot: 'bg-[#6A994E]' },
-  { key: 'RECHAZADA', label: 'Rechazadas', border: 'border-l-[#9C2B1B]', dot: 'bg-[#9C2B1B]' },
+  { key: 'ACTIVA',    label: 'Activos',    border: 'border-l-[#6A994E]', dot: 'bg-[#6A994E]' },
+  { key: 'INACTIVA',  label: 'Inactivos',  border: 'border-l-[#9CA3AF]', dot: 'bg-[#9CA3AF]' },
+  { key: 'RECHAZADA', label: 'Rechazados', border: 'border-l-[#9C2B1B]', dot: 'bg-[#9C2B1B]' },
 ];
 
-// Dos columnas por tipo: voluntariado/casa de acogida y voluntariado UMU.
+// Dos columnas por tipo: voluntariado UMU (izquierda) y voluntariado/casa de acogida (derecha).
 const COLUMNAS: { key: 'NORMAL' | 'UMU'; label: string; icono: ReactNode; tipos: string[] }[] = [
-  { key: 'NORMAL', label: 'Voluntariado', icono: <Heart className="w-5 h-5 text-gray-600" />, tipos: ['VOLUNTARIADO', 'ACOGIDA'] },
   { key: 'UMU', label: 'Voluntariado UMU', icono: <GraduationCap className="w-5 h-5 text-gray-600" />, tipos: ['VOLUNTARIADO_UMU'] },
+  { key: 'NORMAL', label: 'Voluntariado', icono: <Heart className="w-5 h-5 text-gray-600" />, tipos: ['VOLUNTARIADO', 'ACOGIDA'] },
 ];
 
-const ROJO_UMU = '#BD2A33';
+const CLAVE_TAREAS = 'Tareas de interés';
+const tareasDe = (s: SolicitudColaboracion): string[] =>
+  (s.respuestas?.[CLAVE_TAREAS] ?? '').split('; ').map(t => t.trim()).filter(Boolean);
+
+function EstadoMenu({ estado, disabled, onSelect }: {
+  estado: EstadoSolicitud;
+  disabled?: boolean;
+  onSelect: (e: EstadoSolicitud) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (ev: MouseEvent) => {
+      if (ref.current && !ref.current.contains(ev.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  const actual = SECCIONES.find(s => s.key === estado);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setOpen(v => !v)}
+        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50"
+        title="Cambiar actividad"
+      >
+        <span className={`w-2 h-2 rounded-full ${actual?.dot ?? 'bg-gray-300'}`} />
+        {actual?.label ?? estado}
+        <ChevronDown className="w-3.5 h-3.5" />
+      </button>
+      {open && (
+        <div className="absolute z-20 mt-1 left-0 min-w-[10rem] bg-white rounded-xl border border-gray-100 shadow-lg py-1">
+          {SECCIONES.map(s => (
+            <button
+              key={s.key}
+              type="button"
+              onClick={() => { setOpen(false); onSelect(s.key); }}
+              className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-left hover:bg-gray-50 transition-colors"
+            >
+              <span className={`w-2 h-2 rounded-full ${s.dot}`} />
+              <span className={s.key === estado ? 'font-semibold text-gray-900' : 'text-gray-600'}>{s.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function formatFecha(iso: string | null): string {
   if (!iso) return '—';
@@ -49,7 +104,8 @@ export default function VoluntariadoSolicitudes() {
   const [guardandoCrau, setGuardandoCrau] = useState<number | null>(null);
   const [eliminarId, setEliminarId] = useState<number | null>(null);
   const [seccionesColapsadas, setSeccionesColapsadas] = useState<Record<string, boolean>>({});
-  const [mostrarReglas, setMostrarReglas] = useState(false);
+  const [mostrarBusqueda, setMostrarBusqueda] = useState(false);
+  const [tareasSel, setTareasSel] = useState<string[]>([]);
 
   const cargar = useCallback(async () => {
     if (!token) return;
@@ -66,7 +122,7 @@ export default function VoluntariadoSolicitudes() {
 
   useEffect(() => { cargar(); }, [cargar]);
 
-  const decidir = async (solicitud: SolicitudColaboracion, estado: 'ACEPTADA' | 'RECHAZADA') => {
+  const decidir = async (solicitud: SolicitudColaboracion, estado: EstadoSolicitud) => {
     if (!token) return;
     if (estado === 'RECHAZADA' && !window.confirm('¿Rechazar esta solicitud?')) return;
     setActualizando(solicitud.id);
@@ -129,22 +185,14 @@ export default function VoluntariadoSolicitudes() {
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setMostrarReglas(v => !v)}
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+            onClick={() => setMostrarBusqueda(true)}
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold text-white shadow-sm hover:opacity-90 transition-opacity"
+            style={{ backgroundColor: '#547792' }}
           >
-            <Info className="w-4 h-4" /> Reglas CRAU
-          </button>
-          <button
-            onClick={cargar}
-            disabled={loading}
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Actualizar
+            <UserSearch className="w-4 h-4" /> ¿Necesitas un voluntario?
           </button>
         </div>
       </div>
-
-      {mostrarReglas && <CrauNota />}
 
       <div className="bg-white rounded-2xl border border-gray-100 p-4 flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
@@ -242,11 +290,10 @@ export default function VoluntariadoSolicitudes() {
                                   <div className="flex items-center gap-2 flex-shrink-0">
                                     {col.key === 'UMU' && crauTotal(s.crauDetalle) > 0 && (
                                       <span
-                                        className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full text-white whitespace-nowrap"
-                                        style={{ backgroundColor: ROJO_UMU }}
+                                        className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border border-gray-200 text-gray-600 bg-white whitespace-nowrap"
                                         title="CRAU acumulados"
                                       >
-                                        <Award className="w-3.5 h-3.5" /> {crauTotal(s.crauDetalle)} CRAU
+                                        <Award className="w-3.5 h-3.5 text-gray-400" /> {crauTotal(s.crauDetalle)} CRAU
                                       </span>
                                     )}
                                     {abierta
@@ -290,9 +337,13 @@ export default function VoluntariadoSolicitudes() {
                                     {s.mensajeRespuesta && (
                                       <div
                                         className="rounded-xl px-3 py-2 text-xs"
-                                        style={s.estado === 'ACEPTADA'
-                                          ? { backgroundColor: 'rgba(106,153,78,0.08)', color: '#3f5f2d' }
-                                          : { backgroundColor: 'rgba(156,43,27,0.08)', color: '#7d2317' }}
+                                        style={
+                                          s.estado === 'ACTIVA'
+                                            ? { backgroundColor: 'rgba(106,153,78,0.08)', color: '#3f5f2d' }
+                                            : s.estado === 'INACTIVA'
+                                              ? { backgroundColor: 'rgba(156,163,175,0.12)', color: '#4b5563' }
+                                              : { backgroundColor: 'rgba(156,43,27,0.08)', color: '#7d2317' }
+                                        }
                                       >
                                         <span className="opacity-70 block mb-0.5">
                                           Nota interna · {formatFecha(s.fechaDecision)}
@@ -307,7 +358,7 @@ export default function VoluntariadoSolicitudes() {
                                   {s.estado === 'PENDIENTE' && (
                                     <>
                                       <button
-                                        onClick={() => decidir(s, 'ACEPTADA')}
+                                        onClick={() => decidir(s, 'ACTIVA')}
                                         disabled={actualizando === s.id}
                                         className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-[#6A994E] bg-[#6A994E]/10 hover:bg-[#6A994E]/20 transition-colors disabled:opacity-50"
                                       >
@@ -331,18 +382,21 @@ export default function VoluntariadoSolicitudes() {
                                   >
                                     <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
                                   </a>
+                                  <div className="flex-1" />
+                                  <EstadoMenu
+                                    estado={s.estado}
+                                    disabled={actualizando === s.id}
+                                    onSelect={estado => decidir(s, estado)}
+                                  />
                                   {esAdmin && (
-                                    <>
-                                      <div className="flex-1" />
-                                      <button
-                                        onClick={() => setEliminarId(s.id)}
-                                        disabled={actualizando === s.id}
-                                        className="p-1.5 rounded-lg text-red-300 hover:bg-red-50 hover:text-red-500 transition-colors disabled:opacity-50"
-                                        title="Eliminar solicitud"
-                                      >
-                                        <Trash2 className="w-4 h-4" />
-                                      </button>
-                                    </>
+                                    <button
+                                      onClick={() => setEliminarId(s.id)}
+                                      disabled={actualizando === s.id}
+                                      className="p-1.5 rounded-lg text-red-300 hover:bg-red-50 hover:text-red-500 transition-colors disabled:opacity-50"
+                                      title="Eliminar solicitud"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
                                   )}
                                 </div>
                               </div>
@@ -356,6 +410,91 @@ export default function VoluntariadoSolicitudes() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {mostrarBusqueda && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center p-4 overflow-y-auto">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setMostrarBusqueda(false)} />
+          <div className="relative bg-white rounded-2xl w-full max-w-2xl shadow-xl z-10 my-8">
+            <div className="flex items-start justify-between gap-4 px-6 pt-6 pb-4 border-b border-gray-100">
+              <div className="flex items-start gap-2">
+                <UserSearch className="w-5 h-5 text-[#547792] mt-0.5" />
+                <div>
+                  <h3 className="text-gray-900 font-semibold">¿Necesitas un voluntario?</h3>
+                  <p className="text-xs text-gray-500 mt-0.5">Marca las tareas y verás voluntarios activos disponibles.</p>
+                </div>
+              </div>
+              <button onClick={() => setMostrarBusqueda(false)} className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="px-6 py-4">
+              <div className="flex flex-wrap gap-2">
+                {TAREAS.map(t => {
+                  const activa = tareasSel.includes(t);
+                  return (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => setTareasSel(prev => activa ? prev.filter(x => x !== t) : [...prev, t])}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                        activa ? 'bg-[#547792] text-white border-[#547792]' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="px-6 pb-6">
+              {tareasSel.length === 0 ? (
+                <p className="text-sm text-gray-400 text-center py-8">Marca una o varias tareas para ver voluntarios disponibles.</p>
+              ) : (() => {
+                const coincidencias = solicitudes.filter(s => s.estado === 'ACTIVA' && tareasDe(s).some(t => tareasSel.includes(t)));
+                if (coincidencias.length === 0) {
+                  return <p className="text-sm text-gray-400 text-center py-8">No hay voluntarios activos para esas tareas.</p>;
+                }
+                return (
+                  <div className="space-y-2 max-h-[55vh] overflow-y-auto">
+                    <p className="text-xs text-gray-400">
+                      {coincidencias.length} voluntario{coincidencias.length !== 1 ? 's' : ''} disponible{coincidencias.length !== 1 ? 's' : ''}
+                    </p>
+                    {coincidencias.map(s => {
+                      const telefono = s.respuestas?.['Teléfono de contacto'] ?? '';
+                      const coincideTareas = tareasDe(s).filter(t => tareasSel.includes(t));
+                      return (
+                        <div key={s.id} className="rounded-xl border border-gray-100 bg-gray-50/60 px-4 py-3">
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="text-sm font-medium text-gray-900 truncate">{s.nombre ?? 'Sin nombre'}</p>
+                              <p className="text-xs text-gray-500 truncate">{s.email}</p>
+                            </div>
+                            {s.tipo === 'VOLUNTARIADO_UMU' && (
+                              <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full border border-gray-200 text-gray-600 bg-white flex-shrink-0">
+                                <GraduationCap className="w-3 h-3" /> UMU
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-xs">
+                            {telefono && (
+                              <a href={`https://wa.me/${telefono.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[#6A994E] hover:underline">
+                                <MessageCircle className="w-3.5 h-3.5" /> {telefono}
+                              </a>
+                            )}
+                            <span className="text-gray-500">{coincideTareas.join(', ')}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
         </div>
       )}
 

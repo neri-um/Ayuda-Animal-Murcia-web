@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import vidanimal.aplicacion.input.SolicitudVoluntariadoUseCase;
 import vidanimal.aplicacion.output.SolicitudVoluntariadoRepositorioPort;
 import vidanimal.dominio.excepcion.RecursoNoEncontradoException;
-import vidanimal.dominio.modelo.EstadoSolicitudCuestionario;
+import vidanimal.dominio.modelo.EstadoSolicitudVoluntariado;
 import vidanimal.dominio.modelo.SolicitudVoluntariado;
 import vidanimal.dominio.modelo.TipoColaboracion;
 import vidanimal.infraestructura.rest.dto.ColaboracionDTO;
@@ -49,7 +49,7 @@ public class SolicitudVoluntariadoService implements SolicitudVoluntariadoUseCas
         solicitud.setEmail(dto.getEmail().trim());
         solicitud.setNombre(extraerNombre(dto.getRespuestas()));
         solicitud.setFecha(LocalDate.now());
-        solicitud.setEstado(EstadoSolicitudCuestionario.PENDIENTE);
+        solicitud.setEstado(EstadoSolicitudVoluntariado.PENDIENTE);
         solicitud.setRespuestas(respuestasJson);
 
         SolicitudVoluntariado guardada = repo.guardar(solicitud);
@@ -71,9 +71,9 @@ public class SolicitudVoluntariadoService implements SolicitudVoluntariadoUseCas
     }
 
     @Override
-    public SolicitudVoluntariado cambiarEstado(Long id, EstadoSolicitudCuestionario estado, String mensaje) {
-        if (estado != EstadoSolicitudCuestionario.ACEPTADA && estado != EstadoSolicitudCuestionario.RECHAZADA) {
-            throw new IllegalArgumentException("Solo se puede aceptar o rechazar una solicitud.");
+    public SolicitudVoluntariado cambiarEstado(Long id, EstadoSolicitudVoluntariado estado, String mensaje) {
+        if (estado == null) {
+            throw new IllegalArgumentException("El estado no puede estar vacío.");
         }
 
         SolicitudVoluntariado solicitud = repo.buscarPorId(id)
@@ -81,7 +81,9 @@ public class SolicitudVoluntariadoService implements SolicitudVoluntariadoUseCas
 
         solicitud.setEstado(estado);
         solicitud.setFechaDecision(LocalDate.now());
-        solicitud.setMensajeRespuesta(mensaje);
+        if (mensaje != null && !mensaje.isBlank()) {
+            solicitud.setMensajeRespuesta(mensaje);
+        }
         return repo.guardar(solicitud);
     }
 

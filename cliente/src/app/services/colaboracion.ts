@@ -3,7 +3,7 @@ import { API_BASE as BASE, leerMensajeError } from './api';
 
 export type TipoColaboracion = 'VOLUNTARIADO' | 'VOLUNTARIADO_UMU' | 'ACOGIDA';
 
-export type EstadoSolicitudColaboracion = 'PENDIENTE' | 'ACEPTADA' | 'RECHAZADA';
+export type EstadoSolicitudColaboracion = 'PENDIENTE' | 'ACTIVA' | 'INACTIVA' | 'RECHAZADA';
 
 export interface SolicitudColaboracion {
   id: number;
@@ -48,7 +48,7 @@ export async function listarSolicitudesColaboracion(token: string): Promise<Soli
 export async function decidirSolicitudColaboracion(
   token: string,
   id: number,
-  estado: 'ACEPTADA' | 'RECHAZADA',
+  estado: EstadoSolicitudColaboracion,
   mensaje = '',
 ): Promise<SolicitudColaboracion> {
   const res = await fetch(`${BASE}/colaboracion/${id}/estado`, {

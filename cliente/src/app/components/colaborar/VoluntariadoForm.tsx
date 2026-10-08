@@ -5,7 +5,7 @@ import { CampoTexto, PreguntaOpciones } from './campos';
 import { Seccion, AceptacionClausula, ExitoFormulario } from './comun';
 import { enviarColaboracion, type TipoColaboracion } from '../../services/colaboracion';
 
-const TAREAS = [
+export const TAREAS = [
   'Gestionar animales en adopción',
   'Difusión en redes sociales',
   'Transporte de animales (visitas veterinarias, recogidas, etc.)',

@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import vidanimal.dominio.modelo.EstadoSolicitudCuestionario;
+import vidanimal.dominio.modelo.EstadoSolicitudVoluntariado;
 
 /**
  * Solicitud de colaboración tal y como se devuelve al dashboard: datos de
@@ -18,7 +18,7 @@ public class SolicitudVoluntariadoRespuestaDTO {
     private String nombre;
     private LocalDate fechaSolicitud;
     private LocalDate fechaDecision;
-    private EstadoSolicitudCuestionario estado;
+    private EstadoSolicitudVoluntariado estado;
     private String mensajeRespuesta;
     private Integer crau;
     private Map<String, Integer> crauDetalle = new LinkedHashMap<>();
@@ -42,8 +42,8 @@ public class SolicitudVoluntariadoRespuestaDTO {
     public LocalDate getFechaDecision() { return fechaDecision; }
     public void setFechaDecision(LocalDate fechaDecision) { this.fechaDecision = fechaDecision; }
 
-    public EstadoSolicitudCuestionario getEstado() { return estado; }
-    public void setEstado(EstadoSolicitudCuestionario estado) { this.estado = estado; }
+    public EstadoSolicitudVoluntariado getEstado() { return estado; }
+    public void setEstado(EstadoSolicitudVoluntariado estado) { this.estado = estado; }
 
     public String getMensajeRespuesta() { return mensajeRespuesta; }
     public void setMensajeRespuesta(String mensajeRespuesta) { this.mensajeRespuesta = mensajeRespuesta; }
