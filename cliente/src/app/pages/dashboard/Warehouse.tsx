@@ -355,10 +355,7 @@ export default function Warehouse() {
         </div>
         <button
           onClick={openAddProduct}
-          className="inline-flex items-center gap-2 text-white px-5 py-2.5 rounded-xl text-sm transition-colors"
-          style={{ backgroundColor: '#547792' }}
-          onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#3d6180')}
-          onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#547792')}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm transition-colors border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
         >
           <Plus className="w-4 h-4" />
           Añadir producto
