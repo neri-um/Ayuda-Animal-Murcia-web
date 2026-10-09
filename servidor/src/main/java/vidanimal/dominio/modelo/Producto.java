@@ -26,18 +26,19 @@ public class Producto {
 	@Column(nullable = false)
 	private int stockDisponible;
 
-	@Column(nullable = false, columnDefinition = "boolean default false")
+	@Column(name = "para_perro", nullable = false, columnDefinition = "boolean default false")
 	private boolean paraPerro;
 
-	@Column(nullable = false, columnDefinition = "boolean default false")
+	@Column(name = "para_gato", nullable = false, columnDefinition = "boolean default false")
 	private boolean paraGato;
 
-	@Column(nullable = false, columnDefinition = "int default 0")
+	@Column(name = "stock_minimo", nullable = false, columnDefinition = "int default 0")
 	private int stockMinimo;
 
+	@Column(name = "fecha_caducidad")
 	private LocalDate fechaCaducidad;
 
-	@Column(nullable = false, columnDefinition = "boolean default false")
+	@Column(name = "reservado_cer", nullable = false, columnDefinition = "boolean default false")
 	private boolean reservadoCer;
 
 	public Producto() {

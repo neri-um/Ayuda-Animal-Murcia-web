@@ -238,6 +238,12 @@ function mapProductFromBackend(p: any): Product {
     categoria: p.categoria ?? 'OTRO',
     stockTotal: p.stockTotal ?? 0,
     stockDisponible: p.stockDisponible ?? 0,
+    paraPerro: Boolean(p.paraPerro ?? false),
+    paraGato: Boolean(p.paraGato ?? false),
+    stockMinimo: p.stockMinimo ?? 0,
+    fechaCaducidad: p.fechaCaducidad ?? undefined,
+    reservadoCer: Boolean(p.reservadoCer ?? false),
+    caducado: Boolean(p.caducado ?? false),
   };
 }
 
