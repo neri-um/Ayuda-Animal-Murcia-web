@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Plus, Edit2, Trash2, Package, AlertTriangle, Search, Send, XCircle } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
+import { Plus, Edit2, Trash2, Package, AlertTriangle, Search, Send, XCircle, Dog, Cat, Bone, Soup, Pill, PawPrint, Ban } from 'lucide-react';
 import { Link } from 'react-router';
 import { useApp, useAuth } from '../../context/AppContext';
 import { Product } from '../../types';
@@ -200,12 +200,12 @@ export default function Warehouse() {
               </Link>
               {isCaducado && (
                 <span className="inline-flex items-center gap-1 text-xs leading-none text-red-600 bg-red-50 px-2 py-1 rounded-full border border-red-200" title="Caducado - Gastar con urgencia">
-                  <span role="img" aria-label="caducado">⚠️</span> Caducado
+                  <AlertTriangle className="w-3 h-3" /> Caducado
                 </span>
               )}
               {p.reservadoCer && (
                 <span className="inline-flex items-center gap-1 text-xs leading-none text-purple-600 bg-purple-50 px-2 py-1 rounded-full border border-purple-200" title="Reservado CER">
-                  <span role="img" aria-label="cer">❌</span> CER
+                  <Ban className="w-3 h-3" /> CER
                 </span>
               )}
               {isEmpty && (
@@ -305,9 +305,9 @@ export default function Warehouse() {
     </div>
   );
 
-  const sectionHeader = (emoji: string, label: string, count: number, color: string) => (
+  const sectionHeader = (icon: ReactNode, label: string, count: number, color: string) => (
     <div className="flex items-center gap-2 mb-3">
-      <span className="text-lg" role="img">{emoji}</span>
+      <span style={{ color }}>{icon}</span>
       <h2 className="text-gray-800" style={{ fontWeight: 700, fontSize: '1rem' }}>{label}</h2>
       <span className="text-xs px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: color }}>{count}</span>
       <div className="flex-1 h-px bg-gray-100" />
@@ -323,34 +323,48 @@ export default function Warehouse() {
     </p>
   );
 
-  const renderEtapas = (items: Product[], esGato: boolean) => {
+  const etapaColumns = (items: Product[], esGato: boolean) => {
     const adulto = items.filter(p => p.etapaAlimento === 'ADULTO');
     const cachorro = items.filter(p => p.etapaAlimento === 'CACHORRO');
     const sin = items.filter(p => p.etapaAlimento !== 'ADULTO' && p.etapaAlimento !== 'CACHORRO');
+    const cols: { key: string; label: string; list: Product[]; color: string }[] = [];
+    if (cachorro.length > 0) cols.push({ key: 'cachorro', label: etapaLabel('CACHORRO', esGato), list: cachorro, color: '#6A994E' });
+    if (adulto.length > 0) cols.push({ key: 'adulto', label: etapaLabel('ADULTO', esGato), list: adulto, color: '#547792' });
+    if (sin.length > 0) cols.push({ key: 'sin', label: 'Sin etapa', list: sin, color: '#9CA3AF' });
+    if (cols.length === 0) return null;
     return (
-      <>
-        {adulto.length > 0 && (<>{subHeader(etapaLabel('ADULTO', esGato), adulto.length)}<div className={gridClass}>{adulto.map(renderCard)}</div></>)}
-        {cachorro.length > 0 && (<>{subHeader(etapaLabel('CACHORRO', esGato), cachorro.length)}<div className={gridClass}>{cachorro.map(renderCard)}</div></>)}
-        {sin.length > 0 && (<div className={gridClass}>{sin.map(renderCard)}</div>)}
-      </>
-    );
-  };
-
-  const renderSubGrupo = (icon: string, label: string, items: Product[], esGato: boolean) => {
-    if (items.length === 0) return null;
-    return (
-      <div>
-        <div className="flex items-center gap-2 mb-2">
-          <span role="img">{icon}</span>
-          <h3 className="text-gray-700" style={{ fontWeight: 600 }}>{label}</h3>
-          <span className="text-xs text-gray-400">({items.length})</span>
-        </div>
-        {renderEtapas(items, esGato)}
+      <div className={`grid gap-6 ${cols.length > 1 ? 'lg:grid-cols-2' : ''}`}>
+        {cols.map(c => (
+          <div key={c.key}>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: c.color }} />
+              <span className="text-xs uppercase tracking-wide" style={{ fontWeight: 700, color: c.color }}>{c.label}</span>
+              <span className="text-xs text-gray-400">({c.list.length})</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {c.list.map(renderCard)}
+            </div>
+          </div>
+        ))}
       </div>
     );
   };
 
-  const renderSpecies = (emoji: string, label: string, color: string, items: Product[], esGato: boolean) => {
+  const renderTipo = (icon: ReactNode, label: string, items: Product[], esGato: boolean, accent: string) => {
+    if (items.length === 0) return null;
+    return (
+      <div className="rounded-xl border-l-4 bg-gray-50 p-4" style={{ borderColor: accent }}>
+        <div className="flex items-center gap-2 mb-4">
+          <span style={{ color: accent }}>{icon}</span>
+          <h3 className="text-gray-700" style={{ fontWeight: 700 }}>{label}</h3>
+          <span className="text-xs text-gray-400">({items.length})</span>
+        </div>
+        {etapaColumns(items, esGato)}
+      </div>
+    );
+  };
+
+  const renderSpecies = (icon: ReactNode, label: string, items: Product[], esGato: boolean) => {
     if (items.length === 0) return null;
     const dietas = items.filter(p => p.esDieta);
     const resto = items.filter(p => !p.esDieta);
@@ -358,16 +372,16 @@ export default function Warehouse() {
     const humedo = resto.filter(p => p.tipoAlimento === 'HUMEDO');
     const otros = resto.filter(p => p.tipoAlimento !== 'SECO' && p.tipoAlimento !== 'HUMEDO');
     return (
-      <section className="rounded-2xl border-2 overflow-hidden bg-white" style={{ borderColor: color }}>
-        <div className="flex items-center gap-2 px-5 py-3" style={{ backgroundColor: `${color}14` }}>
-          <span className="text-xl" role="img">{emoji}</span>
-          <h2 style={{ fontWeight: 700, color }}>{label}</h2>
-          <span className="text-xs px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: color }}>{items.length}</span>
+      <section className="rounded-2xl border border-gray-300 overflow-hidden bg-white shadow-sm">
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-300 bg-gray-200">
+          <span className="text-gray-700">{icon}</span>
+          <h2 style={{ fontWeight: 700, color: '#334155' }}>{label}</h2>
+          <span className="text-xs px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: '#475569' }}>{items.length}</span>
         </div>
         <div className="p-5 space-y-6">
-          {renderSubGrupo('🦴', 'Sólido', seco, esGato)}
-          {renderSubGrupo('🍲', 'Húmedo', humedo, esGato)}
-          {renderSubGrupo('💊', 'Dietas', dietas, esGato)}
+          {renderTipo(<Bone className="w-5 h-5" />, 'Sólido', seco, esGato, '#547792')}
+          {renderTipo(<Soup className="w-5 h-5" />, 'Húmedo', humedo, esGato, '#6A994E')}
+          {renderTipo(<Pill className="w-5 h-5" />, 'Dietas', dietas, esGato, '#D4AF37')}
           {otros.length > 0 && (
             <div>
               {subHeader('Sin clasificar', otros.length)}
@@ -455,19 +469,19 @@ export default function Warehouse() {
             onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
           >
             <option value="ALL">Perro y gato</option>
-            <option value="PERRO">🐶 Solo perro</option>
-            <option value="GATO">🐱 Solo gato</option>
+            <option value="PERRO">Solo perro</option>
+            <option value="GATO">Solo gato</option>
           </select>
         )}
       </div>
 
       {groupFilter === 'CONSUMIBLE' ? (
         <div className="space-y-10">
-          {showPerro && renderSpecies('🐶', 'Perro', '#547792', perroList, false)}
-          {showGato && renderSpecies('🐱', 'Gato', '#d6336c', gatoList, true)}
+          {showGato && renderSpecies(<Cat className="w-6 h-6" />, 'Gato', gatoList, true)}
+          {showPerro && renderSpecies(<Dog className="w-6 h-6" />, 'Perro', perroList, false)}
           {speciesFilter === 'ALL' && sinEspecieList.length > 0 && (
             <section>
-              {sectionHeader('🐾', 'Sin clasificar', sinEspecieList.length, '#9CA3AF')}
+              {sectionHeader(<PawPrint className="w-5 h-5" />, 'Sin clasificar', sinEspecieList.length, '#9CA3AF')}
               <div className={gridClass}>{sinEspecieList.map(renderCard)}</div>
             </section>
           )}
@@ -521,8 +535,8 @@ export default function Warehouse() {
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={productForm.paraPerro} onChange={e => setProductForm(f => ({ ...f, paraPerro: e.target.checked }))} /> 🐶 Perro</label>
-                <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={productForm.paraGato} onChange={e => setProductForm(f => ({ ...f, paraGato: e.target.checked }))} /> 🐱 Gato</label>
+                <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={productForm.paraPerro} onChange={e => setProductForm(f => ({ ...f, paraPerro: e.target.checked }))} /> <Dog className="w-4 h-4 text-gray-500" /> Perro</label>
+                <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={productForm.paraGato} onChange={e => setProductForm(f => ({ ...f, paraGato: e.target.checked }))} /> <Cat className="w-4 h-4 text-gray-500" /> Gato</label>
               </div>
 
               {productForm.categoria === 'ALIMENTACION' && (
@@ -577,7 +591,7 @@ export default function Warehouse() {
                 <label className="block text-sm text-gray-700 mb-1">Fecha caducidad (opcional)</label>
                 <input type="date" value={productForm.fechaCaducidad} onChange={e => setProductForm(f => ({ ...f, fechaCaducidad: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none" />
               </div>
-              <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={productForm.reservadoCer} onChange={e => setProductForm(f => ({ ...f, reservadoCer: e.target.checked }))} /> ❌ Reservado CER</label>
+              <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={productForm.reservadoCer} onChange={e => setProductForm(f => ({ ...f, reservadoCer: e.target.checked }))} /> <Ban className="w-4 h-4 text-gray-500" /> Reservado CER</label>
 
               <div>
                 <label className="block text-sm text-gray-700 mb-1">Descripción</label>

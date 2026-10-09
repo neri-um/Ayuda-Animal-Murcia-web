@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router';
-import { ArrowLeft, Package, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Package, AlertTriangle, Dog, Cat, Ban } from 'lucide-react';
 import { useApp, useAuth } from '../../context/AppContext';
 import { formatEnum } from '../../hooks/useEnums';
 
@@ -56,10 +56,10 @@ export default function ProductDetail() {
             <div className="flex items-center gap-2 flex-wrap mb-1">
               <h1 className="text-gray-900 text-xl" style={{ fontWeight: 700 }}>{product.nombre}</h1>
               {product.paraPerro && (
-                <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200" title="Perro">🐶</span>
+                <span className="inline-flex items-center gap-1 text-xs text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200"><Dog className="w-3 h-3" /> Perro</span>
               )}
               {product.paraGato && (
-                <span className="text-xs text-pink-600 bg-pink-50 px-2 py-0.5 rounded-full border border-pink-200" title="Gato">🐱</span>
+                <span className="inline-flex items-center gap-1 text-xs text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200"><Cat className="w-3 h-3" /> Gato</span>
               )}
               {isAgotado && (
                 <span className="flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-200">
@@ -72,13 +72,13 @@ export default function ProductDetail() {
                 </span>
               )}
               {isCaducado && (
-                <span className="flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-200" title="Caducado - Gastar con urgencia">
-                  ⚠️ Caducado
+                <span className="inline-flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-200" title="Caducado - Gastar con urgencia">
+                  <AlertTriangle className="w-3 h-3" /> Caducado
                 </span>
               )}
               {product.reservadoCer && (
-                <span className="flex items-center gap-1 text-xs text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200" title="Reservado CER">
-                  ❌ CER
+                <span className="inline-flex items-center gap-1 text-xs text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200" title="Reservado CER">
+                  <Ban className="w-3 h-3" /> CER
                 </span>
               )}
             </div>
