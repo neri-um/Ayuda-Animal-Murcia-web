@@ -72,7 +72,7 @@ export default function ProductDetail() {
                 </span>
               )}
               {isCaducado && (
-                <span className="inline-flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-200" title="Caducado - Gastar con urgencia">
+                <span className="inline-flex items-center gap-1 text-xs text-white px-2 py-0.5 rounded-full" style={{ backgroundColor: '#A32F30' }} title="Caducado - Gastar con urgencia">
                   <AlertTriangle className="w-3 h-3" /> Caducado
                 </span>
               )}
