@@ -42,15 +42,23 @@ export default function Warehouse() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const filtered = products.filter(p => {
+  const baseFiltered = products.filter(p => {
     const inGroup = groupFilter === 'CONSUMIBLE' ? isConsumible(p.categoria) : !isConsumible(p.categoria);
     if (!inGroup) return false;
     if (search && !p.nombre.toLowerCase().includes(search.toLowerCase())) return false;
     if (catFilter && p.categoria !== catFilter) return false;
-    if (speciesFilter === 'PERRO' && !p.paraPerro) return false;
-    if (speciesFilter === 'GATO' && !p.paraGato) return false;
     return true;
   });
+
+  const showPerro = groupFilter === 'CONSUMIBLE' && speciesFilter !== 'GATO';
+  const showGato = groupFilter === 'CONSUMIBLE' && speciesFilter !== 'PERRO';
+  const perroList = baseFiltered.filter(p => p.paraPerro);
+  const gatoList = baseFiltered.filter(p => p.paraGato);
+  const sinEspecieList = baseFiltered.filter(p => !p.paraPerro && !p.paraGato);
+  const hasVisibleConsumible =
+    (showPerro ? perroList.length : 0) +
+    (showGato ? gatoList.length : 0) +
+    (speciesFilter === 'ALL' ? sinEspecieList.length : 0) > 0;
 
   const groupCount = (group: 'CONSUMIBLE' | 'OBJETO') =>
     products.filter(p => group === 'CONSUMIBLE' ? isConsumible(p.categoria) : !isConsumible(p.categoria)).length;
@@ -157,6 +165,152 @@ export default function Warehouse() {
     }
   };
 
+  const renderCard = (p: Product) => {
+    const assigned  = p.stockTotal - p.stockDisponible;
+    const available = p.stockDisponible;
+    const isEmpty   = available === 0;
+    const isLow     = !isEmpty && p.stockMinimo > 0 && available <= p.stockMinimo;
+    const isCaducado = p.caducado;
+    const volunteers = assignedVolunteers(p.id);
+
+    return (
+      <div
+        key={p.id}
+        className="bg-white rounded-2xl border p-5 flex flex-col gap-3"
+        style={{ borderColor: isEmpty ? '#fecaca' : '#f3f4f6' }}
+      >
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Link to={`/dashboard/almacen/${p.id}`}>
+                <h3 className="text-sm hover:underline" style={{ fontWeight: 600, color: '#547792' }}>{p.nombre}</h3>
+              </Link>
+              {p.paraPerro && (
+                <span className="flex items-center gap-1 text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200" title="Perro">
+                  <span className="w-3 h-3" role="img" aria-label="perro">🐶</span>
+                </span>
+              )}
+              {p.paraGato && (
+                <span className="flex items-center gap-1 text-xs text-pink-600 bg-pink-50 px-2 py-0.5 rounded-full border border-pink-200" title="Gato">
+                  <span className="w-3 h-3" role="img" aria-label="gato">🐱</span>
+                </span>
+              )}
+              {isCaducado && (
+                <span className="flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-200" title="Caducado - Gastar con urgencia">
+                  <span className="w-3 h-3" role="img" aria-label="caducado">⚠️</span> Caducado
+                </span>
+              )}
+              {p.reservadoCer && (
+                <span className="flex items-center gap-1 text-xs text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200" title="Reservado CER">
+                  <span className="w-3 h-3" role="img" aria-label="cer">❌</span> CER
+                </span>
+              )}
+              {isEmpty && (
+                <span className="flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-200">
+                  <XCircle className="w-3 h-3" /> Reponer
+                </span>
+              )}
+              {isLow && (
+                <span className="flex items-center gap-1 text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                  <AlertTriangle className="w-3 h-3" /> Stock bajo
+                </span>
+              )}
+            </div>
+            <span className="text-xs text-gray-400 mt-0.5 block">{formatEnum(p.categoria)}</span>
+          </div>
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <button onClick={() => openEditProduct(p)} className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors" title="Editar">
+              <Edit2 className="w-3.5 h-3.5" />
+            </button>
+            <button onClick={() => setDeleteConfirm(p.id)} className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors" title="Eliminar">
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
+        <div className={`grid gap-2 text-center ${isConsumible(p.categoria) ? 'grid-cols-1' : 'grid-cols-2'}`}>
+          <div className="rounded-xl p-2" style={{ backgroundColor: available === 0 ? '#fee2e2' : '#f0fdf4' }}>
+            <div className="text-base" style={{ fontWeight: 700, color: available === 0 ? '#b91c1c' : '#166534' }}>{available}</div>
+            <div className="text-xs text-gray-400">Disponible</div>
+          </div>
+          {!isConsumible(p.categoria) && (
+            <div className="rounded-xl p-2" style={{ backgroundColor: assigned > 0 ? '#fefce8' : '#f9fafb' }}>
+              <div className="text-base" style={{ fontWeight: 700, color: assigned > 0 ? '#854d0e' : '#6b7280' }}>{assigned}</div>
+              <div className="text-xs text-gray-400">En uso</div>
+            </div>
+          )}
+        </div>
+
+        {p.descripcion && (
+          <p className="text-xs text-gray-500">{p.descripcion}</p>
+        )}
+
+        {volunteers.length > 0 && (
+          <div className="rounded-xl px-3 py-2 text-xs bg-gray-50 border border-gray-100">
+            <span className="text-gray-400 block mb-1">En uso actualmente:</span>
+            <div className="flex flex-wrap gap-1">
+              {volunteers.map(r => (
+                <span
+                  key={r.id}
+                  title={r.detalleEntregado}
+                  className="inline-flex flex-col items-start px-2.5 py-1.5 rounded-lg text-xs bg-white border border-gray-200"
+                >
+                  <span className="text-gray-700">
+                    {getNombreVoluntario(r.volunteerId)}
+                    {r.quantity > 1 && (
+                      <span className="ml-1 text-gray-400">×{r.quantity}</span>
+                    )}
+                  </span>
+                  {r.detalleEntregado && (
+                    <span className="text-gray-500 mt-0.5">{r.detalleEntregado}</span>
+                  )}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {!isManager && (
+          isEmpty ? (
+            <div className="mt-auto flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm w-full bg-red-50 border border-red-200 text-red-500">
+              <XCircle className="w-4 h-4" />
+              Sin stock disponible
+            </div>
+          ) : (
+            <button
+              onClick={() => { setRequestModal(p); setReqForm({ quantity: 1, reason: '' }); }}
+              className="mt-auto flex items-center justify-center gap-2 text-white px-4 py-2 rounded-xl text-sm transition-colors w-full"
+              style={{ backgroundColor: '#547792' }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#3d6180')}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#547792')}
+            >
+              <Send className="w-4 h-4" />
+              Solicitar
+            </button>
+          )
+        )}
+      </div>
+    );
+  };
+
+  const gridClass = 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4';
+
+  const emptyState = (
+    <div className="bg-white rounded-2xl border border-gray-100 text-center py-16 text-gray-400">
+      <Package className="w-10 h-10 mx-auto mb-3 opacity-50" />
+      <p>{groupFilter === 'CONSUMIBLE' ? 'No hay productos de alimentación o consumibles' : 'No hay objetos o equipos en el almacén'}</p>
+    </div>
+  );
+
+  const sectionHeader = (emoji: string, label: string, count: number, color: string) => (
+    <div className="flex items-center gap-2 mb-3">
+      <span className="text-lg" role="img">{emoji}</span>
+      <h2 className="text-gray-800" style={{ fontWeight: 700, fontSize: '1rem' }}>{label}</h2>
+      <span className="text-xs px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: color }}>{count}</span>
+      <div className="flex-1 h-px bg-gray-100" />
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -224,153 +378,46 @@ export default function Warehouse() {
             <option key={c} value={c}>{formatEnum(c)}</option>
           ))}
         </select>
-        <select
-          value={speciesFilter}
-          onChange={e => setSpeciesFilter(e.target.value as 'ALL' | 'PERRO' | 'GATO')}
-          className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none"
-          onFocus={e => (e.currentTarget.style.borderColor = '#547792')}
-          onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
-        >
-          <option value="ALL">Todas las especies</option>
-          <option value="PERRO">🐶 Perro</option>
-          <option value="GATO">🐱 Gato</option>
-        </select>
+        {groupFilter === 'CONSUMIBLE' && (
+          <select
+            value={speciesFilter}
+            onChange={e => setSpeciesFilter(e.target.value as 'ALL' | 'PERRO' | 'GATO')}
+            className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none"
+            onFocus={e => (e.currentTarget.style.borderColor = '#547792')}
+            onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
+          >
+            <option value="ALL">Perro y gato</option>
+            <option value="PERRO">🐶 Solo perro</option>
+            <option value="GATO">🐱 Solo gato</option>
+          </select>
+        )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-        {filtered.length === 0 ? (
-          <div className="col-span-full bg-white rounded-2xl border border-gray-100 text-center py-16 text-gray-400">
-            <Package className="w-10 h-10 mx-auto mb-3 opacity-50" />
-            <p>{groupFilter === 'CONSUMIBLE' ? 'No hay productos de alimentación o consumibles' : 'No hay objetos o equipos en el almacén'}</p>
-          </div>
-        ) : filtered.map(p => {
-          const assigned  = p.stockTotal - p.stockDisponible;
-          const available = p.stockDisponible;
-          const isEmpty   = available === 0;
-          const isLow     = !isEmpty && p.stockMinimo > 0 && available <= p.stockMinimo;
-          const isCaducado = p.caducado;
-          const volunteers = assignedVolunteers(p.id);
-
-          return (
-            <div
-              key={p.id}
-              className="bg-white rounded-2xl border p-5 flex flex-col gap-3"
-              style={{ borderColor: isEmpty ? '#fecaca' : '#f3f4f6' }}
-            >
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <Link to={`/dashboard/almacen/${p.id}`}>
-                      <h3 className="text-sm hover:underline" style={{ fontWeight: 600, color: '#547792' }}>{p.nombre}</h3>
-                    </Link>
-                    {p.paraPerro && (
-                      <span className="flex items-center gap-1 text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200" title="Perro">
-                        <span className="w-3 h-3" role="img" aria-label="perro">🐶</span>
-                      </span>
-                    )}
-                    {p.paraGato && (
-                      <span className="flex items-center gap-1 text-xs text-pink-600 bg-pink-50 px-2 py-0.5 rounded-full border border-pink-200" title="Gato">
-                        <span className="w-3 h-3" role="img" aria-label="gato">🐱</span>
-                      </span>
-                    )}
-                    {isCaducado && (
-                      <span className="flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-200" title="Caducado - Gastar con urgencia">
-                        <span className="w-3 h-3" role="img" aria-label="caducado">⚠️</span> Caducado
-                      </span>
-                    )}
-                    {p.reservadoCer && (
-                      <span className="flex items-center gap-1 text-xs text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200" title="Reservado CER">
-                        <span className="w-3 h-3" role="img" aria-label="cer">❌</span> CER
-                      </span>
-                    )}
-                    {isEmpty && (
-                      <span className="flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-200">
-                        <XCircle className="w-3 h-3" /> Reponer
-                      </span>
-                    )}
-                    {isLow && (
-                      <span className="flex items-center gap-1 text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
-                        <AlertTriangle className="w-3 h-3" /> Stock bajo
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-xs text-gray-400 mt-0.5 block">{formatEnum(p.categoria)}</span>
-                </div>
-                <div className="flex items-center gap-1 flex-shrink-0">
-                  <button onClick={() => openEditProduct(p)} className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors" title="Editar">
-                    <Edit2 className="w-3.5 h-3.5" />
-                  </button>
-                  <button onClick={() => setDeleteConfirm(p.id)} className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors" title="Eliminar">
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-
-              <div className={`grid gap-2 text-center ${isConsumible(p.categoria) ? 'grid-cols-1' : 'grid-cols-2'}`}>
-                <div className="rounded-xl p-2" style={{ backgroundColor: available === 0 ? '#fee2e2' : '#f0fdf4' }}>
-                  <div className="text-base" style={{ fontWeight: 700, color: available === 0 ? '#b91c1c' : '#166534' }}>{available}</div>
-                  <div className="text-xs text-gray-400">Disponible</div>
-                </div>
-                {!isConsumible(p.categoria) && (
-                  <div className="rounded-xl p-2" style={{ backgroundColor: assigned > 0 ? '#fefce8' : '#f9fafb' }}>
-                    <div className="text-base" style={{ fontWeight: 700, color: assigned > 0 ? '#854d0e' : '#6b7280' }}>{assigned}</div>
-                    <div className="text-xs text-gray-400">En uso</div>
-                  </div>
-                )}
-              </div>
-
-              {p.descripcion && (
-                <p className="text-xs text-gray-500">{p.descripcion}</p>
-              )}
-
-              {volunteers.length > 0 && (
-                <div className="rounded-xl px-3 py-2 text-xs bg-gray-50 border border-gray-100">
-                  <span className="text-gray-400 block mb-1">En uso actualmente:</span>
-                  <div className="flex flex-wrap gap-1">
-                    {volunteers.map(r => (
-                      <span
-                        key={r.id}
-                        title={r.detalleEntregado}
-                        className="inline-flex flex-col items-start px-2.5 py-1.5 rounded-lg text-xs bg-white border border-gray-200"
-                      >
-                        <span className="text-gray-700">
-                          {getNombreVoluntario(r.volunteerId)}
-                          {r.quantity > 1 && (
-                            <span className="ml-1 text-gray-400">×{r.quantity}</span>
-                          )}
-                        </span>
-                        {r.detalleEntregado && (
-                          <span className="text-gray-500 mt-0.5">{r.detalleEntregado}</span>
-                        )}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {!isManager && (
-                isEmpty ? (
-                  <div className="mt-auto flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm w-full bg-red-50 border border-red-200 text-red-500">
-                    <XCircle className="w-4 h-4" />
-                    Sin stock disponible
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => { setRequestModal(p); setReqForm({ quantity: 1, reason: '' }); }}
-                    className="mt-auto flex items-center justify-center gap-2 text-white px-4 py-2 rounded-xl text-sm transition-colors w-full"
-                    style={{ backgroundColor: '#547792' }}
-                    onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#3d6180')}
-                    onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#547792')}
-                  >
-                    <Send className="w-4 h-4" />
-                    Solicitar
-                  </button>
-                )
-              )}
-            </div>
-          );
-        })}
-      </div>
+      {groupFilter === 'CONSUMIBLE' ? (
+        <div className="space-y-8">
+          {showPerro && perroList.length > 0 && (
+            <section>
+              {sectionHeader('🐶', 'Perro', perroList.length, '#547792')}
+              <div className={gridClass}>{perroList.map(renderCard)}</div>
+            </section>
+          )}
+          {showGato && gatoList.length > 0 && (
+            <section>
+              {sectionHeader('🐱', 'Gato', gatoList.length, '#d6336c')}
+              <div className={gridClass}>{gatoList.map(renderCard)}</div>
+            </section>
+          )}
+          {speciesFilter === 'ALL' && sinEspecieList.length > 0 && (
+            <section>
+              {sectionHeader('🐾', 'Sin clasificar', sinEspecieList.length, '#9CA3AF')}
+              <div className={gridClass}>{sinEspecieList.map(renderCard)}</div>
+            </section>
+          )}
+          {!hasVisibleConsumible && emptyState}
+        </div>
+      ) : (
+        baseFiltered.length === 0 ? emptyState : <div className={gridClass}>{baseFiltered.map(renderCard)}</div>
+      )}
 
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
