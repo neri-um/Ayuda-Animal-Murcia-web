@@ -188,7 +188,7 @@ export default function Warehouse() {
     }
   };
 
-  const renderCard = (p: Product) => {
+  const renderCard = (p: Product, esGato = false) => {
     const assigned  = p.stockTotal - p.stockDisponible;
     const available = p.stockDisponible;
     const isEmpty   = available === 0;
@@ -235,7 +235,7 @@ export default function Warehouse() {
                 {p.esDieta && <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200"><Pill className="w-3 h-3" /> Dieta</span>}
                 {!p.esDieta && p.tipoAlimento === 'SECO' && <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200"><Bone className="w-3 h-3" /> Sólido</span>}
                 {!p.esDieta && p.tipoAlimento === 'HUMEDO' && <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-200"><Soup className="w-3 h-3" /> Húmedo</span>}
-                {p.etapaAlimento === 'CACHORRO' && <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Cachorro/Kitten</span>}
+                {p.etapaAlimento === 'CACHORRO' && <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-50 text-slate-600 border border-slate-200">{esGato ? 'Kitten' : 'Cachorro'}</span>}
                 {p.etapaAlimento === 'ADULTO' && <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-50 text-slate-600 border border-slate-200">Adulto</span>}
               </div>
             )}
@@ -324,7 +324,7 @@ export default function Warehouse() {
     </div>
   );
 
-  const renderSpecies = (icon: ReactNode, label: string, items: Product[]) => {
+  const renderSpecies = (icon: ReactNode, label: string, items: Product[], esGato = false) => {
     if (items.length === 0) return null;
     return (
       <section className="space-y-4">
@@ -335,7 +335,7 @@ export default function Warehouse() {
           <h2 style={{ fontWeight: 700, color: '#334155', fontSize: '1.1rem' }}>{label}</h2>
           <span className="text-xs px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: '#475569' }}>{items.length}</span>
         </div>
-        <div className={gridClass}>{items.map(renderCard)}</div>
+        <div className={gridClass}>{items.map(p => renderCard(p, esGato))}</div>
       </section>
     );
   };
@@ -396,18 +396,20 @@ export default function Warehouse() {
           />
         </div>
         <div className="flex flex-wrap gap-3">
-          <select
-            value={catFilter}
-            onChange={e => setCatFilter(e.target.value)}
-            className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none"
-            onFocus={e => (e.currentTarget.style.borderColor = '#547792')}
-            onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
-          >
-            <option value="">Todas las categorías</option>
-            {categoriesInGroup.map(c => (
-              <option key={c} value={c}>{formatEnum(c)}</option>
-            ))}
-          </select>
+          {groupFilter === 'OBJETO' && (
+            <select
+              value={catFilter}
+              onChange={e => setCatFilter(e.target.value)}
+              className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none"
+              onFocus={e => (e.currentTarget.style.borderColor = '#547792')}
+              onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
+            >
+              <option value="">Todas las categorías</option>
+              {categoriesInGroup.map(c => (
+                <option key={c} value={c}>{formatEnum(c)}</option>
+              ))}
+            </select>
+          )}
           {groupFilter === 'CONSUMIBLE' && (
             <>
               <select
@@ -440,7 +442,7 @@ export default function Warehouse() {
                 onFocus={e => (e.currentTarget.style.borderColor = '#547792')}
                 onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
               >
-                <option value="ALL">Todas las etapas</option>
+                <option value="ALL">Todas las edades</option>
                 <option value="CACHORRO">Cachorros / Kitten</option>
                 <option value="ADULTO">Adultos</option>
               </select>
@@ -451,13 +453,13 @@ export default function Warehouse() {
 
       {groupFilter === 'CONSUMIBLE' ? (
         <div className="space-y-10">
-          {showGato && renderSpecies(<Cat className="w-5 h-5" />, 'Gato', gatoList)}
-          {showPerro && renderSpecies(<Dog className="w-5 h-5" />, 'Perro', perroList)}
+          {showGato && renderSpecies(<Cat className="w-5 h-5" />, 'Gato', gatoList, true)}
+          {showPerro && renderSpecies(<Dog className="w-5 h-5" />, 'Perro', perroList, false)}
           {speciesFilter === 'ALL' && renderSpecies(<PawPrint className="w-5 h-5" />, 'Sin clasificar', sinEspecieList)}
           {!hasVisibleConsumible && emptyState}
         </div>
       ) : (
-        baseFiltered.length === 0 ? emptyState : <div className={gridClass}>{baseFiltered.map(renderCard)}</div>
+        baseFiltered.length === 0 ? emptyState : <div className={gridClass}>{baseFiltered.map(p => renderCard(p))}</div>
       )}
 
       {showForm && (
