@@ -231,10 +231,10 @@ export default function Warehouse() {
             <span className="text-xs text-gray-400 mt-0.5 block">{formatEnum(p.categoria)}</span>
             {(p.tipoAlimento || p.etapaAlimento || p.esDieta || isCaducado) && (
               <div className="flex flex-wrap gap-1 mt-1.5">
-                {isCaducado && <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-red-50 text-red-600 border border-red-200" title="Caducado - Gastar con urgencia"><AlertTriangle className="w-3 h-3" /> Caducado</span>}
-                {p.esDieta && <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200"><Pill className="w-3 h-3" /> Dieta</span>}
-                {!p.esDieta && p.tipoAlimento === 'SECO' && <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200"><Bone className="w-3 h-3" /> Sólido</span>}
-                {!p.esDieta && p.tipoAlimento === 'HUMEDO' && <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-200"><Soup className="w-3 h-3" /> Húmedo</span>}
+                {isCaducado && <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: '#A32F30' }} title="Caducado - Gastar con urgencia"><AlertTriangle className="w-3 h-3" /> Caducado</span>}
+                {p.esDieta && <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: '#52796D' }}><Pill className="w-3 h-3" /> Dieta</span>}
+                {!p.esDieta && p.tipoAlimento === 'SECO' && <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: '#88596C' }}><Bone className="w-3 h-3" /> Sólido</span>}
+                {!p.esDieta && p.tipoAlimento === 'HUMEDO' && <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: '#446C7E' }}><Soup className="w-3 h-3" /> Húmedo</span>}
                 {p.etapaAlimento === 'CACHORRO' && <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-50 text-slate-600 border border-slate-200">{esGato ? 'Kitten' : 'Cachorro'}</span>}
                 {p.etapaAlimento === 'ADULTO' && <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-50 text-slate-600 border border-slate-200">Adulto</span>}
               </div>
