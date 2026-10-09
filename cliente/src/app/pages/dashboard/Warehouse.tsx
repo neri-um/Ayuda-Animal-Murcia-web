@@ -198,33 +198,23 @@ export default function Warehouse() {
               <Link to={`/dashboard/almacen/${p.id}`}>
                 <h3 className="text-sm hover:underline" style={{ fontWeight: 600, color: '#547792' }}>{p.nombre}</h3>
               </Link>
-              {p.paraPerro && (
-                <span className="flex items-center gap-1 text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200" title="Perro">
-                  <span className="w-3 h-3" role="img" aria-label="perro">🐶</span>
-                </span>
-              )}
-              {p.paraGato && (
-                <span className="flex items-center gap-1 text-xs text-pink-600 bg-pink-50 px-2 py-0.5 rounded-full border border-pink-200" title="Gato">
-                  <span className="w-3 h-3" role="img" aria-label="gato">🐱</span>
-                </span>
-              )}
               {isCaducado && (
-                <span className="flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-200" title="Caducado - Gastar con urgencia">
-                  <span className="w-3 h-3" role="img" aria-label="caducado">⚠️</span> Caducado
+                <span className="inline-flex items-center gap-1 text-xs leading-none text-red-600 bg-red-50 px-2 py-1 rounded-full border border-red-200" title="Caducado - Gastar con urgencia">
+                  <span role="img" aria-label="caducado">⚠️</span> Caducado
                 </span>
               )}
               {p.reservadoCer && (
-                <span className="flex items-center gap-1 text-xs text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200" title="Reservado CER">
-                  <span className="w-3 h-3" role="img" aria-label="cer">❌</span> CER
+                <span className="inline-flex items-center gap-1 text-xs leading-none text-purple-600 bg-purple-50 px-2 py-1 rounded-full border border-purple-200" title="Reservado CER">
+                  <span role="img" aria-label="cer">❌</span> CER
                 </span>
               )}
               {isEmpty && (
-                <span className="flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-200">
+                <span className="inline-flex items-center gap-1 text-xs leading-none text-red-600 bg-red-50 px-2 py-1 rounded-full border border-red-200">
                   <XCircle className="w-3 h-3" /> Reponer
                 </span>
               )}
               {isLow && (
-                <span className="flex items-center gap-1 text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                <span className="inline-flex items-center gap-1 text-xs leading-none text-amber-600 bg-amber-50 px-2 py-1 rounded-full border border-amber-200">
                   <AlertTriangle className="w-3 h-3" /> Stock bajo
                 </span>
               )}
@@ -306,7 +296,7 @@ export default function Warehouse() {
     );
   };
 
-  const gridClass = 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4';
+  const gridClass = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4';
 
   const emptyState = (
     <div className="bg-white rounded-2xl border border-gray-100 text-center py-16 text-gray-400">
@@ -368,17 +358,23 @@ export default function Warehouse() {
     const humedo = resto.filter(p => p.tipoAlimento === 'HUMEDO');
     const otros = resto.filter(p => p.tipoAlimento !== 'SECO' && p.tipoAlimento !== 'HUMEDO');
     return (
-      <section className="space-y-6">
-        {sectionHeader(emoji, label, items.length, color)}
-        {renderSubGrupo('🦴', 'Sólido', seco, esGato)}
-        {renderSubGrupo('🍲', 'Húmedo', humedo, esGato)}
-        {renderSubGrupo('💊', 'Dietas', dietas, esGato)}
-        {otros.length > 0 && (
-          <div>
-            {subHeader('Sin clasificar', otros.length)}
-            <div className={gridClass}>{otros.map(renderCard)}</div>
-          </div>
-        )}
+      <section className="rounded-2xl border-2 overflow-hidden bg-white" style={{ borderColor: color }}>
+        <div className="flex items-center gap-2 px-5 py-3" style={{ backgroundColor: `${color}14` }}>
+          <span className="text-xl" role="img">{emoji}</span>
+          <h2 style={{ fontWeight: 700, color }}>{label}</h2>
+          <span className="text-xs px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: color }}>{items.length}</span>
+        </div>
+        <div className="p-5 space-y-6">
+          {renderSubGrupo('🦴', 'Sólido', seco, esGato)}
+          {renderSubGrupo('🍲', 'Húmedo', humedo, esGato)}
+          {renderSubGrupo('💊', 'Dietas', dietas, esGato)}
+          {otros.length > 0 && (
+            <div>
+              {subHeader('Sin clasificar', otros.length)}
+              <div className={gridClass}>{otros.map(renderCard)}</div>
+            </div>
+          )}
+        </div>
       </section>
     );
   };
@@ -512,6 +508,17 @@ export default function Warehouse() {
                     <option key={c} value={c}>{formatEnum(c)}</option>
                   ))}
                 </select>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-700 mb-1">Stock (unidades) *</label>
+                <input
+                  type="number" min={0} required
+                  value={productForm.stock}
+                  onChange={e => setProductForm(f => ({ ...f, stock: Math.max(0, Number(e.target.value)) }))}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none"
+                  onFocus={e => (e.currentTarget.style.borderColor = '#547792')}
+                  onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={productForm.paraPerro} onChange={e => setProductForm(f => ({ ...f, paraPerro: e.target.checked }))} /> 🐶 Perro</label>
