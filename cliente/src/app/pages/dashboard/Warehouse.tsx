@@ -20,6 +20,8 @@ export default function Warehouse() {
   const [search, setSearch] = useState('');
   const [catFilter, setCatFilter] = useState('');
   const [speciesFilter, setSpeciesFilter] = useState<'ALL' | 'PERRO' | 'GATO'>('ALL');
+  const [tipoFilter, setTipoFilter] = useState<'ALL' | 'SECO' | 'HUMEDO' | 'DIETAS'>('ALL');
+  const [etapaFilter, setEtapaFilter] = useState<'ALL' | 'ADULTO' | 'CACHORRO'>('ALL');
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -51,6 +53,14 @@ export default function Warehouse() {
     if (!inGroup) return false;
     if (search && !p.nombre.toLowerCase().includes(search.toLowerCase())) return false;
     if (catFilter && p.categoria !== catFilter) return false;
+    if (groupFilter === 'CONSUMIBLE') {
+      if (tipoFilter === 'DIETAS') {
+        if (!p.esDieta) return false;
+      } else if (tipoFilter !== 'ALL') {
+        if (p.esDieta || p.tipoAlimento !== tipoFilter) return false;
+      }
+      if (etapaFilter !== 'ALL' && p.etapaAlimento !== etapaFilter) return false;
+    }
     return true;
   });
 
@@ -220,6 +230,15 @@ export default function Warehouse() {
               )}
             </div>
             <span className="text-xs text-gray-400 mt-0.5 block">{formatEnum(p.categoria)}</span>
+            {(p.tipoAlimento || p.etapaAlimento || p.esDieta) && (
+              <div className="flex flex-wrap gap-1 mt-1.5">
+                {p.esDieta && <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200"><Pill className="w-3 h-3" /> Dieta</span>}
+                {!p.esDieta && p.tipoAlimento === 'SECO' && <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200"><Bone className="w-3 h-3" /> Sólido</span>}
+                {!p.esDieta && p.tipoAlimento === 'HUMEDO' && <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-200"><Soup className="w-3 h-3" /> Húmedo</span>}
+                {p.etapaAlimento === 'CACHORRO' && <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Cachorro/Kitten</span>}
+                {p.etapaAlimento === 'ADULTO' && <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-50 text-slate-600 border border-slate-200">Adulto</span>}
+              </div>
+            )}
           </div>
           <div className="flex items-center gap-1 flex-shrink-0">
             <button onClick={() => openEditProduct(p)} className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors" title="Editar">
@@ -305,90 +324,18 @@ export default function Warehouse() {
     </div>
   );
 
-  const sectionHeader = (icon: ReactNode, label: string, count: number, color: string) => (
-    <div className="flex items-center gap-2 mb-3">
-      <span style={{ color }}>{icon}</span>
-      <h2 className="text-gray-800" style={{ fontWeight: 700, fontSize: '1rem' }}>{label}</h2>
-      <span className="text-xs px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: color }}>{count}</span>
-      <div className="flex-1 h-px bg-gray-100" />
-    </div>
-  );
-
-  const etapaLabel = (etapa: 'ADULTO' | 'CACHORRO', esGato: boolean) =>
-    etapa === 'ADULTO' ? 'Adultos' : (esGato ? 'Kitten' : 'Cachorros');
-
-  const subHeader = (label: string, count: number) => (
-    <p className="text-xs uppercase tracking-wide text-gray-400 mb-2 mt-1">
-      {label} <span className="text-gray-300">({count})</span>
-    </p>
-  );
-
-  const etapaColumns = (items: Product[], esGato: boolean) => {
-    const adulto = items.filter(p => p.etapaAlimento === 'ADULTO');
-    const cachorro = items.filter(p => p.etapaAlimento === 'CACHORRO');
-    const sin = items.filter(p => p.etapaAlimento !== 'ADULTO' && p.etapaAlimento !== 'CACHORRO');
-    const cols: { key: string; label: string; list: Product[]; color: string }[] = [];
-    if (cachorro.length > 0) cols.push({ key: 'cachorro', label: etapaLabel('CACHORRO', esGato), list: cachorro, color: '#6A994E' });
-    if (adulto.length > 0) cols.push({ key: 'adulto', label: etapaLabel('ADULTO', esGato), list: adulto, color: '#547792' });
-    if (sin.length > 0) cols.push({ key: 'sin', label: 'Sin etapa', list: sin, color: '#9CA3AF' });
-    if (cols.length === 0) return null;
-    return (
-      <div className={`grid gap-6 ${cols.length > 1 ? 'lg:grid-cols-2' : ''}`}>
-        {cols.map(c => (
-          <div key={c.key}>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: c.color }} />
-              <span className="text-xs uppercase tracking-wide" style={{ fontWeight: 700, color: c.color }}>{c.label}</span>
-              <span className="text-xs text-gray-400">({c.list.length})</span>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {c.list.map(renderCard)}
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  };
-
-  const renderTipo = (icon: ReactNode, label: string, items: Product[], esGato: boolean, accent: string) => {
+  const renderSpecies = (icon: ReactNode, label: string, items: Product[]) => {
     if (items.length === 0) return null;
     return (
-      <div className="rounded-xl border-l-4 bg-gray-50 p-4" style={{ borderColor: accent }}>
-        <div className="flex items-center gap-2 mb-4">
-          <span style={{ color: accent }}>{icon}</span>
-          <h3 className="text-gray-700" style={{ fontWeight: 700 }}>{label}</h3>
-          <span className="text-xs text-gray-400">({items.length})</span>
-        </div>
-        {etapaColumns(items, esGato)}
-      </div>
-    );
-  };
-
-  const renderSpecies = (icon: ReactNode, label: string, items: Product[], esGato: boolean) => {
-    if (items.length === 0) return null;
-    const dietas = items.filter(p => p.esDieta);
-    const resto = items.filter(p => !p.esDieta);
-    const seco = resto.filter(p => p.tipoAlimento === 'SECO');
-    const humedo = resto.filter(p => p.tipoAlimento === 'HUMEDO');
-    const otros = resto.filter(p => p.tipoAlimento !== 'SECO' && p.tipoAlimento !== 'HUMEDO');
-    return (
-      <section className="rounded-2xl border border-gray-300 overflow-hidden bg-white shadow-sm">
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-300 bg-gray-200">
-          <span className="text-gray-700">{icon}</span>
-          <h2 style={{ fontWeight: 700, color: '#334155' }}>{label}</h2>
+      <section className="space-y-4">
+        <div className="flex items-center gap-3">
+          <span className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#e5e7eb', color: '#334155' }}>
+            {icon}
+          </span>
+          <h2 style={{ fontWeight: 700, color: '#334155', fontSize: '1.1rem' }}>{label}</h2>
           <span className="text-xs px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: '#475569' }}>{items.length}</span>
         </div>
-        <div className="p-5 space-y-6">
-          {renderTipo(<Bone className="w-5 h-5" />, 'Sólido', seco, esGato, '#547792')}
-          {renderTipo(<Soup className="w-5 h-5" />, 'Húmedo', humedo, esGato, '#6A994E')}
-          {renderTipo(<Pill className="w-5 h-5" />, 'Dietas', dietas, esGato, '#D4AF37')}
-          {otros.length > 0 && (
-            <div>
-              {subHeader('Sin clasificar', otros.length)}
-              <div className={gridClass}>{otros.map(renderCard)}</div>
-            </div>
-          )}
-        </div>
+        <div className={gridClass}>{items.map(renderCard)}</div>
       </section>
     );
   };
@@ -435,8 +382,8 @@ export default function Warehouse() {
         ))}
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 p-4 flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
+      <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
+        <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
@@ -448,43 +395,65 @@ export default function Warehouse() {
             onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
           />
         </div>
-        <select
-          value={catFilter}
-          onChange={e => setCatFilter(e.target.value)}
-          className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none"
-          onFocus={e => (e.currentTarget.style.borderColor = '#547792')}
-          onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
-        >
-          <option value="">Todas las categorías</option>
-          {categoriesInGroup.map(c => (
-            <option key={c} value={c}>{formatEnum(c)}</option>
-          ))}
-        </select>
-        {groupFilter === 'CONSUMIBLE' && (
+        <div className="flex flex-wrap gap-3">
           <select
-            value={speciesFilter}
-            onChange={e => setSpeciesFilter(e.target.value as 'ALL' | 'PERRO' | 'GATO')}
+            value={catFilter}
+            onChange={e => setCatFilter(e.target.value)}
             className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none"
             onFocus={e => (e.currentTarget.style.borderColor = '#547792')}
             onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
           >
-            <option value="ALL">Perro y gato</option>
-            <option value="PERRO">Solo perro</option>
-            <option value="GATO">Solo gato</option>
+            <option value="">Todas las categorías</option>
+            {categoriesInGroup.map(c => (
+              <option key={c} value={c}>{formatEnum(c)}</option>
+            ))}
           </select>
-        )}
+          {groupFilter === 'CONSUMIBLE' && (
+            <>
+              <select
+                value={speciesFilter}
+                onChange={e => setSpeciesFilter(e.target.value as 'ALL' | 'PERRO' | 'GATO')}
+                className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none"
+                onFocus={e => (e.currentTarget.style.borderColor = '#547792')}
+                onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
+              >
+                <option value="ALL">Gato y perro</option>
+                <option value="GATO">Solo gato</option>
+                <option value="PERRO">Solo perro</option>
+              </select>
+              <select
+                value={tipoFilter}
+                onChange={e => setTipoFilter(e.target.value as 'ALL' | 'SECO' | 'HUMEDO' | 'DIETAS')}
+                className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none"
+                onFocus={e => (e.currentTarget.style.borderColor = '#547792')}
+                onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
+              >
+                <option value="ALL">Todos los tipos</option>
+                <option value="SECO">Sólido</option>
+                <option value="HUMEDO">Húmedo</option>
+                <option value="DIETAS">Dietas</option>
+              </select>
+              <select
+                value={etapaFilter}
+                onChange={e => setEtapaFilter(e.target.value as 'ALL' | 'ADULTO' | 'CACHORRO')}
+                className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none"
+                onFocus={e => (e.currentTarget.style.borderColor = '#547792')}
+                onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
+              >
+                <option value="ALL">Todas las etapas</option>
+                <option value="CACHORRO">Cachorros / Kitten</option>
+                <option value="ADULTO">Adultos</option>
+              </select>
+            </>
+          )}
+        </div>
       </div>
 
       {groupFilter === 'CONSUMIBLE' ? (
         <div className="space-y-10">
-          {showGato && renderSpecies(<Cat className="w-6 h-6" />, 'Gato', gatoList, true)}
-          {showPerro && renderSpecies(<Dog className="w-6 h-6" />, 'Perro', perroList, false)}
-          {speciesFilter === 'ALL' && sinEspecieList.length > 0 && (
-            <section>
-              {sectionHeader(<PawPrint className="w-5 h-5" />, 'Sin clasificar', sinEspecieList.length, '#9CA3AF')}
-              <div className={gridClass}>{sinEspecieList.map(renderCard)}</div>
-            </section>
-          )}
+          {showGato && renderSpecies(<Cat className="w-5 h-5" />, 'Gato', gatoList)}
+          {showPerro && renderSpecies(<Dog className="w-5 h-5" />, 'Perro', perroList)}
+          {speciesFilter === 'ALL' && renderSpecies(<PawPrint className="w-5 h-5" />, 'Sin clasificar', sinEspecieList)}
           {!hasVisibleConsumible && emptyState}
         </div>
       ) : (
