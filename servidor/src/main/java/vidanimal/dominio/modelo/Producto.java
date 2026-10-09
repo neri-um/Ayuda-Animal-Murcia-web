@@ -53,6 +53,9 @@ public class Producto {
 	@Column(name = "es_dieta", nullable = false, columnDefinition = "boolean default false")
 	private boolean esDieta;
 
+	@Column(name = "abierto", nullable = false, columnDefinition = "boolean default false")
+	private boolean abierto;
+
 	public Producto() {
 	}
 
@@ -143,6 +146,10 @@ public class Producto {
 	@JsonProperty("esDieta")
 	public boolean isEsDieta() { return esDieta; }
 	public void setEsDieta(boolean esDieta) { this.esDieta = esDieta; }
+
+	@JsonProperty("abierto")
+	public boolean isAbierto() { return abierto; }
+	public void setAbierto(boolean abierto) { this.abierto = abierto; }
 
 	@JsonProperty("caducado")
 	public boolean isCaducado() {

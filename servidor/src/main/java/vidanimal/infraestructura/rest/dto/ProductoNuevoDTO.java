@@ -27,6 +27,7 @@ public class ProductoNuevoDTO {
     private String tipoAlimento;
     private String etapaAlimento;
     private boolean esDieta;
+    private boolean abierto;
 
     public Producto toDominio() {
         int cantidad = stock != null ? stock : 0;
@@ -46,6 +47,7 @@ public class ProductoNuevoDTO {
         p.setTipoAlimento(normalizarOpcion(tipoAlimento));
         p.setEtapaAlimento(normalizarOpcion(etapaAlimento));
         p.setEsDieta(esDieta);
+        p.setAbierto(abierto);
         return p;
     }
 
@@ -97,4 +99,7 @@ public class ProductoNuevoDTO {
 
     public boolean isEsDieta() { return esDieta; }
     public void setEsDieta(boolean esDieta) { this.esDieta = esDieta; }
+
+    public boolean isAbierto() { return abierto; }
+    public void setAbierto(boolean abierto) { this.abierto = abierto; }
 }

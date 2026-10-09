@@ -63,6 +63,7 @@ public class AlmacenService implements AlmacenUseCase {
         producto.setTipoAlimento(datosNuevos.getTipoAlimento());
         producto.setEtapaAlimento(datosNuevos.getEtapaAlimento());
         producto.setEsDieta(datosNuevos.isEsDieta());
+        producto.setAbierto(datosNuevos.isAbierto());
 
         int diferencia = datosNuevos.getStockTotal() - producto.getStockTotal();
         producto.setStockTotal(datosNuevos.getStockTotal());
