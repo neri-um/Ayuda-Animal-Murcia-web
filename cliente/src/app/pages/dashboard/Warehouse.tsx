@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { Plus, Edit2, Trash2, Package, AlertTriangle, Search, Send, XCircle, Dog, Cat, Bone, Soup, Pill, PawPrint, Ban } from 'lucide-react';
+import { Plus, Edit2, Trash2, Package, AlertTriangle, Search, Send, XCircle, Dog, Cat, Bone, Soup, Pill, PawPrint, Ban, Info } from 'lucide-react';
 import { Link } from 'react-router';
 import { useApp, useAuth } from '../../context/AppContext';
 import { Product } from '../../types';
@@ -229,9 +229,10 @@ export default function Warehouse() {
               )}
             </div>
             <span className="text-xs text-gray-400 mt-0.5 block">{formatEnum(p.categoria)}</span>
-            {(p.tipoAlimento || p.etapaAlimento || p.esDieta || isCaducado) && (
+            {(p.tipoAlimento || p.etapaAlimento || p.esDieta || isCaducado || (p as any).abierto) && (
               <div className="flex flex-wrap gap-1 mt-1.5">
                 {isCaducado && <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border" style={{ color: '#A32F30', borderColor: '#A32F30', backgroundColor: '#A32F3014' }} title="Caducado - Gastar con urgencia"><AlertTriangle className="w-3 h-3" /> Caducado</span>}
+                {(p as any).abierto && <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border" style={{ color: '#A32F30', borderColor: '#A32F30', backgroundColor: '#A32F3014' }}><Info className="w-3 h-3" /> Abierto</span>}
                 {p.esDieta && <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border" style={{ color: '#52796D', borderColor: '#52796D', backgroundColor: '#52796D14' }}><Pill className="w-3 h-3" /> Dieta</span>}
                 {!p.esDieta && p.tipoAlimento === 'SECO' && <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border" style={{ color: '#88596C', borderColor: '#88596C', backgroundColor: '#88596C14' }}><Bone className="w-3 h-3" /> Sólido</span>}
                 {!p.esDieta && p.tipoAlimento === 'HUMEDO' && <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border" style={{ color: '#446C7E', borderColor: '#446C7E', backgroundColor: '#446C7E14' }}><Soup className="w-3 h-3" /> Húmedo</span>}

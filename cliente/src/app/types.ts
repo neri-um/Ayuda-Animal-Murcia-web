@@ -108,6 +108,7 @@ export interface Product {
   tipoAlimento?: string;
   etapaAlimento?: string;
   esDieta: boolean;
+  abierto?: boolean;
 }
 
 export interface ProductRequest {

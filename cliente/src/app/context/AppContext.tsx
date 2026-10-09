@@ -247,6 +247,7 @@ function mapProductFromBackend(p: any): Product {
     tipoAlimento: p.tipoAlimento ?? undefined,
     etapaAlimento: p.etapaAlimento ?? undefined,
     esDieta: Boolean(p.esDieta ?? false),
+    abierto: Boolean(p.abierto ?? false),
   };
 }
 
