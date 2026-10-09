@@ -64,11 +64,15 @@ export default function Warehouse() {
     return true;
   });
 
+  const tipoOrder = (p: Product) =>
+    p.esDieta ? 2 : p.tipoAlimento === 'SECO' ? 0 : p.tipoAlimento === 'HUMEDO' ? 1 : 3;
+  const byTipo = (a: Product, b: Product) => tipoOrder(a) - tipoOrder(b);
+
   const showPerro = groupFilter === 'CONSUMIBLE' && speciesFilter !== 'GATO';
   const showGato = groupFilter === 'CONSUMIBLE' && speciesFilter !== 'PERRO';
-  const perroList = baseFiltered.filter(p => p.paraPerro);
-  const gatoList = baseFiltered.filter(p => p.paraGato);
-  const sinEspecieList = baseFiltered.filter(p => !p.paraPerro && !p.paraGato);
+  const perroList = baseFiltered.filter(p => p.paraPerro).sort(byTipo);
+  const gatoList = baseFiltered.filter(p => p.paraGato).sort(byTipo);
+  const sinEspecieList = baseFiltered.filter(p => !p.paraPerro && !p.paraGato).sort(byTipo);
   const hasVisibleConsumible =
     (showPerro ? perroList.length : 0) +
     (showGato ? gatoList.length : 0) +
