@@ -212,11 +212,6 @@ export default function Warehouse() {
               <Link to={`/dashboard/almacen/${p.id}`}>
                 <h3 className="text-sm hover:underline" style={{ fontWeight: 600, color: '#547792' }}>{p.nombre}</h3>
               </Link>
-              {isCaducado && (
-                <span className="inline-flex items-center gap-1 text-xs leading-none text-red-600 bg-red-50 px-2 py-1 rounded-full border border-red-200" title="Caducado - Gastar con urgencia">
-                  <AlertTriangle className="w-3 h-3" /> Caducado
-                </span>
-              )}
               {p.reservadoCer && (
                 <span className="inline-flex items-center gap-1 text-xs leading-none text-purple-600 bg-purple-50 px-2 py-1 rounded-full border border-purple-200" title="Reservado CER">
                   <Ban className="w-3 h-3" /> CER
@@ -234,8 +229,9 @@ export default function Warehouse() {
               )}
             </div>
             <span className="text-xs text-gray-400 mt-0.5 block">{formatEnum(p.categoria)}</span>
-            {(p.tipoAlimento || p.etapaAlimento || p.esDieta) && (
+            {(p.tipoAlimento || p.etapaAlimento || p.esDieta || isCaducado) && (
               <div className="flex flex-wrap gap-1 mt-1.5">
+                {isCaducado && <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-red-50 text-red-600 border border-red-200" title="Caducado - Gastar con urgencia"><AlertTriangle className="w-3 h-3" /> Caducado</span>}
                 {p.esDieta && <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200"><Pill className="w-3 h-3" /> Dieta</span>}
                 {!p.esDieta && p.tipoAlimento === 'SECO' && <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200"><Bone className="w-3 h-3" /> Sólido</span>}
                 {!p.esDieta && p.tipoAlimento === 'HUMEDO' && <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-200"><Soup className="w-3 h-3" /> Húmedo</span>}
