@@ -111,7 +111,11 @@ export default function DashboardHome() {
   const availableAnimals = animalsTodos.filter(a => a.status === 'EN_ADOPCION').length;
   const myAnimals        = animalsTodos.filter(a => String(a.volunteerId) === String(currentUser?.id));
   const otherAnimals     = animalsTodos.filter(a => String(a.volunteerId) !== String(currentUser?.id));
-  const lowStock         = products.filter(p => p.stockDisponible <= 5);
+  const avisos = products.filter(p =>
+    p.stockDisponible === 0 ||
+    (p.stockMinimo > 0 && p.stockDisponible <= p.stockMinimo) ||
+    p.caducado
+  );
 
   const getNombreResponsable = (volunteerId: string | undefined): string | undefined => {
     if (!volunteerId) return undefined;
@@ -170,16 +174,25 @@ export default function DashboardHome() {
         />
       </div>
 
-      {canAccess('ENCARGADO') && lowStock.length > 0 && (
+      {canAccess('ENCARGADO') && avisos.length > 0 && (
         <div className="bg-[#dce8ed] border border-[#b5cdd8] rounded-2xl p-4">
           <div className="flex items-center gap-2 mb-3">
             <AlertTriangle className="w-5 h-5" style={{ color: '#547792' }} />
-            <span className="text-sm font-semibold" style={{ color: '#213448' }}>Stock bajo en {lowStock.length} {lowStock.length === 1 ? 'producto' : 'productos'}</span>
+            <span className="text-sm font-semibold" style={{ color: '#213448' }}>Avisos de almacén: {avisos.length} {avisos.length === 1 ? 'producto' : 'productos'}</span>
           </div>
           <div className="flex flex-wrap gap-2">
-            {lowStock.map(p => (
-              <span key={p.id} className="bg-white text-sm px-3 py-1 rounded-full border border-[#b5cdd8]" style={{ color: '#547792' }}>{p.nombre} ({p.stockDisponible} uds)</span>
-            ))}
+            {avisos.map(p => {
+              const agotado = p.stockDisponible === 0;
+              const bajo = !agotado && p.stockMinimo > 0 && p.stockDisponible <= p.stockMinimo;
+              return (
+                <span key={p.id} className="bg-white text-sm px-3 py-1 rounded-full border border-[#b5cdd8]" style={{ color: '#547792' }}>
+                  {p.nombre} ({p.stockDisponible} uds)
+                  {agotado && <span className="text-red-600"> · reponer</span>}
+                  {bajo && <span className="text-amber-600"> · stock bajo</span>}
+                  {p.caducado && <span className="text-red-600"> · caducado</span>}
+                </span>
+              );
+            })}
           </div>
           <Link to="/dashboard/almacen" className="text-sm underline mt-3 block" style={{ color: '#547792' }}>Gestionar almacén →</Link>
         </div>

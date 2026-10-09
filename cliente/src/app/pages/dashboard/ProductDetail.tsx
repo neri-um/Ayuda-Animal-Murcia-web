@@ -30,7 +30,9 @@ export default function ProductDetail() {
 
   const assigned  = product.stockTotal - product.stockDisponible;
   const available = product.stockDisponible;
-  const isLow     = product.stockDisponible === 0;
+  const isAgotado = available === 0;
+  const isLow     = !isAgotado && product.stockMinimo > 0 && available <= product.stockMinimo;
+  const isCaducado = product.caducado;
 
   const activeRequests = requests.filter(
     r => String(r.productId) === String(product.id) && r.status === 'ACEPTADA' && !r.returnConfirmed
@@ -53,9 +55,30 @@ export default function ProductDetail() {
           <div>
             <div className="flex items-center gap-2 flex-wrap mb-1">
               <h1 className="text-gray-900 text-xl" style={{ fontWeight: 700 }}>{product.nombre}</h1>
+              {product.paraPerro && (
+                <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200" title="Perro">🐶</span>
+              )}
+              {product.paraGato && (
+                <span className="text-xs text-pink-600 bg-pink-50 px-2 py-0.5 rounded-full border border-pink-200" title="Gato">🐱</span>
+              )}
+              {isAgotado && (
+                <span className="flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-200">
+                  <AlertTriangle className="w-3 h-3" /> Reponer
+                </span>
+              )}
               {isLow && (
                 <span className="flex items-center gap-1 text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
                   <AlertTriangle className="w-3 h-3" /> Stock bajo
+                </span>
+              )}
+              {isCaducado && (
+                <span className="flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-200" title="Caducado - Gastar con urgencia">
+                  ⚠️ Caducado
+                </span>
+              )}
+              {product.reservadoCer && (
+                <span className="flex items-center gap-1 text-xs text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200" title="Reservado CER">
+                  ❌ CER
                 </span>
               )}
             </div>
@@ -68,6 +91,12 @@ export default function ProductDetail() {
 
         {product.descripcion && (
           <p className="mt-4 text-sm text-gray-600 leading-relaxed">{product.descripcion}</p>
+        )}
+
+        {product.fechaCaducidad && (
+          <p className={`mt-2 text-xs ${isCaducado ? 'text-red-600' : 'text-gray-500'}`}>
+            Caducidad: {product.fechaCaducidad.split('-').reverse().join('/')}{isCaducado ? ' (caducado)' : ''}
+          </p>
         )}
 
         <div className="grid grid-cols-3 gap-3 mt-6">
