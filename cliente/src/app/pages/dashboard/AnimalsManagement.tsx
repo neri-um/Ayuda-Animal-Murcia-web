@@ -213,14 +213,14 @@ function AnimalCard({ animal, responsable, statusOptions, onStatusChange, onDele
         </div>
       </div>
 
-      <div className="flex items-center gap-2 mt-3">
+      <div className="flex flex-wrap items-center gap-2 mt-3">
         <Link to={`/dashboard/animales/${animal.id}`}
           className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap border border-gray-200 text-gray-600 hover:bg-gray-50"
         >
           <Eye className="w-3.5 h-3.5" /> Ficha
         </Link>
         <Link to={`/dashboard/animales/${animal.id}/appointments`}
-          className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap"
+          className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap"
           style={{ backgroundColor: '#dce8ed', color: '#213448' }}
           onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#547792'; e.currentTarget.style.color = '#fff'; }}
           onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#dce8ed'; e.currentTarget.style.color = '#213448'; }}
@@ -344,13 +344,10 @@ export default function AnimalsManagement() {
           <h1 className="text-gray-900">Gestión de animales</h1>
           <p className="text-gray-500 text-sm mt-1">{animalsTodos.length} animales en total</p>
         </div>
-        <div className="flex flex-col items-stretch sm:items-end gap-2 self-start sm:self-auto">
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
           {(esAdmin || esVoluntario || esEncargado) && (
             <Link to="/dashboard/animales/nuevo"
-              className="inline-flex items-center justify-center gap-2 text-white px-4 py-2 rounded-xl transition-colors text-sm"
-              style={{ backgroundColor: '#547792' }}
-              onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#3d6180')}
-              onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#547792')}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl transition-colors text-sm border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
             >
               <Plus className="w-4 h-4" /> Añadir animal
             </Link>
