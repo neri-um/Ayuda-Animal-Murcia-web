@@ -305,10 +305,7 @@ export default function Warehouse() {
           ) : (
             <button
               onClick={() => { setRequestModal(p); setReqForm({ quantity: 1, reason: '' }); }}
-              className="mt-auto flex items-center justify-center gap-2 text-white px-4 py-2 rounded-xl text-sm transition-colors w-full"
-              style={{ backgroundColor: '#547792' }}
-              onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#3d6180')}
-              onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#547792')}
+              className="mt-auto flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm transition-colors w-full border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
             >
               <Send className="w-4 h-4" />
               Solicitar
