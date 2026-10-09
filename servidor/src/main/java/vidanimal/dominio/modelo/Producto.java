@@ -41,6 +41,18 @@ public class Producto {
 	@Column(name = "reservado_cer", nullable = false, columnDefinition = "boolean default false")
 	private boolean reservadoCer;
 
+	/** Solo para ALIMENTACION: SECO (sólido) o HUMEDO. */
+	@Column(name = "tipo_alimento")
+	private String tipoAlimento;
+
+	/** Solo para ALIMENTACION: ADULTO o CACHORRO (para gatos se muestra como Kitten). */
+	@Column(name = "etapa_alimento")
+	private String etapaAlimento;
+
+	/** Solo para ALIMENTACION: alimento de dieta (gastrointestinal, etc.). */
+	@Column(name = "es_dieta", nullable = false, columnDefinition = "boolean default false")
+	private boolean esDieta;
+
 	public Producto() {
 	}
 
@@ -119,6 +131,18 @@ public class Producto {
 	@JsonProperty("reservadoCer")
 	public boolean isReservadoCer() { return reservadoCer; }
 	public void setReservadoCer(boolean reservadoCer) { this.reservadoCer = reservadoCer; }
+
+	@JsonProperty("tipoAlimento")
+	public String getTipoAlimento() { return tipoAlimento; }
+	public void setTipoAlimento(String tipoAlimento) { this.tipoAlimento = tipoAlimento; }
+
+	@JsonProperty("etapaAlimento")
+	public String getEtapaAlimento() { return etapaAlimento; }
+	public void setEtapaAlimento(String etapaAlimento) { this.etapaAlimento = etapaAlimento; }
+
+	@JsonProperty("esDieta")
+	public boolean isEsDieta() { return esDieta; }
+	public void setEsDieta(boolean esDieta) { this.esDieta = esDieta; }
 
 	@JsonProperty("caducado")
 	public boolean isCaducado() {

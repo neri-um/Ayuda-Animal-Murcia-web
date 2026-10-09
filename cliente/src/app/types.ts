@@ -105,6 +105,9 @@ export interface Product {
   fechaCaducidad?: string;
   reservadoCer: boolean;
   caducado: boolean;
+  tipoAlimento?: string;
+  etapaAlimento?: string;
+  esDieta: boolean;
 }
 
 export interface ProductRequest {

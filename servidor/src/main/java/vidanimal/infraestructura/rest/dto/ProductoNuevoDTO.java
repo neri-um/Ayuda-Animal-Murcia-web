@@ -24,6 +24,9 @@ public class ProductoNuevoDTO {
     private Integer stockMinimo;
     private String fechaCaducidad;
     private boolean reservadoCer;
+    private String tipoAlimento;
+    private String etapaAlimento;
+    private boolean esDieta;
 
     public Producto toDominio() {
         int cantidad = stock != null ? stock : 0;
@@ -40,7 +43,15 @@ public class ProductoNuevoDTO {
             p.setFechaCaducidad(LocalDate.parse(fechaCaducidad));
         }
         p.setReservadoCer(reservadoCer);
+        p.setTipoAlimento(normalizarOpcion(tipoAlimento));
+        p.setEtapaAlimento(normalizarOpcion(etapaAlimento));
+        p.setEsDieta(esDieta);
         return p;
+    }
+
+    private String normalizarOpcion(String valor) {
+        if (valor == null || valor.isBlank()) return null;
+        return valor.trim().toUpperCase();
     }
 
     private CategoriaProducto parseCategoria(String categoria) {
@@ -77,4 +88,13 @@ public class ProductoNuevoDTO {
 
     public boolean isReservadoCer() { return reservadoCer; }
     public void setReservadoCer(boolean reservadoCer) { this.reservadoCer = reservadoCer; }
+
+    public String getTipoAlimento() { return tipoAlimento; }
+    public void setTipoAlimento(String tipoAlimento) { this.tipoAlimento = tipoAlimento; }
+
+    public String getEtapaAlimento() { return etapaAlimento; }
+    public void setEtapaAlimento(String etapaAlimento) { this.etapaAlimento = etapaAlimento; }
+
+    public boolean isEsDieta() { return esDieta; }
+    public void setEsDieta(boolean esDieta) { this.esDieta = esDieta; }
 }

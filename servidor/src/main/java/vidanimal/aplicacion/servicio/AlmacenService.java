@@ -55,12 +55,14 @@ public class AlmacenService implements AlmacenUseCase {
         if (datosNuevos.getNombre() != null) producto.setNombre(datosNuevos.getNombre());
         if (datosNuevos.getDescripcion() != null) producto.setDescripcion(datosNuevos.getDescripcion());
         if (datosNuevos.getCategoria() != null) producto.setCategoria(datosNuevos.getCategoria());
-        
         producto.setParaPerro(datosNuevos.isParaPerro());
         producto.setParaGato(datosNuevos.isParaGato());
         producto.setStockMinimo(datosNuevos.getStockMinimo());
-        if (datosNuevos.getFechaCaducidad() != null) producto.setFechaCaducidad(datosNuevos.getFechaCaducidad());
+        producto.setFechaCaducidad(datosNuevos.getFechaCaducidad());
         producto.setReservadoCer(datosNuevos.isReservadoCer());
+        producto.setTipoAlimento(datosNuevos.getTipoAlimento());
+        producto.setEtapaAlimento(datosNuevos.getEtapaAlimento());
+        producto.setEsDieta(datosNuevos.isEsDieta());
 
         int diferencia = datosNuevos.getStockTotal() - producto.getStockTotal();
         producto.setStockTotal(datosNuevos.getStockTotal());

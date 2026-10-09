@@ -35,9 +35,13 @@ export default function Warehouse() {
     stockMinimo: number;
     fechaCaducidad: string;
     reservadoCer: boolean;
+    tipoAlimento: string;
+    etapaAlimento: string;
+    esDieta: boolean;
   }>({
     nombre: '', categoria: '', stock: 0, descripcion: '',
     paraPerro: false, paraGato: false, stockMinimo: 0, fechaCaducidad: '', reservadoCer: false,
+    tipoAlimento: '', etapaAlimento: '', esDieta: false,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -85,6 +89,9 @@ export default function Warehouse() {
       stockMinimo: p.stockMinimo,
       fechaCaducidad: p.fechaCaducidad ?? '',
       reservadoCer: p.reservadoCer,
+      tipoAlimento: p.tipoAlimento ?? '',
+      etapaAlimento: p.etapaAlimento ?? '',
+      esDieta: p.esDieta,
     });
     setError(null);
     setShowForm(true);
@@ -102,6 +109,9 @@ export default function Warehouse() {
       stockMinimo: 0,
       fechaCaducidad: '',
       reservadoCer: false,
+      tipoAlimento: '',
+      etapaAlimento: '',
+      esDieta: false,
     });
     setError(null);
     setShowForm(true);
@@ -122,6 +132,9 @@ export default function Warehouse() {
         stockMinimo: productForm.stockMinimo,
         fechaCaducidad: productForm.fechaCaducidad || null,
         reservadoCer: productForm.reservadoCer,
+        tipoAlimento: productForm.categoria === 'ALIMENTACION' ? (productForm.tipoAlimento || null) : null,
+        etapaAlimento: productForm.categoria === 'ALIMENTACION' ? (productForm.etapaAlimento || null) : null,
+        esDieta: productForm.categoria === 'ALIMENTACION' ? productForm.esDieta : false,
       };
       if (editId) {
         await updateProduct(editId, payload);
@@ -311,6 +324,65 @@ export default function Warehouse() {
     </div>
   );
 
+  const etapaLabel = (etapa: 'ADULTO' | 'CACHORRO', esGato: boolean) =>
+    etapa === 'ADULTO' ? 'Adultos' : (esGato ? 'Kitten' : 'Cachorros');
+
+  const subHeader = (label: string, count: number) => (
+    <p className="text-xs uppercase tracking-wide text-gray-400 mb-2 mt-1">
+      {label} <span className="text-gray-300">({count})</span>
+    </p>
+  );
+
+  const renderEtapas = (items: Product[], esGato: boolean) => {
+    const adulto = items.filter(p => p.etapaAlimento === 'ADULTO');
+    const cachorro = items.filter(p => p.etapaAlimento === 'CACHORRO');
+    const sin = items.filter(p => p.etapaAlimento !== 'ADULTO' && p.etapaAlimento !== 'CACHORRO');
+    return (
+      <>
+        {adulto.length > 0 && (<>{subHeader(etapaLabel('ADULTO', esGato), adulto.length)}<div className={gridClass}>{adulto.map(renderCard)}</div></>)}
+        {cachorro.length > 0 && (<>{subHeader(etapaLabel('CACHORRO', esGato), cachorro.length)}<div className={gridClass}>{cachorro.map(renderCard)}</div></>)}
+        {sin.length > 0 && (<div className={gridClass}>{sin.map(renderCard)}</div>)}
+      </>
+    );
+  };
+
+  const renderSubGrupo = (icon: string, label: string, items: Product[], esGato: boolean) => {
+    if (items.length === 0) return null;
+    return (
+      <div>
+        <div className="flex items-center gap-2 mb-2">
+          <span role="img">{icon}</span>
+          <h3 className="text-gray-700" style={{ fontWeight: 600 }}>{label}</h3>
+          <span className="text-xs text-gray-400">({items.length})</span>
+        </div>
+        {renderEtapas(items, esGato)}
+      </div>
+    );
+  };
+
+  const renderSpecies = (emoji: string, label: string, color: string, items: Product[], esGato: boolean) => {
+    if (items.length === 0) return null;
+    const dietas = items.filter(p => p.esDieta);
+    const resto = items.filter(p => !p.esDieta);
+    const seco = resto.filter(p => p.tipoAlimento === 'SECO');
+    const humedo = resto.filter(p => p.tipoAlimento === 'HUMEDO');
+    const otros = resto.filter(p => p.tipoAlimento !== 'SECO' && p.tipoAlimento !== 'HUMEDO');
+    return (
+      <section className="space-y-6">
+        {sectionHeader(emoji, label, items.length, color)}
+        {renderSubGrupo('🦴', 'Sólido', seco, esGato)}
+        {renderSubGrupo('🍲', 'Húmedo', humedo, esGato)}
+        {renderSubGrupo('💊', 'Dietas', dietas, esGato)}
+        {otros.length > 0 && (
+          <div>
+            {subHeader('Sin clasificar', otros.length)}
+            <div className={gridClass}>{otros.map(renderCard)}</div>
+          </div>
+        )}
+      </section>
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -394,19 +466,9 @@ export default function Warehouse() {
       </div>
 
       {groupFilter === 'CONSUMIBLE' ? (
-        <div className="space-y-8">
-          {showPerro && perroList.length > 0 && (
-            <section>
-              {sectionHeader('🐶', 'Perro', perroList.length, '#547792')}
-              <div className={gridClass}>{perroList.map(renderCard)}</div>
-            </section>
-          )}
-          {showGato && gatoList.length > 0 && (
-            <section>
-              {sectionHeader('🐱', 'Gato', gatoList.length, '#d6336c')}
-              <div className={gridClass}>{gatoList.map(renderCard)}</div>
-            </section>
-          )}
+        <div className="space-y-10">
+          {showPerro && renderSpecies('🐶', 'Perro', '#547792', perroList, false)}
+          {showGato && renderSpecies('🐱', 'Gato', '#d6336c', gatoList, true)}
           {speciesFilter === 'ALL' && sinEspecieList.length > 0 && (
             <section>
               {sectionHeader('🐾', 'Sin clasificar', sinEspecieList.length, '#9CA3AF')}
@@ -452,18 +514,63 @@ export default function Warehouse() {
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={productForm.paraPerro} onChange={e => setProductForm(f => ({ ...f, paraPerro: e.target.checked }))} /> Perro</label>
-                <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={productForm.paraGato} onChange={e => setProductForm(f => ({ ...f, paraGato: e.target.checked }))} /> Gato</label>
+                <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={productForm.paraPerro} onChange={e => setProductForm(f => ({ ...f, paraPerro: e.target.checked }))} /> 🐶 Perro</label>
+                <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={productForm.paraGato} onChange={e => setProductForm(f => ({ ...f, paraGato: e.target.checked }))} /> 🐱 Gato</label>
               </div>
+
+              {productForm.categoria === 'ALIMENTACION' && (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm text-gray-700 mb-1">Tipo</label>
+                      <select
+                        value={productForm.tipoAlimento}
+                        onChange={e => setProductForm(f => ({ ...f, tipoAlimento: e.target.value }))}
+                        className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none"
+                        onFocus={e => (e.currentTarget.style.borderColor = '#547792')}
+                        onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                      >
+                        <option value="">Sin especificar</option>
+                        <option value="SECO">Sólido</option>
+                        <option value="HUMEDO">Húmedo</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-700 mb-1">Etapa</label>
+                      <select
+                        value={productForm.etapaAlimento}
+                        onChange={e => setProductForm(f => ({ ...f, etapaAlimento: e.target.value }))}
+                        className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none"
+                        onFocus={e => (e.currentTarget.style.borderColor = '#547792')}
+                        onBlur={e => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                      >
+                        <option value="">Sin especificar</option>
+                        <option value="ADULTO">Adulto</option>
+                        <option value="CACHORRO">Cachorro / Kitten</option>
+                      </select>
+                    </div>
+                  </div>
+                  <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={productForm.esDieta} onChange={e => setProductForm(f => ({ ...f, esDieta: e.target.checked }))} /> Dieta (gastrointestinal, etc.)</label>
+                </>
+              )}
+
               <div>
-                <label className="block text-sm text-gray-700 mb-1">Stock mínimo (0 = no avisar)</label>
-                <input type="number" min={0} value={productForm.stockMinimo} onChange={e => setProductForm(f => ({ ...f, stockMinimo: Number(e.target.value) }))} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none" />
+                <label className="flex items-center gap-2 text-sm">
+                  <input type="checkbox" checked={productForm.stockMinimo > 0} onChange={e => setProductForm(f => ({ ...f, stockMinimo: e.target.checked ? 2 : 0 }))} />
+                  Avisar cuando queden pocas unidades
+                </label>
+                {productForm.stockMinimo > 0 && (
+                  <div className="mt-2">
+                    <label className="block text-sm text-gray-700 mb-1">Avisar al llegar a (unidades)</label>
+                    <input type="number" min={1} value={productForm.stockMinimo} onChange={e => setProductForm(f => ({ ...f, stockMinimo: Math.max(0, Number(e.target.value)) }))} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none" />
+                  </div>
+                )}
               </div>
               <div>
                 <label className="block text-sm text-gray-700 mb-1">Fecha caducidad (opcional)</label>
                 <input type="date" value={productForm.fechaCaducidad} onChange={e => setProductForm(f => ({ ...f, fechaCaducidad: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none" />
               </div>
-              <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={productForm.reservadoCer} onChange={e => setProductForm(f => ({ ...f, reservadoCer: e.target.checked }))} /> Reservado CER</label>
+              <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={productForm.reservadoCer} onChange={e => setProductForm(f => ({ ...f, reservadoCer: e.target.checked }))} /> ❌ Reservado CER</label>
 
               <div>
                 <label className="block text-sm text-gray-700 mb-1">Descripción</label>
