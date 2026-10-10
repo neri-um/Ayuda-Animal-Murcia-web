@@ -19,6 +19,7 @@ servidor/target/
 
 # Archivos temporales
 .~lock.*
+__pycache__/
 
 # Análisis temporal (informes de tsc/scan generados en el cliente)
 cliente/*.txt
