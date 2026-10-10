@@ -77,7 +77,7 @@ export default function ProductDetail() {
                 </span>
               )}
               {product.reservadoCer && (
-                <span className="inline-flex items-center gap-1 text-xs text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200" title="Reservado CER">
+                <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border" style={{ color: '#E7A84E', borderColor: '#E7A84E', backgroundColor: '#E7A84E14' }} title="Reservado CER">
                   <Ban className="w-3 h-3" /> CER
                 </span>
               )}
